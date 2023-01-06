@@ -110,7 +110,6 @@ func MoveQueen(board [][]int, row int) bool {
 		}
 		for i := 0; i < cols; i++ {
 			if !Attacked(board, row, i) {
-				// fmt.Println(fmt.Sprintf("Queen: %d Moves: %d", row, i))
 				board[row][i] = 1
 				if MoveQueen(board, row+1) {
 					ok = true
@@ -127,8 +126,9 @@ func MoveQueen(board [][]int, row int) bool {
 func NQueens(n int) {
 	board := MakeBoard(n)
 	if MoveQueen(board, 0) {
+		fmt.Println(fmt.Sprintf("Solved n queens problem for n = %d", n))
 		PrintBoard(board)
 	} else {
-		fmt.Println("Not Solved ...")
+		fmt.Println(fmt.Sprintf("Unable to solve n queens problem for n = %d", n))
 	}
 }
