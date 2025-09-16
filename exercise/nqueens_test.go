@@ -3,6 +3,7 @@ package exercise
 import (
 	"bytes"
 	"fmt"
+	"testing"
 	"time"
 )
 
@@ -137,5 +138,11 @@ func NQueens(n int) {
 	} else {
 		print(fmt.Sprintf("Unable to solve n queens problem for n = %d", n))
 		print("\n")
+	}
+}
+
+func TestNQueens(t *testing.T) {
+	for i := 1; i <= 32; i++ {
+		NQueens(i)
 	}
 }
