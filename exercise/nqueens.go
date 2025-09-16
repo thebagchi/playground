@@ -3,6 +3,7 @@ package exercise
 import (
 	"bytes"
 	"fmt"
+	"time"
 )
 
 func MakeBoard(n int) [][]int {
@@ -124,11 +125,17 @@ func MoveQueen(board [][]int, row int) bool {
 }
 
 func NQueens(n int) {
+	start := time.Now()
+	defer func() {
+		fmt.Println("Execution Time:", time.Since(start))
+	}()
 	board := MakeBoard(n)
 	if MoveQueen(board, 0) {
-		fmt.Println(fmt.Sprintf("Solved n queens problem for n = %d", n))
+		print(fmt.Sprintf("Solved n queens problem for n = %d", n))
+		print("\n")
 		PrintBoard(board)
 	} else {
-		fmt.Println(fmt.Sprintf("Unable to solve n queens problem for n = %d", n))
+		print(fmt.Sprintf("Unable to solve n queens problem for n = %d", n))
+		print("\n")
 	}
 }
