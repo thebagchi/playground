@@ -36,7 +36,11 @@ func BinarySearch(items []int, elem int) int {
 			}
 		}
 		if elem < items[mid] {
-			if items[start] <= items[mid] {
+			if items[end] >= items[mid] {
+				// Right half is sorted, but elem < items[mid]
+				// So elem must be in left half
+				end = mid - 1
+			} else {
 				// Left half is sorted
 				// Check if elem is in the sorted left half
 				if elem >= items[start] {
@@ -46,10 +50,6 @@ func BinarySearch(items []int, elem int) int {
 					// elem is in right half
 					start = mid + 1
 				}
-			} else {
-				// Right half is sorted, but elem < items[mid]
-				// So elem must be in left half
-				end = mid - 1
 			}
 		}
 	}
