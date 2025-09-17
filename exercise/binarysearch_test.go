@@ -5,6 +5,55 @@ import (
 	"testing"
 )
 
+func RecurrsiveBinarySearch(items []int, elem int) int {
+	var (
+		start = 0
+		end   = len(items) - 1
+		mid   = (start + end) / 2
+		tmp   []int
+	)
+	for {
+		if items[mid] == elem {
+			return mid
+		}
+		if elem > items[mid] {
+			if items[start] <= items[mid] {
+				mid = mid + 1
+				tmp = items[mid:]
+			} else {
+				if elem <= items[mid] {
+					mid = mid + 1
+					tmp = items[mid:]
+				} else {
+					tmp = items[:mid]
+					mid = 0
+				}
+			}
+			break
+		}
+		if elem < items[mid] {
+			if items[end] >= items[mid] {
+				tmp = items[:mid]
+				mid = 0
+			} else {
+				if elem >= items[mid] {
+					tmp = items[:mid]
+					mid = 0
+				} else {
+					mid = mid + 1
+					tmp = items[mid:]
+				}
+			}
+			break
+		}
+	}
+	pos := RecurrsiveBinarySearch(tmp, elem)
+	if pos != -1 {
+		pos = mid + pos
+	}
+	return pos
+}
+
 func BinarySearch(items []int, elem int) int {
 	var (
 		start = 0
@@ -57,6 +106,15 @@ func BinarySearch(items []int, elem int) int {
 }
 
 func TestBinarySearch(t *testing.T) {
+	items := []int{7, 8, 9, 0, 1, 2, 3, 4, 5, 6}
+	for i := range 10 {
+		fmt.Println("searching:", i)
+		pos := BinarySearch(items, i)
+		fmt.Println("found at:", pos)
+	}
+}
+
+func TestRecurrsiveBinarySearch(t *testing.T) {
 	items := []int{7, 8, 9, 0, 1, 2, 3, 4, 5, 6}
 	for i := range 10 {
 		fmt.Println("searching:", i)
