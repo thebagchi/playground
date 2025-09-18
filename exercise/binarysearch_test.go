@@ -136,7 +136,11 @@ func TestBinarySearch(t *testing.T) {
 	for i := range 10 {
 		fmt.Println("searching:", i)
 		pos := BinarySearch(items, i)
-		fmt.Println("found at:", pos)
+		if items[pos] == i {
+			fmt.Println("found at:", pos)
+		} else {
+			fmt.Println("found: ", items[pos], "expected: ", i, "at: ", pos)
+		}
 	}
 }
 
