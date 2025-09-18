@@ -36,5 +36,5 @@ func BinarySearchSmallest(items []int) int {
 func TestBinarySearchSmallest(t *testing.T) {
 	items := []int{7, 8, 9, 0, 1, 2, 3, 4, 5, 6}
 	pos := BinarySearchSmallest(items)
-	fmt.Println("smallest found at:", pos)
+	fmt.Println("smallest found at:", pos, "value: ", items[pos])
 }
