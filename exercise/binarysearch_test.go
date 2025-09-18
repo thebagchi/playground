@@ -16,33 +16,59 @@ func RecurrsiveBinarySearch(items []int, elem int) int {
 		if items[mid] == elem {
 			return mid
 		}
+		//if elem > items[mid] {
+		//	if items[start] <= items[mid] {
+		//		mid = mid + 1
+		//		tmp = items[mid:]
+		//	} else {
+		//		if elem <= items[end] {
+		//			mid = mid + 1
+		//			tmp = items[mid:]
+		//		} else {
+		//			tmp = items[:mid]
+		//			mid = 0
+		//		}
+		//	}
+		//	break
+		//}
 		if elem > items[mid] {
-			if items[start] <= items[mid] {
-				mid = mid + 1
-				tmp = items[mid:]
-			} else {
-				if elem <= items[mid] {
-					mid = mid + 1
-					tmp = items[mid:]
-				} else {
-					tmp = items[:mid]
-					mid = 0
-				}
-			}
-			break
-		}
-		if elem < items[mid] {
-			if items[end] >= items[mid] {
+			if items[start] > items[mid] && elem > items[end] {
+				// value at start > value at mid
+				// and elem is greater than value at mid
+				// and elem is greater than value at end
 				tmp = items[:mid]
 				mid = 0
 			} else {
-				if elem >= items[mid] {
-					tmp = items[:mid]
-					mid = 0
-				} else {
-					mid = mid + 1
-					tmp = items[mid:]
-				}
+				mid = mid + 1
+				tmp = items[mid:]
+			}
+			break
+		}
+		//if elem < items[mid] {
+		//	if items[end] >= items[mid] {
+		//		tmp = items[:mid]
+		//		mid = 0
+		//	} else {
+		//		if elem >= items[start] {
+		//			tmp = items[:mid]
+		//			mid = 0
+		//		} else {
+		//			mid = mid + 1
+		//			tmp = items[mid:]
+		//		}
+		//	}
+		//	break
+		//}
+		if elem < items[mid] {
+			if items[end] < items[mid] && elem < items[start] {
+				// value at end < value at mid
+				// and elem is less than value at mid
+				// and elem is less than value at start
+				mid = mid + 1
+				tmp = items[mid:]
+			} else {
+				tmp = items[:mid]
+				mid = 0
 			}
 			break
 		}
@@ -119,6 +145,10 @@ func TestRecurrsiveBinarySearch(t *testing.T) {
 	for i := range 10 {
 		fmt.Println("searching:", i)
 		pos := BinarySearch(items, i)
-		fmt.Println("found at:", pos)
+		if items[pos] == i {
+			fmt.Println("found at:", pos)
+		} else {
+			fmt.Println("found: ", items[pos], "expected: ", i, "at: ", pos)
+		}
 	}
 }
