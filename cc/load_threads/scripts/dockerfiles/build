@@ -1,0 +1,18 @@
+FROM docker.io/rockylinux/rockylinux:8
+
+RUN dnf update -y                                   \
+    && dnf install -y dnf-utils                     \
+    && dnf config-manager --set-enabled powertools  \
+    && dnf install -y gcc-c++ gcc make cmake        \
+    && dnf install -y libstdc++ libgcc glibc-devel  \
+    && dnf install -y libstdc++-static glibc-static \
+    && dnf clean all
+
+WORKDIR /build
+
+COPY load_threads_v1.cc .
+
+RUN g++ -std=c++17                    \
+    -static-libstdc++ -static-libgcc  \ 
+    -O3 load_threads_v1.cc -pthread   \
+    -o load_threads.bin

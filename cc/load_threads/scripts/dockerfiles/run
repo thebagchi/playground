@@ -1,0 +1,6 @@
+FROM docker.io/rockylinux/rockylinux:8-minimal
+RUN microdnf update -y    \
+    && microdnf clean all
+WORKDIR /bin
+COPY load_threads.bin .
+CMD [ "./load_threads.bin" ]
