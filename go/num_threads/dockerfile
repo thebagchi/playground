@@ -1,0 +1,17 @@
+FROM docker.io/library/alpine:latest
+
+RUN apk add --no-cache curl tar build-base
+
+RUN curl -fsSL https://dl.google.com/go/go1.25.0.linux-amd64.tar.gz -o /go1.25.0.linux-amd64.tar.gz \
+    &&  tar -C /usr/local -xzf /go1.25.0.linux-amd64.tar.gz                                         \
+    && rm /go1.25.0.linux-amd64.tar.gz
+
+ENV PATH=$PATH:/usr/local/go/bin
+
+WORKDIR /app
+
+COPY main.go .
+
+RUN go build -o main.bin main.go
+
+CMD ["./main.bin"]
