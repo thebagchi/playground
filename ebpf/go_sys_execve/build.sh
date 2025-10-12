@@ -40,5 +40,5 @@ echo "Compiling eBPF program..."
 clang -O2 -target bpf -g -c bpf.c -I . -o bpf.o
 
 # Compile Go application
-echo "Compiling go application..."
+echo "Compiling Go application..."
 go build -o main.bin main.go
