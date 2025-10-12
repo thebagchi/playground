@@ -9,6 +9,14 @@
 *.dylib
 *.o
 
+# Virtual environments
+venv/
+**/venv/
+
+# Python cache 
+__pycache__/
+**/__pycache__/
+
 # Build directories
 build/
 **/build/
