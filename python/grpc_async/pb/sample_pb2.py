@@ -24,17 +24,17 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0csample.proto\x12\x06sample\"\x1c\n\x0cHelloRequest\x12\x0c\n\x04name\x18\x01 \x01(\t\" \n\rHelloResponse\x12\x0f\n\x07message\x18\x01 \x01(\t2B\n\x07Greeter\x12\x37\n\x08SayHello\x12\x14.sample.HelloRequest\x1a\x15.sample.HelloResponseb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0csample.proto\x12\x06sample\"\x17\n\x07Request\x12\x0c\n\x04\x64\x61ta\x18\x01 \x01(\t\"\x1a\n\x08Response\x12\x0e\n\x06result\x18\x01 \x01(\t2\xe3\x01\n\x07Greeter\x12*\n\x05Greet\x12\x0f.sample.Request\x1a\x10.sample.Response\x12;\n\x14GreetClientStreaming\x12\x0f.sample.Request\x1a\x10.sample.Response(\x01\x12;\n\x14GreetServerStreaming\x12\x0f.sample.Request\x1a\x10.sample.Response0\x01\x12\x32\n\tGreetBidi\x12\x0f.sample.Request\x1a\x10.sample.Response(\x01\x30\x01\x62\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'sample_pb2', _globals)
 if not _descriptor._USE_C_DESCRIPTORS:
   DESCRIPTOR._loaded_options = None
-  _globals['_HELLOREQUEST']._serialized_start=24
-  _globals['_HELLOREQUEST']._serialized_end=52
-  _globals['_HELLORESPONSE']._serialized_start=54
-  _globals['_HELLORESPONSE']._serialized_end=86
-  _globals['_GREETER']._serialized_start=88
-  _globals['_GREETER']._serialized_end=154
+  _globals['_REQUEST']._serialized_start=24
+  _globals['_REQUEST']._serialized_end=47
+  _globals['_RESPONSE']._serialized_start=49
+  _globals['_RESPONSE']._serialized_end=75
+  _globals['_GREETER']._serialized_start=78
+  _globals['_GREETER']._serialized_end=305
 # @@protoc_insertion_point(module_scope)

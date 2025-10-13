@@ -2,14 +2,18 @@ syntax = "proto3";
 
 package sample;
 
-message HelloRequest {
-  string name = 1;
+message Request {
+  string data = 1;
 }
 
-message HelloResponse {
-  string message = 1;
+message Response {
+  string result = 1;
 }
 
 service Greeter {
-  rpc SayHello (HelloRequest) returns (HelloResponse);
+  rpc Greet (Request) returns (Response);
+  rpc GreetClientStreaming (stream Request) returns (Response);
+  rpc GreetServerStreaming (Request) returns (stream Response);
+  rpc GreetBidi (stream Request) returns (stream Response);
 }
+

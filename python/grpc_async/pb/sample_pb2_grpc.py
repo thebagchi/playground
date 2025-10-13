@@ -34,17 +34,50 @@ class GreeterStub(object):
         Args:
             channel: A grpc.Channel.
         """
-        self.SayHello = channel.unary_unary(
-                '/sample.Greeter/SayHello',
-                request_serializer=sample__pb2.HelloRequest.SerializeToString,
-                response_deserializer=sample__pb2.HelloResponse.FromString,
+        self.Greet = channel.unary_unary(
+                '/sample.Greeter/Greet',
+                request_serializer=sample__pb2.Request.SerializeToString,
+                response_deserializer=sample__pb2.Response.FromString,
+                _registered_method=True)
+        self.GreetClientStreaming = channel.stream_unary(
+                '/sample.Greeter/GreetClientStreaming',
+                request_serializer=sample__pb2.Request.SerializeToString,
+                response_deserializer=sample__pb2.Response.FromString,
+                _registered_method=True)
+        self.GreetServerStreaming = channel.unary_stream(
+                '/sample.Greeter/GreetServerStreaming',
+                request_serializer=sample__pb2.Request.SerializeToString,
+                response_deserializer=sample__pb2.Response.FromString,
+                _registered_method=True)
+        self.GreetBidi = channel.stream_stream(
+                '/sample.Greeter/GreetBidi',
+                request_serializer=sample__pb2.Request.SerializeToString,
+                response_deserializer=sample__pb2.Response.FromString,
                 _registered_method=True)
 
 
 class GreeterServicer(object):
     """Missing associated documentation comment in .proto file."""
 
-    def SayHello(self, request, context):
+    def Greet(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GreetClientStreaming(self, request_iterator, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GreetServerStreaming(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GreetBidi(self, request_iterator, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -53,10 +86,25 @@ class GreeterServicer(object):
 
 def add_GreeterServicer_to_server(servicer, server):
     rpc_method_handlers = {
-            'SayHello': grpc.unary_unary_rpc_method_handler(
-                    servicer.SayHello,
-                    request_deserializer=sample__pb2.HelloRequest.FromString,
-                    response_serializer=sample__pb2.HelloResponse.SerializeToString,
+            'Greet': grpc.unary_unary_rpc_method_handler(
+                    servicer.Greet,
+                    request_deserializer=sample__pb2.Request.FromString,
+                    response_serializer=sample__pb2.Response.SerializeToString,
+            ),
+            'GreetClientStreaming': grpc.stream_unary_rpc_method_handler(
+                    servicer.GreetClientStreaming,
+                    request_deserializer=sample__pb2.Request.FromString,
+                    response_serializer=sample__pb2.Response.SerializeToString,
+            ),
+            'GreetServerStreaming': grpc.unary_stream_rpc_method_handler(
+                    servicer.GreetServerStreaming,
+                    request_deserializer=sample__pb2.Request.FromString,
+                    response_serializer=sample__pb2.Response.SerializeToString,
+            ),
+            'GreetBidi': grpc.stream_stream_rpc_method_handler(
+                    servicer.GreetBidi,
+                    request_deserializer=sample__pb2.Request.FromString,
+                    response_serializer=sample__pb2.Response.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -70,7 +118,7 @@ class Greeter(object):
     """Missing associated documentation comment in .proto file."""
 
     @staticmethod
-    def SayHello(request,
+    def Greet(request,
             target,
             options=(),
             channel_credentials=None,
@@ -83,9 +131,90 @@ class Greeter(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/sample.Greeter/SayHello',
-            sample__pb2.HelloRequest.SerializeToString,
-            sample__pb2.HelloResponse.FromString,
+            '/sample.Greeter/Greet',
+            sample__pb2.Request.SerializeToString,
+            sample__pb2.Response.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def GreetClientStreaming(request_iterator,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.stream_unary(
+            request_iterator,
+            target,
+            '/sample.Greeter/GreetClientStreaming',
+            sample__pb2.Request.SerializeToString,
+            sample__pb2.Response.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def GreetServerStreaming(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_stream(
+            request,
+            target,
+            '/sample.Greeter/GreetServerStreaming',
+            sample__pb2.Request.SerializeToString,
+            sample__pb2.Response.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def GreetBidi(request_iterator,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.stream_stream(
+            request_iterator,
+            target,
+            '/sample.Greeter/GreetBidi',
+            sample__pb2.Request.SerializeToString,
+            sample__pb2.Response.FromString,
             options,
             channel_credentials,
             insecure,
