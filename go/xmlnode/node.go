@@ -39,8 +39,35 @@ type Node struct {
 	Content    Content
 }
 
+func (n *Node) GetAttribute(key string) string {
+	if n.Attributes != nil {
+		return n.Attributes[key]
+	}
+	return ""
+}
+
+func (n *Node) GetNodes(name string) []*Node {
+	if children, ok := n.Content.(Children); ok {
+		var result []*Node
+		for _, child := range children {
+			if child.Name == name {
+				result = append(result, child)
+			}
+		}
+		return result
+	}
+	return nil
+}
+
+func (n *Node) GetText() string {
+	if text, ok := n.Content.(Text); ok {
+		return string(text)
+	}
+	return ""
+}
+
 // MarshalXML implements the xml.Marshaler interface
-func (n Node) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+func (n *Node) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	// Set the element name
 	start.Name = xml.Name{Local: n.Name}
 

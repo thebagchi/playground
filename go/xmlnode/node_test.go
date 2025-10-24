@@ -20,8 +20,8 @@ var data = []byte(`
 `)
 
 func TestXMLNode(t *testing.T) {
-	var node Node
-	err := xml.Unmarshal(data, &node)
+	node := new(Node)
+	err := xml.Unmarshal(data, node)
 	if err != nil {
 		t.Error("Error: ", err)
 	}
