@@ -26,7 +26,7 @@ func (t Text) isContent() NodeType {
 }
 
 // Children represents a list of child nodes
-type Children []Node
+type Children []*Node
 
 func (c Children) isContent() NodeType {
 	return TypeChildren
@@ -123,7 +123,7 @@ func (n *Node) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 			if err := d.DecodeElement(&child, &t); err != nil {
 				return err
 			}
-			children = append(children, child)
+			children = append(children, &child)
 		case xml.CharData:
 			// Collect character data
 			text += Text(t)
