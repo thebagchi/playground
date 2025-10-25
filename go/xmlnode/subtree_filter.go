@@ -43,19 +43,69 @@ func (n *Node) SubtreeFilter(filter *Node) *Node {
 	if filter.HasText() {
 		if n.GetText() == filter.GetText() {
 			result.SetText(n.GetText())
+			return result
+		} else {
+			return nil
 		}
-		return result
 	}
 	if filter.HasChildren() {
-		// Filter node has children: recursively filter matching children
+		// Collect all filter children and selection criteria (children with text)
+		var filters []*Node
+		var matches []*Node
 		filter.WalkNodes(func(fc *Node) {
-			// Walk all data children and filter those with matching name
-			n.WalkNodes(func(nc *Node) {
-				if filtered := nc.SubtreeFilter(fc); filtered != nil {
-					result.AddChild(filtered)
-				}
-			})
+			filters = append(filters, fc)
+			if fc.HasText() {
+				matches = append(matches, fc)
+			}
 		})
+		if len(matches) > 0 {
+			// Selection mode: check that all selection criteria have matching data children
+			matched := true
+			for _, fc := range matches {
+				found := false
+				n.WalkNodes(func(nc *Node) {
+					if nc.SubtreeFilter(fc) != nil {
+						found = true
+					}
+				})
+				if !found {
+					matched = false
+				}
+			}
+			if matched {
+				if len(matches) == len(filters) {
+					// All filter children have text: include entire content
+					result.Content = n.Content
+				} else {
+					// Mixed: filter content based on filter children
+					for _, fc := range filters {
+						n.WalkNodes(func(nc *Node) {
+							if filtered := nc.SubtreeFilter(fc); filtered != nil {
+								result.AddChild(filtered)
+							}
+						})
+					}
+					if result.Content == nil {
+						return nil
+					}
+				}
+				return result
+			} else {
+				return nil
+			}
+		} else {
+			// Filter mode: recursively filter matching children
+			for _, fc := range filters {
+				n.WalkNodes(func(nc *Node) {
+					if filtered := nc.SubtreeFilter(fc); filtered != nil {
+						result.AddChild(filtered)
+					}
+				})
+			}
+			if result.Content == nil {
+				return nil
+			}
+		}
 	} else {
 		// Filter has no children content (text or nil): select the data
 		result.Content = n.Content
