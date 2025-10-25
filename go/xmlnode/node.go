@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/xml"
 	"errors"
+	"fmt"
 	"strings"
 )
 
@@ -67,6 +68,15 @@ func MakeName(space, local string) string {
 		return space + ":" + local
 	}
 	return local
+}
+
+func (n *Node) GetXMLName() xml.Name {
+	space := n.Attributes["xmlns"]
+	return xml.Name{Space: space, Local: n.Name}
+}
+
+func PrintXMLName(name xml.Name) {
+	fmt.Println(XMLNameString(name))
 }
 
 func (n *Node) GetAttribute(key string) string {
@@ -297,16 +307,18 @@ func (n *Node) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 		return nil
 	}
 	// Set the element name
-	start.Name = MakeXMLName(n.Name)
+	start.Name = xml.Name{Local: n.Name}
+	if xmlns, ok := n.Attributes["xmlns"]; ok {
+		start.Attr = append(start.Attr, xml.Attr{Name: xml.Name{Local: "xmlns"}, Value: xmlns})
+	}
 
 	// Add attributes
 	if n.Attributes != nil {
-		start.Attr = make([]xml.Attr, 0, len(n.Attributes))
 		for key, value := range n.Attributes {
-			start.Attr = append(start.Attr, xml.Attr{
-				Name:  MakeXMLName(key),
-				Value: value,
-			})
+			if key != "xmlns" {
+				attrName := MakeXMLName(key)
+				start.Attr = append(start.Attr, xml.Attr{Name: attrName, Value: value})
+			}
 		}
 	}
 
@@ -342,7 +354,8 @@ func (n *Node) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 
 // UnmarshalXML implements the xml.Unmarshaler interface
 func (n *Node) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
-	n.Name = XMLNameString(start.Name)
+	// PrintXMLName(start.Name)
+	n.Name = start.Name.Local
 	n.Attributes = make(map[string]string)
 
 	// Collect attributes

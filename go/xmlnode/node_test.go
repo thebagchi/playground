@@ -7,13 +7,12 @@ import (
 )
 
 var data = []byte(`
-<root type="main" id="doc1">
+<root xmlns="http://example.com/schema/1.2/config" type="main" id="doc1">
 	<person id="1" role="admin">
 		<address type="home">
 			<street>123 Main St</street>
 			<city>Springfield</city>
 			<empty></empty>
-			<nochildren></nochildren>
 		</address>
 	</person>
 </root>
