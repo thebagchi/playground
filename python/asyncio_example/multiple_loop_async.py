@@ -8,7 +8,7 @@ from typing import Any
 
 async def producer_loop(message_queue: Queue, loop_name: str) -> None:
     print(f"[{loop_name}] Producer starting")
-    for i in range(1, 6):
+    for i in range(1, 11):
         message = f"Message {i} from {loop_name} producer"
         message_queue.put(message)
         print(f"[{loop_name}] Produced: {message}")
