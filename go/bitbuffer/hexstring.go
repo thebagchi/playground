@@ -6,7 +6,7 @@ import (
 )
 
 var hexes [256]byte
-var hexDigits = "0123456789abcdef"
+var hexds = "0123456789abcdef"
 
 func init() {
 	for i := range hexes {
@@ -122,14 +122,14 @@ func EncodeHexString(data []byte) string {
 			l11 = l1 & 0x0F
 		)
 
-		value := uint64(hexDigits[h00]) |
-			uint64(hexDigits[h01])<<0x08 |
-			uint64(hexDigits[l00])<<0x10 |
-			uint64(hexDigits[l01])<<0x18 |
-			uint64(hexDigits[h10])<<0x20 |
-			uint64(hexDigits[h11])<<0x28 |
-			uint64(hexDigits[l10])<<0x30 |
-			uint64(hexDigits[l11])<<0x38
+		value := uint64(hexds[h00]) |
+			uint64(hexds[h01])<<0x08 |
+			uint64(hexds[l00])<<0x10 |
+			uint64(hexds[l01])<<0x18 |
+			uint64(hexds[h10])<<0x20 |
+			uint64(hexds[h11])<<0x28 |
+			uint64(hexds[l10])<<0x30 |
+			uint64(hexds[l11])<<0x38
 
 		*(*uint64)(unsafe.Add(unsafe.Pointer(dst), j)) = value
 
@@ -150,10 +150,10 @@ func EncodeHexString(data []byte) string {
 			l01 = l0 & 0x0F
 		)
 
-		value := uint32(hexDigits[h00]) |
-			uint32(hexDigits[h01])<<0x08 |
-			uint32(hexDigits[l00])<<0x10 |
-			uint32(hexDigits[l01])<<0x18
+		value := uint32(hexds[h00]) |
+			uint32(hexds[h01])<<0x08 |
+			uint32(hexds[l00])<<0x10 |
+			uint32(hexds[l01])<<0x18
 
 		*(*uint32)(unsafe.Add(unsafe.Pointer(dst), j)) = value
 
@@ -169,7 +169,7 @@ func EncodeHexString(data []byte) string {
 			v1 = v & 0x0F
 		)
 
-		value := uint16(hexDigits[v0]) | uint16(hexDigits[v1])<<0x08
+		value := uint16(hexds[v0]) | uint16(hexds[v1])<<0x08
 
 		*(*uint16)(unsafe.Add(unsafe.Pointer(dst), j)) = value
 	}
