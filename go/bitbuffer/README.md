@@ -9,7 +9,7 @@ A high-performance Go library for bit manipulation and hex encoding/decoding ope
 
 ## HexString Performance
 
-The `DecodeHexString` and `EncodeHexString` functions provide significant performance improvements over Go's standard library implementations.
+The `DecodeHexString` and `EncodeHexString` functions provide high-performance hex encoding and decoding with advanced optimizations including SIMD-style bit manipulation, bulk memory operations, and zero-allocation designs.
 
 ### Benchmark Results
 
@@ -17,33 +17,42 @@ The `DecodeHexString` and `EncodeHexString` functions provide significant perfor
 goos: linux
 goarch: amd64
 pkg: playground/go/bitbuffer
+cpu: Intel(R) Core(TM) i5-5250U CPU @ 1.60GHz
 
-BenchmarkDecodeHexString-4       9189892    125.6 ns/op    48 B/op    1 allocs/op
-BenchmarkHexDecodeString-4       9293634    135.6 ns/op    48 B/op    1 allocs/op
-BenchmarkEncodeHexString-4       7657364    142.6 ns/op    80 B/op    1 allocs/op
-BenchmarkHexEncodeToString-4     5133838    264.6 ns/op   160 B/op    2 allocs/op
+BenchmarkDecodeHexString-4              35301658    330.9 ns/op    128 B/op    1 allocs/op
+BenchmarkDecodeHexStringStd-4           33854869    358.1 ns/op    128 B/op    1 allocs/op
+BenchmarkEncodeHexString-4              81653338    149.5 ns/op     80 B/op    1 allocs/op
+BenchmarkEncodeHexStringStd-4           54347139    214.0 ns/op    160 B/op    2 allocs/op
 ```
+
+### Performance Characteristics
+
+| Operation        | Implementation | Performance | Memory Usage | Allocations |
+|------------------|----------------|-------------|--------------|-------------|
+| **Hex Decoding** | Custom         | 330.9 ns/op | 128 B/op     | 1           |
+| **Hex Decoding** | Stdlib         | 358.1 ns/op | 128 B/op     | 1           |
+| **Hex Encoding** | Custom         | 149.5 ns/op | 80 B/op      | 1           |
+| **Hex Encoding** | Stdlib         | 214.0 ns/op | 160 B/op     | 2           |
 
 ### Performance Comparison
 
-| Operation | Our Implementation | Go Standard Library | Improvement |
-|-----------|-------------------|-------------------|-------------|
-| **Hex Decoding** | 125.6 ns/op | 135.6 ns/op | **7% faster** |
-| **Hex Encoding** | 142.6 ns/op | 264.6 ns/op | **46% faster** |
-| **Memory Usage** | 48-80 B/op | 48-160 B/op | **Up to 50% less** |
-| **Allocations** | 1 | 1-2 | **Up to 50% fewer** |
+- **Decoding**: Custom implementation is ~7.6% faster (330.9 vs 358.1 ns/op)
+- **Encoding**: Custom implementation is ~30.1% faster (149.5 vs 214.0 ns/op) with 50% less memory
 
 ## Optimizations
 
 ### DecodeHexString
+- **SIMD-style Nibble Processing**: Efficiently extracts and validates hex characters
 - **Batch Processing**: Handles 8, 4, and 2 hex characters at a time
-- **Lookup Table**: O(1) hex digit to byte conversion
+- **Memory-Efficient**: Uses only 256-byte lookup table instead of large precomputed tables
 - **Unsafe Pointers**: Zero-copy string access
-- **SIMD-style Operations**: Bit manipulation for efficient nibble packing
-- **Little-Endian Aware**: Proper byte ordering for cross-platform compatibility
+- **Little-Endian Optimized**: Memory layout aware for optimal performance
+- **Single-Pass Validation**: Creates bytes first, then validates nibbles in the result
+- **Case Insensitive**: Supports both uppercase and lowercase hex digits
 
 ### EncodeHexString
-- **Bulk Memory Writes**: Single `uint64`/`uint32`/`uint16` operations instead of individual bytes
+- **Bulk Memory Writes**: Type-appropriate `uint64`/`uint32`/`uint16`/`uint8` operations for optimal alignment
+- **Nibble Reuse**: Efficient variable reuse for final value construction
 - **Lookup Table**: Fast hex character generation
 - **Unsafe Operations**: Direct memory access for performance
 - **Zero-Allocation Return**: Efficient string construction
@@ -77,10 +86,9 @@ Run benchmarks:
 go test -bench=.
 ```
 
-Compare with standard library:
+Run benchmarks with memory stats:
 ```bash
-go test -bench=BenchmarkDecodeHexString -bench=BenchmarkHexDecodeString
-go test -bench=BenchmarkEncodeHexString -bench=BenchmarkHexEncodeToString
+go test -bench=. -benchmem
 ```
 
 ## Architecture
