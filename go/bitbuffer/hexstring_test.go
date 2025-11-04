@@ -73,10 +73,63 @@ func BenchmarkDecodeHexString(b *testing.B) {
 	}
 }
 
-func BenchmarkHexDecodeString(b *testing.B) {
-	testData := "48656c6c6f20576f726c642048656c6c6f20576f726c642048656c6c6f20576f726c64"
+func TestEncodeHexString(t *testing.T) {
+	testCases := []struct {
+		name     string
+		input    []byte
+		expected string
+	}{
+		{
+			name:     "Hello World",
+			input:    []byte("Hello World"),
+			expected: "48656c6c6f20576f726c64",
+		},
+		{
+			name:     "empty slice",
+			input:    []byte{},
+			expected: "",
+		},
+		{
+			name:     "single byte",
+			input:    []byte{255},
+			expected: "ff",
+		},
+		{
+			name:     "mixed bytes",
+			input:    []byte{0, 1, 15, 16, 255},
+			expected: "00010f10ff",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			result := EncodeHexString(tc.input)
+			if result != tc.expected {
+				t.Errorf("expected %s, got %s", tc.expected, result)
+			}
+		})
+	}
+}
+
+func BenchmarkEncodeHexString(b *testing.B) {
+	testData := []byte("Hello World Hello World Hello World")
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_, _ = hex.DecodeString(testData)
+		_ = EncodeHexString(testData)
+	}
+}
+
+func TestRoundTrip(t *testing.T) {
+	original := []byte("Hello World! This is a test of hex encoding/decoding.")
+
+	encoded := EncodeHexString(original)
+	decoded, err := DecodeHexString(encoded)
+
+	if err != nil {
+		t.Fatalf("Decode error: %v", err)
+	}
+
+	if string(original) != string(decoded) {
+		t.Errorf("Round-trip failed: original %q, decoded %q", original, decoded)
 	}
 }

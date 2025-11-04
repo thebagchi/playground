@@ -6,6 +6,7 @@ import (
 )
 
 var hexes [256]byte
+var hexDigits = "0123456789abcdef"
 
 func init() {
 	for i := range hexes {
@@ -89,4 +90,89 @@ func DecodeHexString(data string) ([]byte, error) {
 	}
 
 	return result, nil
+}
+
+func EncodeHexString(data []byte) string {
+	n := len(data)
+	if n == 0 {
+		return ""
+	}
+
+	result := make([]byte, n*2)
+	src := unsafe.SliceData(data)
+	dst := unsafe.SliceData(result)
+	i, j := 0, 0
+
+	for n-i >= 4 {
+		v := (*uint32)(unsafe.Add(unsafe.Pointer(src), i))
+
+		h0 := byte(*v >> 0x00)
+		l0 := byte(*v >> 0x08)
+		h1 := byte(*v >> 0x10)
+		l1 := byte(*v >> 0x18)
+
+		var (
+			h00 = h0 >> 0x04
+			h01 = h0 & 0x0F
+			l00 = l0 >> 0x04
+			l01 = l0 & 0x0F
+			h10 = h1 >> 0x04
+			h11 = h1 & 0x0F
+			l10 = l1 >> 0x04
+			l11 = l1 & 0x0F
+		)
+
+		value := uint64(hexDigits[h00]) |
+			uint64(hexDigits[h01])<<0x08 |
+			uint64(hexDigits[l00])<<0x10 |
+			uint64(hexDigits[l01])<<0x18 |
+			uint64(hexDigits[h10])<<0x20 |
+			uint64(hexDigits[h11])<<0x28 |
+			uint64(hexDigits[l10])<<0x30 |
+			uint64(hexDigits[l11])<<0x38
+
+		*(*uint64)(unsafe.Add(unsafe.Pointer(dst), j)) = value
+
+		i += 4
+		j += 8
+	}
+
+	if n-i >= 2 {
+		v := (*uint16)(unsafe.Add(unsafe.Pointer(src), i))
+
+		h0 := byte(*v >> 0x00)
+		l0 := byte(*v >> 0x08)
+
+		var (
+			h00 = h0 >> 0x04
+			h01 = h0 & 0x0F
+			l00 = l0 >> 0x04
+			l01 = l0 & 0x0F
+		)
+
+		value := uint32(hexDigits[h00]) |
+			uint32(hexDigits[h01])<<0x08 |
+			uint32(hexDigits[l00])<<0x10 |
+			uint32(hexDigits[l01])<<0x18
+
+		*(*uint32)(unsafe.Add(unsafe.Pointer(dst), j)) = value
+
+		i += 2
+		j += 4
+	}
+
+	if n-i >= 1 {
+		v := *(*byte)(unsafe.Add(unsafe.Pointer(src), i))
+
+		var (
+			v0 = v >> 0x04
+			v1 = v & 0x0F
+		)
+
+		value := uint16(hexDigits[v0]) | uint16(hexDigits[v1])<<0x08
+
+		*(*uint16)(unsafe.Add(unsafe.Pointer(dst), j)) = value
+	}
+
+	return unsafe.String(unsafe.SliceData(result), len(result))
 }
