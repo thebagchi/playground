@@ -145,7 +145,7 @@ func EncodeNumString(data int64) string {
 	var (
 		neg = data < 0
 		abs = uint64(data)
-		buf [22]byte
+		buf [24]byte
 		pos = len(buf) - 1
 		dst = unsafe.Pointer(&buf[0])
 		lut = unsafe.Pointer(&numps[0])
