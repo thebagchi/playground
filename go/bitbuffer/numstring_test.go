@@ -5,75 +5,98 @@ import (
 	"testing"
 )
 
+var nums = []int64{
+	0, 1, -1,
+	12, -12,
+	123, -123,
+	1234, -1234,
+	12345, -12345,
+	123456, -123456,
+	1234567, -1234567,
+	12345678, -12345678,
+	123456789, -123456789,
+	1234567890, -1234567890,
+	12345678901, -12345678901,
+	123456789012, -123456789012,
+	1234567890123, -1234567890123,
+	12345678901234, -12345678901234,
+	123456789012345, -123456789012345,
+	1234567890123456, -1234567890123456,
+	12345678901234567, -12345678901234567,
+	123456789012345678, -123456789012345678,
+	1234567890123456789, -1234567890123456789,
+	9223372036854775807, -9223372036854775808,
+}
+
+var strs = []string{
+	"0", "1", "-1",
+	"12", "-12",
+	"123", "-123",
+	"1234", "-1234",
+	"12345", "-12345",
+	"123456", "-123456",
+	"1234567", "-1234567",
+	"12345678", "-12345678",
+	"123456789", "-123456789",
+	"1234567890", "-1234567890",
+	"12345678901", "-12345678901",
+	"123456789012", "-123456789012",
+	"1234567890123", "-1234567890123",
+	"12345678901234", "-12345678901234",
+	"123456789012345", "-123456789012345",
+	"1234567890123456", "-1234567890123456",
+	"12345678901234567", "-12345678901234567",
+	"123456789012345678", "-123456789012345678",
+	"1234567890123456789", "-1234567890123456789",
+	"9223372036854775807", "-9223372036854775808",
+}
+
 func TestDecodeNumString(t *testing.T) {
-	tests := []struct {
-		input    string
-		expected int64
-		wantErr  bool
-	}{
-		{"0", 0, false},
-		{"123", 123, false},
-		{"456789", 456789, false},
-		{"-123", -123, false},
-		{"+456", 456, false},
-		{"9223372036854775807", 9223372036854775807, false},   // max int64
-		{"-9223372036854775808", -9223372036854775808, false}, // min int64
-		{"", 0, false},
-		{"abc", 0, true},
-		{"12a34", 0, true},
-		{"-", 0, true},
-		{"+", 0, true},
+	for _, input := range strs {
+		expected, _ := strconv.Atoi(input)
+		t.Run(input, func(t *testing.T) {
+			result, err := DecodeNumString(input)
+			if err != nil {
+				t.Errorf("unexpected error for input %q: %v", input, err)
+			}
+			if result != int64(expected) {
+				t.Errorf("DecodeNumString(%q) = %d, want %d", input, result, expected)
+			}
+		})
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.input, func(t *testing.T) {
-			result, err := DecodeNumString(tt.input)
-			if tt.wantErr {
-				if err == nil {
-					t.Errorf("expected error for input %q, got none", tt.input)
-				}
-			} else {
-				if err != nil {
-					t.Errorf("unexpected error for input %q: %v", tt.input, err)
-				}
-				if result != tt.expected {
-					t.Errorf("DecodeNumString(%q) = %d, want %d", tt.input, result, tt.expected)
-				}
+	// Test error cases
+	errorTests := []string{
+		"abc",
+		"12a34",
+		"-",
+		"+",
+	}
+
+	for _, input := range errorTests {
+		t.Run(input, func(t *testing.T) {
+			_, err := DecodeNumString(input)
+			if err == nil {
+				t.Errorf("expected error for input %q, got none", input)
 			}
 		})
 	}
 }
 
 func TestEncodeNumString(t *testing.T) {
-	tests := []struct {
-		input    int64
-		expected string
-	}{
-		{0, "0"},
-		{123, "123"},
-		{456789, "456789"},
-		{-123, "-123"},
-		{9223372036854775807, "9223372036854775807"},
-		{-9223372036854775808, "-9223372036854775808"},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.expected, func(t *testing.T) {
-			result := EncodeNumString(tt.input)
-			if result != tt.expected {
-				t.Errorf("EncodeNumString(%d) = %q, want %q", tt.input, result, tt.expected)
+	for _, input := range nums {
+		expected := strconv.FormatInt(input, 10)
+		t.Run(expected, func(t *testing.T) {
+			result := EncodeNumString(input)
+			if result != expected {
+				t.Errorf("EncodeNumString(%d) = %q, want %q", input, result, expected)
 			}
 		})
 	}
 }
 
 func TestNumStringRoundTrip(t *testing.T) {
-	tests := []int64{
-		0, 1, -1, 123, -456, 999999, -999999,
-		9223372036854775807, -9223372036854775808,
-	}
-
-	for _, tt := range tests {
+	for _, tt := range nums {
 		encoded := EncodeNumString(tt)
 		decoded, err := DecodeNumString(encoded)
 		if err != nil {
@@ -87,56 +110,29 @@ func TestNumStringRoundTrip(t *testing.T) {
 
 // Benchmark tests
 func BenchmarkDecodeNumString(b *testing.B) {
-	testCases := []string{
-		"0",
-		"123",
-		"123456789",
-		"-987654321",
-		"9223372036854775807",
-		"-9223372036854775808",
-	}
-
-	for _, tc := range testCases {
-		b.Run(tc, func(b *testing.B) {
+	for _, input := range strs {
+		b.Run(input, func(b *testing.B) {
 			b.ReportAllocs()
 			for i := 0; i < b.N; i++ {
-				_, _ = DecodeNumString(tc)
+				_, _ = DecodeNumString(input)
 			}
 		})
 	}
 }
 
 func BenchmarkDecodeNumStringStd(b *testing.B) {
-	testCases := []string{
-		"0",
-		"123",
-		"123456789",
-		"-987654321",
-		"9223372036854775807",
-		"-9223372036854775808",
-	}
-
-	for _, tc := range testCases {
-		b.Run(tc, func(b *testing.B) {
+	for _, input := range strs {
+		b.Run(input, func(b *testing.B) {
 			b.ReportAllocs()
 			for i := 0; i < b.N; i++ {
-				_, _ = strconv.Atoi(tc)
+				_, _ = strconv.Atoi(input)
 			}
 		})
 	}
 }
 
 func BenchmarkEncodeNumString(b *testing.B) {
-	testCases := []int64{
-		0,
-		123,
-		123456789,
-		-987654321,
-		9223372036854775807,
-		-9223372036854775808,
-	}
-
-	for _, tc := range testCases {
+	for _, tc := range nums {
 		b.Run(strconv.FormatInt(tc, 10), func(b *testing.B) {
 			b.ReportAllocs()
 			for i := 0; i < b.N; i++ {
@@ -147,16 +143,7 @@ func BenchmarkEncodeNumString(b *testing.B) {
 }
 
 func BenchmarkEncodeNumStringStd(b *testing.B) {
-	testCases := []int64{
-		0,
-		123,
-		123456789,
-		-987654321,
-		9223372036854775807,
-		-9223372036854775808,
-	}
-
-	for _, tc := range testCases {
+	for _, tc := range nums {
 		b.Run(strconv.FormatInt(tc, 10), func(b *testing.B) {
 			b.ReportAllocs()
 			for i := 0; i < b.N; i++ {
