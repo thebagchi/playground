@@ -1,0 +1,7 @@
+# Generated files
+*.a
+*.so
+*.h
+
+# Executables
+main
