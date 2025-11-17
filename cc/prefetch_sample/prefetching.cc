@@ -13,14 +13,39 @@
 #include <iomanip>
 #include <iostream>
 #include <memory>
+#include <optional>
 #include <random>
 #include <string>
 #include <tuple>
 #include <vector>
 
+// Configuration constants
+namespace config {
+constexpr std::size_t DEFAULT_ARRAY_SIZE = 10 * 1024 * 1024 / sizeof(int);
+constexpr std::int32_t NUM_RUNS = 100;
+constexpr std::int32_t WARMUP_RUNS = 5;
+const std::size_t DEFAULT_PREFETCH_DISTANCE = 64;
+const std::size_t DEFAULT_PREFETCH_STRIDE = 8;
+}  // namespace config
+
+// RAII timer class for automatic timing
+class Timer {
+  std::chrono::high_resolution_clock::time_point start_;
+  double& result_;
+
+ public:
+  explicit Timer(double& result) noexcept
+      : start_(std::chrono::high_resolution_clock::now()), result_(result) {}
+
+  ~Timer() {
+    auto end = std::chrono::high_resolution_clock::now();
+    result_ = std::chrono::duration<double>(end - start_).count();
+  }
+};
+
 // Helper: print byte counts in a short human-readable form (e.g., 1.5M)
 // Prints directly to the provided ostream and restores stream flags/precision.
-static void print_bytes_short(std::ostream& out, std::uint64_t bytes) {
+static void print_bytes_short(std::ostream& out, std::uint64_t bytes) noexcept {
   auto flags = out.flags();
   auto prec = out.precision();
 
@@ -28,7 +53,6 @@ static void print_bytes_short(std::ostream& out, std::uint64_t bytes) {
     double m = static_cast<double>(bytes) / (1024.0 * 1024.0);
     out << std::fixed << std::setprecision(1) << m << "M";
   } else if (bytes >= 1024ull) {
-    // Keep KB as integer for readability
     out << static_cast<std::uint64_t>(bytes / 1024ull) << "K";
   } else {
     out << bytes << "B";
@@ -82,49 +106,41 @@ class Allocator {
   }
 };
 
-std::size_t ARRAY_SIZE = 10 * 1024 * 1024 / sizeof(int);  // ~10 MB
-std::size_t PREFETCH_DISTANCE = 64;  // Will be calculated based on L1 cache
-std::size_t PREFETCH_STRIDE = 8;     // Will be calculated based on L1 cache
-
-// Default fallback values
-const std::size_t DEFAULT_PREFETCH_DISTANCE = 64;
-const std::size_t DEFAULT_PREFETCH_STRIDE = 8;
+std::size_t ARRAY_SIZE = config::DEFAULT_ARRAY_SIZE;
+std::size_t PREFETCH_DISTANCE = config::DEFAULT_PREFETCH_DISTANCE;
+std::size_t PREFETCH_STRIDE = config::DEFAULT_PREFETCH_STRIDE;
 
 // Sequential traversal without prefetch
-double sequential_no_prefetch(const std::int32_t* arr, std::size_t size) {
-  volatile std::int64_t sum = 0;  // Prevent optimization
-  auto start = std::chrono::high_resolution_clock::now();
+[[nodiscard]] std::int64_t sequential_no_prefetch(const std::int32_t* arr,
+                                                  std::size_t size) noexcept {
+  std::int64_t sum = 0;
   for (std::size_t i = 0; i < size; ++i) {
-    sum = sum + arr[i];
+    sum = sum + *(arr + i);
   }
-  auto end = std::chrono::high_resolution_clock::now();
-  std::chrono::duration<double> diff = end - start;
-  return diff.count();
+  return sum;
 }
 
 // Sequential traversal WITH prefetch
-double sequential_with_prefetch(
+[[nodiscard]] std::int64_t sequential_with_prefetch(
     const std::int32_t* arr, std::size_t size,
-    std::size_t distance = DEFAULT_PREFETCH_DISTANCE,
-    std::size_t stride = DEFAULT_PREFETCH_STRIDE) {
-  volatile std::int64_t sum = 0;
-  auto start = std::chrono::high_resolution_clock::now();
+    std::size_t distance = config::DEFAULT_PREFETCH_DISTANCE,
+    std::size_t stride = config::DEFAULT_PREFETCH_STRIDE) noexcept {
+  std::int64_t sum = 0;
   for (std::size_t i = 0; i < size; ++i) {
     // Prefetch far enough ahead
     if ((i % stride) == 0 && i + distance < size) {
-      _mm_prefetch(reinterpret_cast<const char*>(&arr[i + distance]),
+      _mm_prefetch(reinterpret_cast<const char*>(arr + i + distance),
                    _MM_HINT_T0);
     }
-    sum = sum + arr[i];
+    sum = sum + *(arr + i);
   }
-  auto end = std::chrono::high_resolution_clock::now();
-  std::chrono::duration<double> diff = end - start;
-  return diff.count();
+  return sum;
 }
 
 // Random access (poor cache behavior)
-double random_access(const std::int32_t* arr, std::size_t size) {
-  volatile std::int64_t sum = 0;
+[[nodiscard]] std::int64_t random_access(const std::int32_t* arr,
+                                         std::size_t size) {
+  std::int64_t sum = 0;
   std::vector<std::size_t> indices(size);
   std::iota(indices.begin(), indices.end(), 0);
 
@@ -133,24 +149,28 @@ double random_access(const std::int32_t* arr, std::size_t size) {
   std::mt19937 gen(rd());
   std::shuffle(indices.begin(), indices.end(), gen);
 
-  auto start = std::chrono::high_resolution_clock::now();
   for (std::size_t i = 0; i < indices.size(); ++i) {
-    sum = sum + arr[indices[i]];
+    sum = sum + *(arr + indices[i]);
   }
-  auto end = std::chrono::high_resolution_clock::now();
-  std::chrono::duration<double> diff = end - start;
-  return diff.count();
+  return sum;
 }
 
 template <typename T>
-std::tuple<std::size_t, std::size_t> print_cache_sizes() {
+std::optional<std::tuple<std::size_t, std::size_t>> print_cache_sizes() {
   std::cout << "Cache sizes (via CPUID):" << std::endl;
 
-  std::uint32_t eax, ebx, ecx, edx;
+  // Check if CPUID leaf 0x04 is supported
+  std::uint32_t eax = 0, ebx = 0, ecx = 0, edx = 0;
+  __cpuid(0, eax, ebx, ecx, edx);
+  if (eax < 0x04) {
+    std::cerr << "Error: CPUID leaf 0x04 not supported" << std::endl;
+    return std::nullopt;
+  }
+
   std::size_t l1_cache_size = 0;
   std::uint32_t line_size_l1 = 64;  // default if unknown; updated when level==1
-  std::size_t prefetch_distance = DEFAULT_PREFETCH_DISTANCE;
-  std::size_t prefetch_stride = DEFAULT_PREFETCH_STRIDE;
+  std::size_t prefetch_distance = config::DEFAULT_PREFETCH_DISTANCE;
+  std::size_t prefetch_stride = config::DEFAULT_PREFETCH_STRIDE;
 
   // Use CPUID leaf 0x04 (Deterministic Cache Parameters)
   for (int i = 0;; ++i) {
@@ -208,7 +228,8 @@ std::tuple<std::size_t, std::size_t> print_cache_sizes() {
     std::cout << "Using fallback prefetch parameters" << std::endl;
   }
 
-  return {prefetch_distance, prefetch_stride};
+  return std::make_optional(
+      std::make_tuple(prefetch_distance, prefetch_stride));
 }
 
 int main() {
@@ -217,9 +238,14 @@ int main() {
             << ARRAY_SIZE * sizeof(int) / (1024.0 * 1024.0) << " MB)"
             << std::endl;
 
-  auto [calculated_distance, calculated_stride] = print_cache_sizes<int>();
-  PREFETCH_DISTANCE = calculated_distance;
-  PREFETCH_STRIDE = calculated_stride;
+  auto cache_params = print_cache_sizes<int>();
+  if (cache_params.has_value()) {
+    auto [calculated_distance, calculated_stride] = cache_params.value();
+    PREFETCH_DISTANCE = calculated_distance;
+    PREFETCH_STRIDE = calculated_stride;
+  } else {
+    std::cout << "Using default prefetch parameters" << std::endl;
+  }
   std::cout << std::endl;
 
   // Allocate aligned memory
@@ -229,40 +255,64 @@ int main() {
     return 1;
   }
 
+  // Verify 64-byte alignment
+  if (reinterpret_cast<std::uintptr_t>(arr.data()) % 64 != 0) {
+    std::cerr << "Warning: Array not 64-byte aligned" << std::endl;
+  }
+
   // Initialize array
   for (std::size_t i = 0; i < ARRAY_SIZE; ++i) {
-    arr[i] = static_cast<std::int32_t>(i);
+    *(arr.data() + i) = static_cast<std::int32_t>(i);
   }
 
   // Warm up cache (optional, but helps consistency)
   std::cout << "Warming up..." << std::endl;
   volatile std::int64_t dummy = 0;
-  for (size_t i = 0; i < ARRAY_SIZE; ++i) {
-    dummy = dummy + arr[i];
+  for (std::int32_t r = 0; r < config::WARMUP_RUNS; ++r) {
+    for (std::size_t i = 0; i < ARRAY_SIZE; ++i) {
+      dummy = dummy + *(arr.data() + i);
+    }
   }
 
   // Run benchmarks multiple times and average
-  const int runs = 100;
-  double time_without_prefetch = 0, time_with_prefetch = 0,
-         time_random_access = 0;
+  double time_without_prefetch = 0.0;
+  double time_with_prefetch = 0.0;
+  double time_random_access = 0.0;
 
-  for (int r = 0; r < runs; ++r) {
-    time_without_prefetch =
-        time_without_prefetch + sequential_no_prefetch(arr.data(), ARRAY_SIZE);
-    time_with_prefetch =
-        time_with_prefetch + sequential_with_prefetch(arr.data(), ARRAY_SIZE,
-                                                      PREFETCH_DISTANCE,
-                                                      PREFETCH_STRIDE);
-    time_random_access =
-        time_random_access + random_access(arr.data(), ARRAY_SIZE);
+  {
+    Timer timer(time_without_prefetch);
+    volatile std::int64_t result = 0;
+    for (std::int32_t r = 0; r < config::NUM_RUNS; ++r) {
+      result = sequential_no_prefetch(arr.data(), ARRAY_SIZE);
+    }
+    // Use result to prevent optimization
+    if (result == 0) std::cout << "";
   }
+  time_without_prefetch = time_without_prefetch / config::NUM_RUNS;
 
-  time_without_prefetch = time_without_prefetch / runs;
-  time_with_prefetch = time_with_prefetch / runs;
-  time_random_access = time_random_access / runs;
+  {
+    Timer timer(time_with_prefetch);
+    volatile std::int64_t result = 0;
+    for (std::int32_t r = 0; r < config::NUM_RUNS; ++r) {
+      result = sequential_with_prefetch(arr.data(), ARRAY_SIZE,
+                                        PREFETCH_DISTANCE, PREFETCH_STRIDE);
+    }
+    if (result == 0) std::cout << "";
+  }
+  time_with_prefetch = time_with_prefetch / config::NUM_RUNS;
+
+  {
+    Timer timer(time_random_access);
+    volatile std::int64_t result = 0;
+    for (std::int32_t r = 0; r < config::NUM_RUNS; ++r) {
+      result = random_access(arr.data(), ARRAY_SIZE);
+    }
+    if (result == 0) std::cout << "";
+  }
+  time_random_access = time_random_access / config::NUM_RUNS;
 
   // Results
-  std::cout << "\n=== Performance Results (avg of " << runs
+  std::cout << "\n=== Performance Results (avg of " << config::NUM_RUNS
             << " runs) ===" << std::endl;
   std::cout << "Sequential (no prefetch):    " << std::fixed
             << std::setprecision(4) << time_without_prefetch << " sec"
