@@ -183,7 +183,7 @@ json_struct/
 ├── cmake/              # CMake utilities
 ├── build.sh            # Build script
 ├── thirdparty/         # Downloaded Boost (auto-generated)
-└── libs/              # Installed Boost (auto-generated)
+└── libs/               # Installed Boost (auto-generated)
 ```
 
 ## Contributing
