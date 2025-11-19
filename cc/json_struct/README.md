@@ -2,14 +2,25 @@
 
 A modern, header-only C++ JSON serialization/deserialization library using Boost.JSON with compile-time reflection.
 
+## Recent Updates (November 2025)
+
+- ✅ **Comprehensive Type Aliases**: Added pre-defined type aliases for all vector/map combinations with nullable types
+- ✅ **Standardized Test Suite**: 20 test cases following `TEST_PARSE_JSON_{TYPENAME}` naming convention
+- ✅ **Clean Test Output**: Removed verbose output, keeping only JSON serialization results with standardized "==> TEST_NAME" prefixes
+- ✅ **Consistent Error Messages**: Updated to uniform "Error in 'TEST_NAME': " format
+- ✅ **Code Cleanup**: Removed all comments from test files for improved maintainability
+- ✅ **Variable Naming**: Renamed `data_optional` to `data_with_optional` for clarity
+
 ## Features
 
 - **Compile-time Reflection**: Uses C++17 template metaprogramming for zero-runtime reflection overhead
 - **Multiple Nullable Types**: Supports `std::unique_ptr`, `std::shared_ptr`, and `std::optional` for nullable fields
+- **Comprehensive Type Aliases**: Pre-defined type aliases for vectors and maps with all nullable combinations
 - **Type Safety**: Strong typing with compile-time validation
 - **Boost.JSON Integration**: Built on top of Boost.JSON for efficient parsing and serialization
-- **Container Support**: Works with `std::vector` and other STL containers
+- **Container Support**: Works with `std::vector`, `std::map` and other STL containers
 - **Error Handling**: Comprehensive error messages for serialization/deserialization failures
+- **Standardized Testing**: 20 comprehensive test cases with clean, consistent output formatting
 
 ## Requirements
 
@@ -24,21 +35,17 @@ A modern, header-only C++ JSON serialization/deserialization library using Boost
 The project includes CMake scripts that automatically download and build Boost:
 
 ```bash
-# Clone the repository
+# Navigate to the project directory
 cd cc/json_struct
 
-# Create build directory
-mkdir build && cd build
+# Build the project (downloads and builds Boost automatically)
+./build.sh
 
-# Configure and build
-cmake ..
-make
+# Run the comprehensive test suite (20 test cases)
+./build/test_json
 
-# Run tests
-./test_json
-
-# Run demo
-./main.bin
+# Run the demo program
+./build/main.bin
 ```
 
 ### Manual Build
@@ -49,6 +56,7 @@ If you have Boost installed system-wide:
 # Set Boost paths in CMakeLists.txt
 # Comment out the automatic download sections
 
+mkdir build && cd build
 cmake ..
 make
 ```
@@ -111,10 +119,25 @@ int main() {
 
 ### Container Support
 
+The library provides comprehensive support for STL containers with nullable types. Pre-defined type aliases are available for common combinations:
+
 ```cpp
+// Vector types
+using PersonVector = std::vector<Person>;
+using PersonVectorUniquePtr = std::vector<std::unique_ptr<Person>>;
+using PersonVectorSharedPtr = std::vector<std::shared_ptr<Person>>;
+using PersonVectorOptional = std::vector<std::optional<Person>>;
+
+// Map types
+using PersonMap = std::map<std::string, Person>;
+using PersonMapUniquePtr = std::map<std::string, std::unique_ptr<Person>>;
+using PersonMapSharedPtr = std::map<std::string, std::shared_ptr<Person>>;
+using PersonMapOptional = std::map<std::string, std::optional<Person>>;
+
+// Example usage
 class PersonList {
 public:
-  std::unique_ptr<std::vector<Person>> persons_;
+  std::unique_ptr<PersonVector> persons_;
 
 public:
   constexpr const static auto properties = std::make_tuple(
@@ -142,17 +165,34 @@ public:
 
 ## Testing
 
-The library includes comprehensive unit tests covering:
+The library includes a comprehensive unit test suite with 20 test cases covering all serialization scenarios:
 
-- Basic serialization/deserialization
-- Nullable types (`unique_ptr`, `shared_ptr`, `optional`)
-- Container serialization
-- Error handling
-- Mixed type scenarios
+- Basic object serialization/deserialization
+- All nullable types (`unique_ptr`, `shared_ptr`, `optional`)
+- Container serialization (vectors and maps)
+- Mixed nullable/required field combinations
+- Error handling and validation
 
-Run tests with:
+### Test Output Format
+
+Tests use a clean, standardized output format:
+
+```
+==> TEST_PARSE_JSON_PERSON
+{"name":"John Doe","age":30,"city":"New York","email":null}
+
+==> TEST_PARSE_JSON_PERSON_VECTOR_OPTIONAL
+[{"name":"Alice Cooper","age":28,"city":"Boston","email":"alice@example.com"},null,{"name":"David Wilson","age":42,"city":"Seattle","email":null}]
+```
+
+### Running Tests
+
 ```bash
-./test_json
+# Build and run all tests
+./build.sh
+./build/test_json
+
+# Expected output: "*** No errors detected" with 20 test cases passing
 ```
 
 ## Architecture
@@ -178,7 +218,8 @@ The library uses C++17 template metaprogramming to generate serialization code a
 json_struct/
 ├── json.h              # Main library header
 ├── main.cc             # Demo program
-├── test_json.cc        # Unit tests
+├── test_json.cc        # Unit tests (20 comprehensive test cases)
+├── test_data.h         # Test data definitions
 ├── CMakeLists.txt      # Build configuration
 ├── cmake/              # CMake utilities
 ├── build.sh            # Build script

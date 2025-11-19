@@ -404,6 +404,11 @@ struct Write {
  */
 template <typename T>
 struct Write<std::vector<T>> {
+  static_assert(
+      !std::is_pointer_v<T>,
+      "Raw pointers are not supported in std::vector for serialization. "
+      "Use std::unique_ptr, std::shared_ptr, or std::optional instead.");
+
   boost::json::value operator()(const std::vector<T>* object) {
     if (!object) return nullptr;
 
@@ -434,6 +439,46 @@ struct Write<std::map<std::string, T>> {
     }
 
     return obj;
+  }
+};
+
+// =============================================================================
+// Specializations for Nullable Types
+// =============================================================================
+
+/**
+ * @brief Specialization for std::unique_ptr<T>
+ * @tparam T Pointed-to type
+ */
+template <typename T>
+struct Write<std::unique_ptr<T>> {
+  boost::json::value operator()(const std::unique_ptr<T>* object) {
+    if (!object || !*object) return nullptr;
+    return Write<T>{}(object->get());
+  }
+};
+
+/**
+ * @brief Specialization for std::shared_ptr<T>
+ * @tparam T Pointed-to type
+ */
+template <typename T>
+struct Write<std::shared_ptr<T>> {
+  boost::json::value operator()(const std::shared_ptr<T>* object) {
+    if (!object || !*object) return nullptr;
+    return Write<T>{}(object->get());
+  }
+};
+
+/**
+ * @brief Specialization for std::optional<T>
+ * @tparam T Contained type
+ */
+template <typename T>
+struct Write<std::optional<T>> {
+  boost::json::value operator()(const std::optional<T>* object) {
+    if (!object || !*object) return nullptr;
+    return Write<T>{}(&**object);
   }
 };
 
@@ -543,6 +588,59 @@ struct Read {
 };
 
 // =============================================================================
+// Specializations for Nullable Types (Read)
+// =============================================================================
+
+/**
+ * @brief Specialization for std::unique_ptr<T>
+ * @tparam T Pointed-to type
+ */
+template <typename T>
+struct Read<std::unique_ptr<T>> {
+  void operator()(const boost::json::value& value, std::unique_ptr<T>* object) {
+    if (value.is_null()) {
+      *object = nullptr;
+    } else {
+      *object = std::make_unique<T>();
+      Read<T>{}(value, object->get());
+    }
+  }
+};
+
+/**
+ * @brief Specialization for std::shared_ptr<T>
+ * @tparam T Pointed-to type
+ */
+template <typename T>
+struct Read<std::shared_ptr<T>> {
+  void operator()(const boost::json::value& value, std::shared_ptr<T>* object) {
+    if (value.is_null()) {
+      *object = nullptr;
+    } else {
+      *object = std::make_shared<T>();
+      Read<T>{}(value, object->get());
+    }
+  }
+};
+
+/**
+ * @brief Specialization for std::optional<T>
+ * @tparam T Contained type
+ */
+template <typename T>
+struct Read<std::optional<T>> {
+  void operator()(const boost::json::value& value, std::optional<T>* object) {
+    if (value.is_null()) {
+      *object = std::nullopt;
+    } else {
+      T temp;
+      Read<T>{}(value, &temp);
+      *object = std::move(temp);
+    }
+  }
+};
+
+// =============================================================================
 // Specializations for Basic Types (Read)
 // =============================================================================
 
@@ -632,6 +730,11 @@ struct Read<bool> {
  */
 template <typename T>
 struct Read<std::vector<T>> {
+  static_assert(
+      !std::is_pointer_v<T>,
+      "Raw pointers are not supported in std::vector for deserialization. "
+      "Use std::unique_ptr, std::shared_ptr, or std::optional instead.");
+
   void operator()(const boost::json::value& value, std::vector<T>* object) {
     if (!value.is_null() && value.is_array()) {
       const boost::json::array& arr = value.as_array();
