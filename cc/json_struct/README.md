@@ -2,15 +2,6 @@
 
 A modern, header-only C++ JSON serialization/deserialization library using Boost.JSON with compile-time reflection.
 
-## Recent Updates (November 2025)
-
-- ✅ **Comprehensive Type Aliases**: Added pre-defined type aliases for all vector/map combinations with nullable types
-- ✅ **Standardized Test Suite**: 20 test cases following `TEST_PARSE_JSON_{TYPENAME}` naming convention
-- ✅ **Clean Test Output**: Removed verbose output, keeping only JSON serialization results with standardized "==> TEST_NAME" prefixes
-- ✅ **Consistent Error Messages**: Updated to uniform "Error in 'TEST_NAME': " format
-- ✅ **Code Cleanup**: Removed all comments from test files for improved maintainability
-- ✅ **Variable Naming**: Renamed `data_optional` to `data_with_optional` for clarity
-
 ## Features
 
 - **Compile-time Reflection**: Uses C++17 template metaprogramming for zero-runtime reflection overhead
@@ -109,13 +100,14 @@ int main() {
 
 ### Field Types
 
-| Type | Nullable | JSON Representation |
-|------|----------|-------------------|
-| `std::string` | No | `"value"` |
-| `std::unique_ptr<T>` | Yes | `value` or `null` |
-| `std::shared_ptr<T>` | Yes | `value` or `null` |
-| `std::optional<T>` | Yes | `value` or `null` |
-| `std::vector<T>` | No | `[item1, item2, ...]` |
+| Type                | Nullable | JSON Representation                           |
+|---------------------|----------|-----------------------------------------------|
+| `std::string`       | No       | `"value"`                                     |
+| `std::unique_ptr<T>`| Yes      | `value` or `null`                             |
+| `std::shared_ptr<T>`| Yes      | `value` or `null`                             |
+| `std::optional<T>`  | Yes      | `value` or `null`                             |
+| `std::vector<T>`    | No       | `[item1, item2, ...]`                         |
+| `std::map<K, V>`    | No       | `{"key1": value1, "key2": value2, ...}`       |
 
 ### Container Support
 
