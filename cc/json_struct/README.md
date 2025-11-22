@@ -11,7 +11,7 @@ A modern, header-only C++ JSON serialization/deserialization library using Boost
 - **Boost.JSON Integration**: Built on top of Boost.JSON for efficient parsing and serialization
 - **Container Support**: Works with `std::vector`, `std::map` and other STL containers
 - **Error Handling**: Comprehensive error messages for serialization/deserialization failures
-- **Standardized Testing**: 20 comprehensive test cases with clean, consistent output formatting
+- **Standardized Testing**: 37 comprehensive test cases with clean, consistent output formatting
 
 ## Requirements
 
@@ -32,7 +32,7 @@ cd cc/json_struct
 # Build the project (downloads and builds Boost automatically)
 ./build.sh
 
-# Run the comprehensive test suite (20 test cases)
+# Run the comprehensive test suite (36 test cases)
 ./build/test_json
 
 # Run the demo program
@@ -100,14 +100,19 @@ int main() {
 
 ### Field Types
 
-| Type                | Nullable | JSON Representation                           |
-|---------------------|----------|-----------------------------------------------|
-| `std::string`       | No       | `"value"`                                     |
-| `std::unique_ptr<T>`| Yes      | `value` or `null`                             |
-| `std::shared_ptr<T>`| Yes      | `value` or `null`                             |
-| `std::optional<T>`  | Yes      | `value` or `null`                             |
-| `std::vector<T>`    | No       | `[item1, item2, ...]`                         |
-| `std::map<K, V>`    | No       | `{"key1": value1, "key2": value2, ...}`       |
+| Type                        | Nullable |
+|-----------------------------|----------|
+| std::string                 | No       |
+| std::int64_t                | No       |
+| std::uint64_t               | No       |
+| double                      | No       |
+| bool                        | No       |
+| boost::json::value          | No       |
+| std::unique_ptr<T>          | Yes      |
+| std::shared_ptr<T>          | Yes      |
+| std::optional<T>            | Yes      |
+| std::vector<T>              | No       |
+| std::map<std::string, T>    | No       |
 
 ### Container Support
 
@@ -126,6 +131,68 @@ using PersonMapUniquePtr = std::map<std::string, std::unique_ptr<Person>>;
 using PersonMapSharedPtr = std::map<std::string, std::shared_ptr<Person>>;
 using PersonMapOptional = std::map<std::string, std::optional<Person>>;
 
+// Arbitrary JSON value types (new in v1.1)
+using ArbitraryList = std::vector<boost::json::value>;
+using ArbitraryListUniquePtr = std::vector<std::unique_ptr<boost::json::value>>;
+using ArbitraryListSharedPtr = std::vector<std::shared_ptr<boost::json::value>>;
+using ArbitraryListOptional = std::vector<std::optional<boost::json::value>>;
+
+using ArbitraryMap = std::map<std::string, boost::json::value>;
+using ArbitraryMapUniquePtr = std::map<std::string, std::unique_ptr<boost::json::value>>;
+using ArbitraryMapSharedPtr = std::map<std::string, std::shared_ptr<boost::json::value>>;
+using ArbitraryMapOptional = std::map<std::string, std::optional<boost::json::value>>;
+
+// Struct member types (new in v1.1)
+class Arbitrary {
+ public:
+  boost::json::value value_;
+
+ public:
+  constexpr const static auto properties =
+      std::make_tuple(prop(&Arbitrary::value_, "value"));
+};
+
+using ArbitraryUniquePtrStruct = std::unique_ptr<Arbitrary>;
+using ArbitrarySharedPtrStruct = std::shared_ptr<Arbitrary>;
+using ArbitraryOptionalStruct = std::optional<Arbitrary>;
+
+// Struct member types with nullable value members (new in v1.1)
+class ArbitraryUniquePtr {
+ public:
+  std::unique_ptr<boost::json::value> value_;
+
+ public:
+  constexpr const static auto properties =
+      std::make_tuple(prop(&ArbitraryUniquePtr::value_, "value"));
+};
+
+class ArbitrarySharedPtr {
+ public:
+  std::shared_ptr<boost::json::value> value_;
+
+ public:
+  constexpr const static auto properties =
+      std::make_tuple(prop(&ArbitrarySharedPtr::value_, "value"));
+};
+
+class ArbitraryOptional {
+ public:
+  std::optional<boost::json::value> value_;
+
+ public:
+  constexpr const static auto properties =
+      std::make_tuple(prop(&ArbitraryOptional::value_, "value"));
+};
+
+class ArbitraryDict {
+ public:
+  std::map<std::string, boost::json::value> value_;
+
+ public:
+  constexpr const static auto properties =
+      std::make_tuple(prop(&ArbitraryDict::value_, "value"));
+};
+
 // Example usage
 class PersonList {
 public:
@@ -143,7 +210,9 @@ public:
 ### Core Functions
 
 - `Marshal(obj)` - Serialize object to `boost::json::value`
+- `MarshalToString(obj)` - Serialize object to JSON string
 - `Unmarshal(json_value, obj)` - Deserialize `boost::json::value` to object
+- `UnmarshalFromString(json_string, obj)` - Deserialize JSON string to object
 
 ### Property Declaration
 
@@ -157,7 +226,7 @@ public:
 
 ## Testing
 
-The library includes a comprehensive unit test suite with 20 test cases covering all serialization scenarios:
+The library includes a comprehensive unit test suite with 37 test cases covering all serialization scenarios:
 
 - Basic object serialization/deserialization
 - All nullable types (`unique_ptr`, `shared_ptr`, `optional`)
@@ -184,7 +253,7 @@ Tests use a clean, standardized output format:
 ./build.sh
 ./build/test_json
 
-# Expected output: "*** No errors detected" with 20 test cases passing
+# Expected output: "*** No errors detected" with 37 test cases passing
 ```
 
 ## Architecture
@@ -210,7 +279,7 @@ The library uses C++17 template metaprogramming to generate serialization code a
 json_struct/
 ├── json.h              # Main library header
 ├── main.cc             # Demo program
-├── test_json.cc        # Unit tests (20 comprehensive test cases)
+├── test_json.cc        # Unit tests (36 comprehensive test cases)
 ├── test_data.h         # Test data definitions
 ├── CMakeLists.txt      # Build configuration
 ├── cmake/              # CMake utilities

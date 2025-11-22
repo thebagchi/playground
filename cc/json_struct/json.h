@@ -345,6 +345,30 @@ struct Write<const bool> {
 };
 
 // =============================================================================
+// Specializations for boost::json::value
+// =============================================================================
+
+/**
+ * @brief Specialization for boost::json::value (pass-through)
+ */
+template <>
+struct Write<boost::json::value> {
+  boost::json::value operator()(const boost::json::value* object) {
+    return *object;  // Pass through as-is
+  }
+};
+
+/**
+ * @brief Specialization for const boost::json::value (pass-through)
+ */
+template <>
+struct Write<const boost::json::value> {
+  boost::json::value operator()(const boost::json::value* object) {
+    return *object;  // Pass through as-is
+  }
+};
+
+// =============================================================================
 // Primary Template Definition
 // =============================================================================
 
@@ -495,6 +519,17 @@ struct Write<std::optional<T>> {
 template <typename T>
 boost::json::value Marshal(const T& object) {
   return Write<T>{}(&object);
+}
+
+/**
+ * @brief Convenience function to marshal (serialize) an object to JSON string
+ * @tparam T Type to serialize
+ * @param object Reference to the object to serialize
+ * @return JSON string representation
+ */
+template <typename T>
+std::string MarshalToString(const T& object) {
+  return boost::json::serialize(Marshal(object));
 }
 
 // =============================================================================
@@ -721,6 +756,21 @@ struct Read<bool> {
 };
 
 // =============================================================================
+// Specializations for boost::json::value (Read)
+// =============================================================================
+
+/**
+ * @brief Specialization for boost::json::value (pass-through)
+ */
+template <>
+struct Read<boost::json::value> {
+  void operator()(const boost::json::value& value,
+                  boost::json::value* object) const {
+    *object = value;  // Pass through as-is
+  }
+};
+
+// =============================================================================
 // Specializations for Container Types (Read)
 // =============================================================================
 
@@ -783,6 +833,19 @@ struct Read<std::map<std::string, T>> {
  */
 template <typename T>
 void Unmarshal(const boost::json::value& value, T& object) {
+  Read<T>{}(value, &object);
+}
+
+/**
+ * @brief Convenience function to unmarshal (deserialize) JSON string to an
+ * object
+ * @tparam T Type to deserialize
+ * @param json_string JSON string to deserialize from
+ * @param object Reference to the object to populate
+ */
+template <typename T>
+void UnmarshalFromString(const std::string& json_string, T& object) {
+  boost::json::value value = boost::json::parse(json_string);
   Read<T>{}(value, &object);
 }
 

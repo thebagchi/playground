@@ -37,9 +37,7 @@ add_executable(main.bin main.cc)
 
 target_link_libraries(main.bin Boost::json)
 
-add_executable(test_json test_json.cc)
-
-target_link_libraries(test_json Boost::json Boost::unit_test_framework)
+add_subdirectory(tests)
 
 # Custom target to remove Boost
 add_custom_target(remove-boost
