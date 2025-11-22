@@ -32,7 +32,7 @@ cd cc/json_struct
 # Build the project (downloads and builds Boost automatically)
 ./build.sh
 
-# Run the comprehensive test suite (36 test cases)
+# Run the comprehensive test suite (37 test cases)
 ./build/test_json
 
 # Run the demo program
@@ -88,11 +88,163 @@ int main() {
   boost::json::value json_value = Marshal(p);
   std::cout << json_value << std::endl;
   // Output: 
-  // {"name":"John Doe","age":30,"city":"New York","email":"john@example.com"}
+  // {
+  //   "name": "John Doe",
+  //   "age": 30,
+  //   "city": "New York",
+  //   "email": "john@example.com"
+  // }
 
   // Deserialize from JSON
   Person p2;
   Unmarshal(json_value, p2);
+
+  return 0;
+}
+```
+
+### Primitive Types Example
+
+```cpp
+#include "json.h"
+
+// All basic types are supported directly
+int main() {
+  // uint64_t
+  std::uint64_t big_number = 1234567890123456789ULL;
+  std::string json_str = MarshalToString(big_number);
+  // json_str: "1234567890123456789"
+  std::uint64_t decoded;
+  UnmarshalFromString(json_str, decoded);
+
+  // int64_t (supports negative numbers)
+  std::int64_t negative = -9223372036854775807LL;
+  json_str = MarshalToString(negative);
+  // json_str: "-9223372036854775807"
+
+  // double
+  double pi = 3.14159265358979323846;
+  json_str = MarshalToString(pi);
+  // json_str: "3.141592653589793"
+
+  // bool
+  bool flag = true;
+  json_str = MarshalToString(flag);
+  // json_str: "true"
+
+  // string
+  std::string message = "Hello, JSON World!";
+  json_str = MarshalToString(message);
+  // json_str: "\"Hello, JSON World!\""
+
+  return 0;
+}
+```
+
+### Container Types Example
+
+```cpp
+#include "json.h"
+#include <vector>
+#include <map>
+
+int main() {
+  // Vector of strings
+  std::vector<std::string> fruits = {"apple", "banana", "cherry"};
+  std::string json_str = MarshalToString(fruits);
+  // json_str: 
+  // [
+  //   "apple",
+  //   "banana", 
+  //   "cherry"
+  // ]
+  std::vector<std::string> decoded_fruits;
+  UnmarshalFromString(json_str, decoded_fruits);
+
+  // Map of string to string
+  std::map<std::string, std::string> person = {
+      {"name", "Alice"},
+      {"city", "Boston"},
+      {"country", "USA"}
+  };
+  json_str = MarshalToString(person);
+  // json_str: 
+  // {
+  //   "city": "Boston",
+  //   "country": "USA",
+  //   "name": "Alice"
+  // }
+  std::map<std::string, std::string> decoded_person;
+  UnmarshalFromString(json_str, decoded_person);
+
+  return 0;
+}
+```
+
+### Nullable Types Example
+
+```cpp
+#include "json.h"
+#include <optional>
+#include <memory>
+
+int main() {
+  // Optional types (can be null)
+  std::optional<std::string> maybe_name = "John Doe";
+  std::string json_str = MarshalToString(maybe_name);
+  // json_str: "\"John Doe\""
+  
+  maybe_name = std::nullopt;  // Set to null
+  json_str = MarshalToString(maybe_name);
+  // json_str: "null"
+
+  // Smart pointers
+  std::unique_ptr<std::uint64_t> age = std::make_unique<std::uint64_t>(30);
+  json_str = MarshalToString(age);
+  // json_str: "30"
+  
+  age = nullptr;  // Set to null
+  json_str = MarshalToString(age);
+  // json_str: "null"
+
+  return 0;
+}
+```
+
+### Arbitrary JSON Example
+
+```cpp
+#include "json.h"
+#include <boost/json.hpp>
+
+int main() {
+  // Arbitrary JSON values (pass-through)
+  boost::json::value arbitrary = {
+      {"message", "Hello arbitrary JSON!"},
+      {"number", 42},
+      {"boolean", true},
+      {"array", {1, 2, 3, 4, 5}},
+      {"nested", {
+          {"key", "value"},
+          {"count", 100}
+      }}
+  };
+  
+  std::string json_str = MarshalToString(arbitrary);
+  // json_str: 
+  // {
+  //   "message": "Hello arbitrary JSON!",
+  //   "number": 42,
+  //   "boolean": true,
+  //   "array": [1, 2, 3, 4, 5],
+  //   "nested": {
+  //     "key": "value",
+  //     "count": 100
+  //   }
+  // }
+  
+  boost::json::value decoded;
+  UnmarshalFromString(json_str, decoded);
 
   return 0;
 }
@@ -277,15 +429,23 @@ The library uses C++17 template metaprogramming to generate serialization code a
 
 ```
 json_struct/
+├── .gitignore          # Git ignore file
+├── CMakeLists.txt      # Main build configuration
+├── README.md           # Project documentation
+├── build.sh            # Build script
 ├── json.h              # Main library header
 ├── main.cc             # Demo program
-├── test_json.cc        # Unit tests (36 comprehensive test cases)
-├── test_data.h         # Test data definitions
-├── CMakeLists.txt      # Build configuration
+├── build/              # Build directory (auto-generated)
 ├── cmake/              # CMake utilities
-├── build.sh            # Build script
-├── thirdparty/         # Downloaded Boost (auto-generated)
-└── libs/               # Installed Boost (auto-generated)
+│   └── boost.cmake     # Boost download/build script
+├── libs/               # Installed Boost libraries (auto-generated)
+│   └── boost/
+├── tests/              # Test suite
+│   ├── CMakeLists.txt  # Test build configuration
+│   ├── test_data.h     # Test data definitions
+│   └── test_json.cc    # Unit tests (37 comprehensive test cases)
+└── thirdparty/         # Downloaded dependencies (auto-generated)
+    └── boost/
 ```
 
 ## Contributing
