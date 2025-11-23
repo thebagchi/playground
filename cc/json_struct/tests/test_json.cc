@@ -224,9 +224,9 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_PERSON) {
   try {
     {
       Person p;
-      p.name_ = std::make_unique<std::string>("John Doe");
-      p.age_ = std::make_unique<std::uint64_t>(30);
-      p.city_ = std::make_unique<std::string>("New York");
+      p.name_ = MAKE_UNIQUE(std::string, "John Doe");
+      p.age_ = MAKE_UNIQUE(std::uint64_t, 30);
+      p.city_ = MAKE_UNIQUE(std::string, "New York");
       p.email_ = nullptr;
 
       json_value = Marshal(p);
@@ -257,9 +257,9 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_PERSON_SHARED) {
     PersonShared p1;
     PersonShared p2;
     {
-      p1.name_ = std::make_shared<std::string>("Charlie Brown");
-      p1.age_ = std::make_shared<std::uint64_t>(35);
-      p1.city_ = std::make_shared<std::string>("San Francisco");
+      p1.name_ = MAKE_SHARED(std::string, "Charlie Brown");
+      p1.age_ = MAKE_SHARED(std::uint64_t, 35);
+      p1.city_ = MAKE_SHARED(std::string, "San Francisco");
       p1.email_ = nullptr;
 
       json_value = Marshal(p1);
@@ -506,16 +506,16 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_PERSON_VECTOR) {
     PersonVector people1;
 
     Person p1;
-    p1.name_ = std::make_unique<std::string>("Alice Cooper");
-    p1.age_ = std::make_unique<std::uint64_t>(28);
-    p1.city_ = std::make_unique<std::string>("Boston");
-    p1.email_ = std::make_unique<std::string>("alice@example.com");
+    p1.name_ = MAKE_UNIQUE(std::string, "Alice Cooper");
+    p1.age_ = MAKE_UNIQUE(std::uint64_t, 28);
+    p1.city_ = MAKE_UNIQUE(std::string, "Boston");
+    p1.email_ = MAKE_UNIQUE(std::string, "alice@example.com");
     people1.push_back(std::move(p1));
 
     Person p2;
-    p2.name_ = std::make_unique<std::string>("David Wilson");
-    p2.age_ = std::make_unique<std::uint64_t>(42);
-    p2.city_ = std::make_unique<std::string>("Seattle");
+    p2.name_ = MAKE_UNIQUE(std::string, "David Wilson");
+    p2.age_ = MAKE_UNIQUE(std::uint64_t, 42);
+    p2.city_ = MAKE_UNIQUE(std::string, "Seattle");
     p2.email_ = nullptr;
     people1.push_back(std::move(p2));
 
@@ -552,17 +552,17 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_PERSON_VECTOR_SHARED_PTR) {
   try {
     PersonVectorSharedPtr people1;
 
-    auto p1 = std::make_shared<Person>();
-    p1->name_ = std::make_unique<std::string>("Alice Cooper");
-    p1->age_ = std::make_unique<std::uint64_t>(28);
-    p1->city_ = std::make_unique<std::string>("Boston");
-    p1->email_ = std::make_unique<std::string>("alice@example.com");
+    auto p1 = MAKE_SHARED(Person);
+    p1->name_ = MAKE_UNIQUE(std::string, "Alice Cooper");
+    p1->age_ = MAKE_UNIQUE(std::uint64_t, 28);
+    p1->city_ = MAKE_UNIQUE(std::string, "Boston");
+    p1->email_ = MAKE_UNIQUE(std::string, "alice@example.com");
     people1.push_back(p1);
 
-    auto p2 = std::make_shared<Person>();
-    p2->name_ = std::make_unique<std::string>("David Wilson");
-    p2->age_ = std::make_unique<std::uint64_t>(42);
-    p2->city_ = std::make_unique<std::string>("Seattle");
+    auto p2 = MAKE_SHARED(Person);
+    p2->name_ = MAKE_UNIQUE(std::string, "David Wilson");
+    p2->age_ = MAKE_UNIQUE(std::uint64_t, 42);
+    p2->city_ = MAKE_UNIQUE(std::string, "Seattle");
     p2->email_ = nullptr;
     people1.push_back(p2);
 
@@ -601,17 +601,17 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_PERSON_VECTOR_UNIQUE_PTR) {
   try {
     PersonVectorUniquePtr people1;
 
-    auto p1 = std::make_unique<Person>();
-    p1->name_ = std::make_unique<std::string>("Alice Cooper");
-    p1->age_ = std::make_unique<std::uint64_t>(28);
-    p1->city_ = std::make_unique<std::string>("Boston");
-    p1->email_ = std::make_unique<std::string>("alice@example.com");
+    auto p1 = MAKE_UNIQUE(Person);
+    p1->name_ = MAKE_UNIQUE(std::string, "Alice Cooper");
+    p1->age_ = MAKE_UNIQUE(std::uint64_t, 28);
+    p1->city_ = MAKE_UNIQUE(std::string, "Boston");
+    p1->email_ = MAKE_UNIQUE(std::string, "alice@example.com");
     people1.push_back(std::move(p1));
 
-    auto p2 = std::make_unique<Person>();
-    p2->name_ = std::make_unique<std::string>("David Wilson");
-    p2->age_ = std::make_unique<std::uint64_t>(42);
-    p2->city_ = std::make_unique<std::string>("Seattle");
+    auto p2 = MAKE_UNIQUE(Person);
+    p2->name_ = MAKE_UNIQUE(std::string, "David Wilson");
+    p2->age_ = MAKE_UNIQUE(std::uint64_t, 42);
+    p2->city_ = MAKE_UNIQUE(std::string, "Seattle");
     p2->email_ = nullptr;
     people1.push_back(std::move(p2));
 
@@ -651,18 +651,18 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_PERSON_VECTOR_OPTIONAL) {
     PersonVectorOptional people1;
 
     Person p1;
-    p1.name_ = std::make_unique<std::string>("Alice Cooper");
-    p1.age_ = std::make_unique<std::uint64_t>(28);
-    p1.city_ = std::make_unique<std::string>("Boston");
-    p1.email_ = std::make_unique<std::string>("alice@example.com");
+    p1.name_ = MAKE_UNIQUE(std::string, "Alice Cooper");
+    p1.age_ = MAKE_UNIQUE(std::uint64_t, 28);
+    p1.city_ = MAKE_UNIQUE(std::string, "Boston");
+    p1.email_ = MAKE_UNIQUE(std::string, "alice@example.com");
     people1.push_back(std::move(p1));
 
     people1.push_back(std::nullopt);
 
     Person p3;
-    p3.name_ = std::make_unique<std::string>("David Wilson");
-    p3.age_ = std::make_unique<std::uint64_t>(42);
-    p3.city_ = std::make_unique<std::string>("Seattle");
+    p3.name_ = MAKE_UNIQUE(std::string, "David Wilson");
+    p3.age_ = MAKE_UNIQUE(std::uint64_t, 42);
+    p3.city_ = MAKE_UNIQUE(std::string, "Seattle");
     p3.email_ = nullptr;
     people1.push_back(std::move(p3));
 
@@ -707,23 +707,23 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_PERSON_MAP) {
     PersonMap persons_map;
 
     Person p1;
-    p1.name_ = std::make_unique<std::string>("John Doe");
-    p1.age_ = std::make_unique<std::uint64_t>(30);
-    p1.city_ = std::make_unique<std::string>("New York");
-    p1.email_ = std::make_unique<std::string>("john@example.com");
+    p1.name_ = MAKE_UNIQUE(std::string, "John Doe");
+    p1.age_ = MAKE_UNIQUE(std::uint64_t, 30);
+    p1.city_ = MAKE_UNIQUE(std::string, "New York");
+    p1.email_ = MAKE_UNIQUE(std::string, "john@example.com");
     persons_map["john"] = std::move(p1);
 
     Person p2;
-    p2.name_ = std::make_unique<std::string>("Jane Smith");
-    p2.age_ = std::make_unique<std::uint64_t>(25);
-    p2.city_ = std::make_unique<std::string>("Los Angeles");
+    p2.name_ = MAKE_UNIQUE(std::string, "Jane Smith");
+    p2.age_ = MAKE_UNIQUE(std::uint64_t, 25);
+    p2.city_ = MAKE_UNIQUE(std::string, "Los Angeles");
     p2.email_ = nullptr;
     persons_map["jane"] = std::move(p2);
 
     Person p3;
-    p3.name_ = std::make_unique<std::string>("Bob Johnson");
-    p3.age_ = std::make_unique<std::uint64_t>(35);
-    p3.city_ = std::make_unique<std::string>("Chicago");
+    p3.name_ = MAKE_UNIQUE(std::string, "Bob Johnson");
+    p3.age_ = MAKE_UNIQUE(std::uint64_t, 35);
+    p3.city_ = MAKE_UNIQUE(std::string, "Chicago");
     p3.email_ = nullptr;
     persons_map["bob"] = std::move(p3);
 
@@ -771,24 +771,24 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_PERSON_MAP_UNIQUE_PTR) {
   try {
     PersonMapUniquePtr persons_map;
 
-    auto p1 = std::make_unique<Person>();
-    p1->name_ = std::make_unique<std::string>("John Doe");
-    p1->age_ = std::make_unique<std::uint64_t>(30);
-    p1->city_ = std::make_unique<std::string>("New York");
-    p1->email_ = std::make_unique<std::string>("john@example.com");
+    auto p1 = MAKE_UNIQUE(Person);
+    p1->name_ = MAKE_UNIQUE(std::string, "John Doe");
+    p1->age_ = MAKE_UNIQUE(std::uint64_t, 30);
+    p1->city_ = MAKE_UNIQUE(std::string, "New York");
+    p1->email_ = MAKE_UNIQUE(std::string, "john@example.com");
     persons_map["john"] = std::move(p1);
 
-    auto p2 = std::make_unique<Person>();
-    p2->name_ = std::make_unique<std::string>("Jane Smith");
-    p2->age_ = std::make_unique<std::uint64_t>(25);
-    p2->city_ = std::make_unique<std::string>("Los Angeles");
+    auto p2 = MAKE_UNIQUE(Person);
+    p2->name_ = MAKE_UNIQUE(std::string, "Jane Smith");
+    p2->age_ = MAKE_UNIQUE(std::uint64_t, 25);
+    p2->city_ = MAKE_UNIQUE(std::string, "Los Angeles");
     p2->email_ = nullptr;
     persons_map["jane"] = std::move(p2);
 
-    auto p3 = std::make_unique<Person>();
-    p3->name_ = std::make_unique<std::string>("Bob Johnson");
-    p3->age_ = std::make_unique<std::uint64_t>(35);
-    p3->city_ = std::make_unique<std::string>("Chicago");
+    auto p3 = MAKE_UNIQUE(Person);
+    p3->name_ = MAKE_UNIQUE(std::string, "Bob Johnson");
+    p3->age_ = MAKE_UNIQUE(std::uint64_t, 35);
+    p3->city_ = MAKE_UNIQUE(std::string, "Chicago");
     p3->email_ = nullptr;
     persons_map["bob"] = std::move(p3);
 
@@ -839,24 +839,24 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_PERSON_MAP_SHARED_PTR) {
   try {
     PersonMapSharedPtr persons_map;
 
-    auto p1 = std::make_shared<Person>();
-    p1->name_ = std::make_unique<std::string>("John Doe");
-    p1->age_ = std::make_unique<std::uint64_t>(30);
-    p1->city_ = std::make_unique<std::string>("New York");
-    p1->email_ = std::make_unique<std::string>("john@example.com");
+    auto p1 = MAKE_SHARED(Person);
+    p1->name_ = MAKE_UNIQUE(std::string, "John Doe");
+    p1->age_ = MAKE_UNIQUE(std::uint64_t, 30);
+    p1->city_ = MAKE_UNIQUE(std::string, "New York");
+    p1->email_ = MAKE_UNIQUE(std::string, "john@example.com");
     persons_map["john"] = p1;
 
-    auto p2 = std::make_shared<Person>();
-    p2->name_ = std::make_unique<std::string>("Jane Smith");
-    p2->age_ = std::make_unique<std::uint64_t>(25);
-    p2->city_ = std::make_unique<std::string>("Los Angeles");
+    auto p2 = MAKE_SHARED(Person);
+    p2->name_ = MAKE_UNIQUE(std::string, "Jane Smith");
+    p2->age_ = MAKE_UNIQUE(std::uint64_t, 25);
+    p2->city_ = MAKE_UNIQUE(std::string, "Los Angeles");
     p2->email_ = nullptr;
     persons_map["jane"] = p2;
 
-    auto p3 = std::make_shared<Person>();
-    p3->name_ = std::make_unique<std::string>("Bob Johnson");
-    p3->age_ = std::make_unique<std::uint64_t>(35);
-    p3->city_ = std::make_unique<std::string>("Chicago");
+    auto p3 = MAKE_SHARED(Person);
+    p3->name_ = MAKE_UNIQUE(std::string, "Bob Johnson");
+    p3->age_ = MAKE_UNIQUE(std::uint64_t, 35);
+    p3->city_ = MAKE_UNIQUE(std::string, "Chicago");
     p3->email_ = nullptr;
     persons_map["bob"] = p3;
 
@@ -908,25 +908,25 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_PERSON_MAP_OPTIONAL) {
     PersonMapOptional persons_map;
 
     Person p1;
-    p1.name_ = std::make_unique<std::string>("John Doe");
-    p1.age_ = std::make_unique<std::uint64_t>(30);
-    p1.city_ = std::make_unique<std::string>("New York");
-    p1.email_ = std::make_unique<std::string>("john@example.com");
+    p1.name_ = MAKE_UNIQUE(std::string, "John Doe");
+    p1.age_ = MAKE_UNIQUE(std::uint64_t, 30);
+    p1.city_ = MAKE_UNIQUE(std::string, "New York");
+    p1.email_ = MAKE_UNIQUE(std::string, "john@example.com");
     persons_map["john"] = std::move(p1);
 
     Person p2;
-    p2.name_ = std::make_unique<std::string>("Jane Smith");
-    p2.age_ = std::make_unique<std::uint64_t>(25);
-    p2.city_ = std::make_unique<std::string>("Los Angeles");
+    p2.name_ = MAKE_UNIQUE(std::string, "Jane Smith");
+    p2.age_ = MAKE_UNIQUE(std::uint64_t, 25);
+    p2.city_ = MAKE_UNIQUE(std::string, "Los Angeles");
     p2.email_ = nullptr;
     persons_map["jane"] = std::move(p2);
 
     persons_map["bob"] = std::nullopt;
 
     Person p4;
-    p4.name_ = std::make_unique<std::string>("Alice Cooper");
-    p4.age_ = std::make_unique<std::uint64_t>(28);
-    p4.city_ = std::make_unique<std::string>("Boston");
+    p4.name_ = MAKE_UNIQUE(std::string, "Alice Cooper");
+    p4.age_ = MAKE_UNIQUE(std::uint64_t, 28);
+    p4.city_ = MAKE_UNIQUE(std::string, "Boston");
     p4.email_ = nullptr;
     persons_map["alice"] = std::move(p4);
 
@@ -982,26 +982,26 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_PERSON_MAP_OPTIONAL) {
 
 BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_PERSON_DICT) {
   try {
-    auto persons_map = std::make_unique<PersonMap>();
+    auto persons_map = MAKE_UNIQUE(PersonMap);
 
     Person p1;
-    p1.name_ = std::make_unique<std::string>("John Doe");
-    p1.age_ = std::make_unique<std::uint64_t>(30);
-    p1.city_ = std::make_unique<std::string>("New York");
-    p1.email_ = std::make_unique<std::string>("john@example.com");
+    p1.name_ = MAKE_UNIQUE(std::string, "John Doe");
+    p1.age_ = MAKE_UNIQUE(std::uint64_t, 30);
+    p1.city_ = MAKE_UNIQUE(std::string, "New York");
+    p1.email_ = MAKE_UNIQUE(std::string, "john@example.com");
     (*persons_map)["john"] = std::move(p1);
 
     Person p2;
-    p2.name_ = std::make_unique<std::string>("Jane Smith");
-    p2.age_ = std::make_unique<std::uint64_t>(25);
-    p2.city_ = std::make_unique<std::string>("Los Angeles");
+    p2.name_ = MAKE_UNIQUE(std::string, "Jane Smith");
+    p2.age_ = MAKE_UNIQUE(std::uint64_t, 25);
+    p2.city_ = MAKE_UNIQUE(std::string, "Los Angeles");
     p2.email_ = nullptr;
     (*persons_map)["jane"] = std::move(p2);
 
     Person p3;
-    p3.name_ = std::make_unique<std::string>("Bob Johnson");
-    p3.age_ = std::make_unique<std::uint64_t>(35);
-    p3.city_ = std::make_unique<std::string>("Chicago");
+    p3.name_ = MAKE_UNIQUE(std::string, "Bob Johnson");
+    p3.age_ = MAKE_UNIQUE(std::uint64_t, 35);
+    p3.city_ = MAKE_UNIQUE(std::string, "Chicago");
     p3.email_ = nullptr;
     (*persons_map)["bob"] = std::move(p3);
 
@@ -1051,26 +1051,26 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_PERSON_DICT) {
 
 BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_PERSON_DICT_UNIQUE_PTR) {
   try {
-    auto persons_map = std::make_unique<PersonMapUniquePtr>();
+    auto persons_map = MAKE_UNIQUE(PersonMapUniquePtr);
 
-    auto p1 = std::make_unique<Person>();
-    p1->name_ = std::make_unique<std::string>("John Doe");
-    p1->age_ = std::make_unique<std::uint64_t>(30);
-    p1->city_ = std::make_unique<std::string>("New York");
-    p1->email_ = std::make_unique<std::string>("john@example.com");
+    auto p1 = MAKE_UNIQUE(Person);
+    p1->name_ = MAKE_UNIQUE(std::string, "John Doe");
+    p1->age_ = MAKE_UNIQUE(std::uint64_t, 30);
+    p1->city_ = MAKE_UNIQUE(std::string, "New York");
+    p1->email_ = MAKE_UNIQUE(std::string, "john@example.com");
     (*persons_map)["john"] = std::move(p1);
 
-    auto p2 = std::make_unique<Person>();
-    p2->name_ = std::make_unique<std::string>("Jane Smith");
-    p2->age_ = std::make_unique<std::uint64_t>(25);
-    p2->city_ = std::make_unique<std::string>("Los Angeles");
+    auto p2 = MAKE_UNIQUE(Person);
+    p2->name_ = MAKE_UNIQUE(std::string, "Jane Smith");
+    p2->age_ = MAKE_UNIQUE(std::uint64_t, 25);
+    p2->city_ = MAKE_UNIQUE(std::string, "Los Angeles");
     p2->email_ = nullptr;
     (*persons_map)["jane"] = std::move(p2);
 
-    auto p3 = std::make_unique<Person>();
-    p3->name_ = std::make_unique<std::string>("Bob Johnson");
-    p3->age_ = std::make_unique<std::uint64_t>(35);
-    p3->city_ = std::make_unique<std::string>("Chicago");
+    auto p3 = MAKE_UNIQUE(Person);
+    p3->name_ = MAKE_UNIQUE(std::string, "Bob Johnson");
+    p3->age_ = MAKE_UNIQUE(std::uint64_t, 35);
+    p3->city_ = MAKE_UNIQUE(std::string, "Chicago");
     p3->email_ = nullptr;
     (*persons_map)["bob"] = std::move(p3);
 
@@ -1123,26 +1123,26 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_PERSON_DICT_UNIQUE_PTR) {
 
 BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_PERSON_DICT_SHARED_PTR) {
   try {
-    auto persons_map = std::make_shared<PersonMapSharedPtr>();
+    auto persons_map = MAKE_SHARED(PersonMapSharedPtr);
 
-    auto p1 = std::make_shared<Person>();
-    p1->name_ = std::make_unique<std::string>("John Doe");
-    p1->age_ = std::make_unique<std::uint64_t>(30);
-    p1->city_ = std::make_unique<std::string>("New York");
-    p1->email_ = std::make_unique<std::string>("john@example.com");
+    auto p1 = MAKE_SHARED(Person);
+    p1->name_ = MAKE_UNIQUE(std::string, "John Doe");
+    p1->age_ = MAKE_UNIQUE(std::uint64_t, 30);
+    p1->city_ = MAKE_UNIQUE(std::string, "New York");
+    p1->email_ = MAKE_UNIQUE(std::string, "john@example.com");
     (*persons_map)["john"] = p1;
 
-    auto p2 = std::make_shared<Person>();
-    p2->name_ = std::make_unique<std::string>("Jane Smith");
-    p2->age_ = std::make_unique<std::uint64_t>(25);
-    p2->city_ = std::make_unique<std::string>("Los Angeles");
+    auto p2 = MAKE_SHARED(Person);
+    p2->name_ = MAKE_UNIQUE(std::string, "Jane Smith");
+    p2->age_ = MAKE_UNIQUE(std::uint64_t, 25);
+    p2->city_ = MAKE_UNIQUE(std::string, "Los Angeles");
     p2->email_ = nullptr;
     (*persons_map)["jane"] = p2;
 
-    auto p3 = std::make_shared<Person>();
-    p3->name_ = std::make_unique<std::string>("Bob Johnson");
-    p3->age_ = std::make_unique<std::uint64_t>(35);
-    p3->city_ = std::make_unique<std::string>("Chicago");
+    auto p3 = MAKE_SHARED(Person);
+    p3->name_ = MAKE_UNIQUE(std::string, "Bob Johnson");
+    p3->age_ = MAKE_UNIQUE(std::uint64_t, 35);
+    p3->city_ = MAKE_UNIQUE(std::string, "Chicago");
     p3->email_ = nullptr;
     (*persons_map)["bob"] = p3;
 
@@ -1198,25 +1198,25 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_PERSON_DICT_OPTIONAL) {
     PersonMapOptional persons_map;
 
     Person p1;
-    p1.name_ = std::make_unique<std::string>("John Doe");
-    p1.age_ = std::make_unique<std::uint64_t>(30);
-    p1.city_ = std::make_unique<std::string>("New York");
-    p1.email_ = std::make_unique<std::string>("john@example.com");
+    p1.name_ = MAKE_UNIQUE(std::string, "John Doe");
+    p1.age_ = MAKE_UNIQUE(std::uint64_t, 30);
+    p1.city_ = MAKE_UNIQUE(std::string, "New York");
+    p1.email_ = MAKE_UNIQUE(std::string, "john@example.com");
     persons_map["john"] = std::move(p1);
 
     Person p2;
-    p2.name_ = std::make_unique<std::string>("Jane Smith");
-    p2.age_ = std::make_unique<std::uint64_t>(25);
-    p2.city_ = std::make_unique<std::string>("Los Angeles");
+    p2.name_ = MAKE_UNIQUE(std::string, "Jane Smith");
+    p2.age_ = MAKE_UNIQUE(std::uint64_t, 25);
+    p2.city_ = MAKE_UNIQUE(std::string, "Los Angeles");
     p2.email_ = nullptr;
     persons_map["jane"] = std::move(p2);
 
     persons_map["bob"] = std::nullopt;
 
     Person p4;
-    p4.name_ = std::make_unique<std::string>("Alice Cooper");
-    p4.age_ = std::make_unique<std::uint64_t>(28);
-    p4.city_ = std::make_unique<std::string>("Boston");
+    p4.name_ = MAKE_UNIQUE(std::string, "Alice Cooper");
+    p4.age_ = MAKE_UNIQUE(std::uint64_t, 28);
+    p4.city_ = MAKE_UNIQUE(std::string, "Boston");
     p4.email_ = nullptr;
     persons_map["alice"] = std::move(p4);
 
@@ -1309,14 +1309,14 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_ARBITRARY_LIST_UNIQUE_PTR) {
   try {
     ArbitraryListUniquePtr values;
 
-    values.push_back(std::make_unique<boost::json::value>("hello world"));
-    values.push_back(std::make_unique<boost::json::value>(42));
-    values.push_back(std::make_unique<boost::json::value>(true));
+    values.push_back(MAKE_UNIQUE(boost::json::value, "hello world"));
+    values.push_back(MAKE_UNIQUE(boost::json::value, 42));
+    values.push_back(MAKE_UNIQUE(boost::json::value, true));
     values.push_back(nullptr);
-    values.push_back(std::make_unique<boost::json::value>(
-        boost::json::object{{"key", "value"}}));
     values.push_back(
-        std::make_unique<boost::json::value>(boost::json::array{1, 2, 3}));
+        MAKE_UNIQUE(boost::json::value, boost::json::object{{"key", "value"}}));
+    values.push_back(
+        MAKE_UNIQUE(boost::json::value, boost::json::array{1, 2, 3}));
 
     boost::json::value json_value = Marshal(values);
     std::cout << "==> TEST_PARSE_JSON_ARBITRARY_LIST_UNIQUE_PTR" << std::endl;
@@ -1350,14 +1350,14 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_ARBITRARY_LIST_SHARED_PTR) {
   try {
     ArbitraryListSharedPtr values;
 
-    values.push_back(std::make_shared<boost::json::value>("hello world"));
-    values.push_back(std::make_shared<boost::json::value>(42));
-    values.push_back(std::make_shared<boost::json::value>(true));
+    values.push_back(MAKE_SHARED(boost::json::value, "hello world"));
+    values.push_back(MAKE_SHARED(boost::json::value, 42));
+    values.push_back(MAKE_SHARED(boost::json::value, true));
     values.push_back(nullptr);
-    values.push_back(std::make_shared<boost::json::value>(
-        boost::json::object{{"key", "value"}}));
     values.push_back(
-        std::make_shared<boost::json::value>(boost::json::array{1, 2, 3}));
+        MAKE_SHARED(boost::json::value, boost::json::object{{"key", "value"}}));
+    values.push_back(
+        MAKE_SHARED(boost::json::value, boost::json::array{1, 2, 3}));
 
     boost::json::value json_value = Marshal(values);
     std::cout << "==> TEST_PARSE_JSON_ARBITRARY_LIST_SHARED_PTR" << std::endl;
@@ -1467,14 +1467,14 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_ARBITRARY_MAP_UNIQUE_PTR) {
   try {
     ArbitraryMapUniquePtr values;
 
-    values["string"] = std::make_unique<boost::json::value>("hello world");
-    values["number"] = std::make_unique<boost::json::value>(42);
-    values["boolean"] = std::make_unique<boost::json::value>(true);
+    values["string"] = MAKE_UNIQUE(boost::json::value, "hello world");
+    values["number"] = MAKE_UNIQUE(boost::json::value, 42);
+    values["boolean"] = MAKE_UNIQUE(boost::json::value, true);
     values["null"] = nullptr;
-    values["object"] = std::make_unique<boost::json::value>(
-        boost::json::object{{"key", "value"}});
+    values["object"] =
+        MAKE_UNIQUE(boost::json::value, boost::json::object{{"key", "value"}});
     values["array"] =
-        std::make_unique<boost::json::value>(boost::json::array{1, 2, 3});
+        MAKE_UNIQUE(boost::json::value, boost::json::array{1, 2, 3});
 
     boost::json::value json_value = Marshal(values);
     std::cout << "==> TEST_PARSE_JSON_ARBITRARY_MAP_UNIQUE_PTR" << std::endl;
@@ -1510,14 +1510,14 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_ARBITRARY_MAP_SHARED_PTR) {
   try {
     ArbitraryMapSharedPtr values;
 
-    values["string"] = std::make_shared<boost::json::value>("hello world");
-    values["number"] = std::make_shared<boost::json::value>(42);
-    values["boolean"] = std::make_shared<boost::json::value>(true);
+    values["string"] = MAKE_SHARED(boost::json::value, "hello world");
+    values["number"] = MAKE_SHARED(boost::json::value, 42);
+    values["boolean"] = MAKE_SHARED(boost::json::value, true);
     values["null"] = nullptr;
-    values["object"] = std::make_shared<boost::json::value>(
-        boost::json::object{{"key", "value"}});
+    values["object"] =
+        MAKE_SHARED(boost::json::value, boost::json::object{{"key", "value"}});
     values["array"] =
-        std::make_shared<boost::json::value>(boost::json::array{1, 2, 3});
+        MAKE_SHARED(boost::json::value, boost::json::array{1, 2, 3});
 
     boost::json::value json_value = Marshal(values);
     std::cout << "==> TEST_PARSE_JSON_ARBITRARY_MAP_SHARED_PTR" << std::endl;
@@ -1618,7 +1618,7 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_ARBITRARY) {
 
 BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_ARBITRARY_UNIQUE_PTR) {
   try {
-    ArbitraryUniquePtrStruct value = std::make_unique<Arbitrary>();
+    ArbitraryUniquePtrStruct value = MAKE_UNIQUE(Arbitrary);
     value->value_ = boost::json::value(42);
 
     boost::json::value json_value = Marshal(value);
@@ -1641,7 +1641,7 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_ARBITRARY_UNIQUE_PTR) {
 
 BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_ARBITRARY_SHARED_PTR) {
   try {
-    ArbitrarySharedPtrStruct value = std::make_shared<Arbitrary>();
+    ArbitrarySharedPtrStruct value = MAKE_SHARED(Arbitrary);
     value->value_ = boost::json::value(true);
 
     boost::json::value json_value = Marshal(value);
@@ -1688,7 +1688,7 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_ARBITRARY_OPTIONAL) {
 BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_ARBITRARY_UNIQUE_PTR_MEMBER) {
   try {
     ArbitraryUniquePtr value;
-    value.value_ = std::make_unique<boost::json::value>("hello world");
+    value.value_ = MAKE_UNIQUE(boost::json::value, "hello world");
 
     boost::json::value json_value = Marshal(value);
     std::cout << "==> TEST_PARSE_JSON_ARBITRARY_UNIQUE_PTR_MEMBER" << std::endl;
@@ -1711,7 +1711,7 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_ARBITRARY_UNIQUE_PTR_MEMBER) {
 BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_ARBITRARY_SHARED_PTR_MEMBER) {
   try {
     ArbitrarySharedPtr value;
-    value.value_ = std::make_shared<boost::json::value>(42);
+    value.value_ = MAKE_SHARED(boost::json::value, 42);
 
     boost::json::value json_value = Marshal(value);
     std::cout << "==> TEST_PARSE_JSON_ARBITRARY_SHARED_PTR_MEMBER" << std::endl;

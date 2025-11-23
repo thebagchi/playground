@@ -12,6 +12,22 @@
 #include <vector>
 
 // =============================================================================
+// Utility Macros for Smart Pointer Creation
+// =============================================================================
+
+/**
+ * @brief Macro to create unique_ptr without angle brackets
+ * Usage: MAKE_UNIQUE(Type, args...) instead of std::make_unique<Type>(args...)
+ */
+#define MAKE_UNIQUE(T, ...) std::make_unique<T>(__VA_ARGS__)
+
+/**
+ * @brief Macro to create shared_ptr without angle brackets
+ * Usage: MAKE_SHARED(Type, args...) instead of std::make_shared<Type>(args...)
+ */
+#define MAKE_SHARED(T, ...) std::make_shared<T>(__VA_ARGS__)
+
+// =============================================================================
 // Type Traits
 // =============================================================================
 
@@ -353,7 +369,7 @@ struct Write<const bool> {
  */
 template <>
 struct Write<boost::json::value> {
-  boost::json::value operator()(const boost::json::value* object) const {
+  inline boost::json::value operator()(const boost::json::value* object) const {
     return *object;  // Pass through as-is
   }
 };
@@ -363,7 +379,7 @@ struct Write<boost::json::value> {
  */
 template <>
 struct Write<const boost::json::value> {
-  boost::json::value operator()(const boost::json::value* object) const {
+  inline boost::json::value operator()(const boost::json::value* object) const {
     return *object;  // Pass through as-is
   }
 };
@@ -383,7 +399,7 @@ struct Write {
    * @param object Pointer to object to serialize
    * @return JSON value representation
    */
-  boost::json::value operator()(const T* object) const {
+  inline boost::json::value operator()(const T* object) const {
     static_assert(has_properties_v<T>,
                   "T must have a static properties member for serialization");
     boost::json::object obj;
@@ -433,7 +449,7 @@ struct Write<std::vector<T>> {
       "Raw pointers are not supported in std::vector for serialization. "
       "Use std::unique_ptr, std::shared_ptr, or std::optional instead.");
 
-  boost::json::value operator()(const std::vector<T>* object) const {
+  inline boost::json::value operator()(const std::vector<T>* object) const {
     if (!object) [[unlikely]]
       return nullptr;
 
@@ -454,7 +470,8 @@ struct Write<std::vector<T>> {
  */
 template <typename T>
 struct Write<std::map<std::string, T>> {
-  boost::json::value operator()(const std::map<std::string, T>* object) const {
+  inline boost::json::value operator()(
+      const std::map<std::string, T>* object) const {
     if (!object) [[unlikely]]
       return nullptr;
 
@@ -479,7 +496,7 @@ struct Write<std::map<std::string, T>> {
  */
 template <typename T>
 struct Write<std::unique_ptr<T>> {
-  boost::json::value operator()(const std::unique_ptr<T>* object) const {
+  inline boost::json::value operator()(const std::unique_ptr<T>* object) const {
     if (!object || !*object) [[unlikely]]
       return nullptr;
     return Write<T>{}(object->get());
@@ -492,7 +509,7 @@ struct Write<std::unique_ptr<T>> {
  */
 template <typename T>
 struct Write<std::shared_ptr<T>> {
-  boost::json::value operator()(const std::shared_ptr<T>* object) const {
+  inline boost::json::value operator()(const std::shared_ptr<T>* object) const {
     if (!object || !*object) [[unlikely]]
       return nullptr;
     return Write<T>{}(object->get());
@@ -505,7 +522,7 @@ struct Write<std::shared_ptr<T>> {
  */
 template <typename T>
 struct Write<std::optional<T>> {
-  boost::json::value operator()(const std::optional<T>* object) const {
+  inline boost::json::value operator()(const std::optional<T>* object) const {
     if (!object || !*object) [[unlikely]]
       return nullptr;
     return Write<T>{}(&**object);
@@ -553,7 +570,7 @@ struct Read {
    * @param value JSON value to deserialize from
    * @param object Pointer to object to populate
    */
-  void operator()(const boost::json::value& value, T* object) const {
+  inline void operator()(const boost::json::value& value, T* object) const {
     if (!value.is_object()) {
       return;  // Invalid JSON type for object deserialization
     }
@@ -638,8 +655,8 @@ struct Read {
  */
 template <typename T>
 struct Read<std::unique_ptr<T>> {
-  void operator()(const boost::json::value& value,
-                  std::unique_ptr<T>* object) const {
+  inline void operator()(const boost::json::value& value,
+                         std::unique_ptr<T>* object) const {
     if (value.is_null()) [[unlikely]] {
       *object = nullptr;
     } else [[likely]] {
@@ -655,8 +672,8 @@ struct Read<std::unique_ptr<T>> {
  */
 template <typename T>
 struct Read<std::shared_ptr<T>> {
-  void operator()(const boost::json::value& value,
-                  std::shared_ptr<T>* object) const {
+  inline void operator()(const boost::json::value& value,
+                         std::shared_ptr<T>* object) const {
     if (value.is_null()) [[unlikely]] {
       *object = nullptr;
     } else [[likely]] {
@@ -672,8 +689,8 @@ struct Read<std::shared_ptr<T>> {
  */
 template <typename T>
 struct Read<std::optional<T>> {
-  void operator()(const boost::json::value& value,
-                  std::optional<T>* object) const {
+  inline void operator()(const boost::json::value& value,
+                         std::optional<T>* object) const {
     if (value.is_null()) [[unlikely]] {
       *object = std::nullopt;
     } else [[likely]] {
@@ -693,7 +710,8 @@ struct Read<std::optional<T>> {
  */
 template <>
 struct Read<std::string> {
-  void operator()(const boost::json::value& value, std::string* object) const {
+  inline void operator()(const boost::json::value& value,
+                         std::string* object) const {
     if (value.is_string()) {
       *object = value.as_string();  // Direct assignment, no c_str() conversion
     }
@@ -705,7 +723,8 @@ struct Read<std::string> {
  */
 template <>
 struct Read<std::int64_t> {
-  void operator()(const boost::json::value& value, std::int64_t* object) const {
+  inline void operator()(const boost::json::value& value,
+                         std::int64_t* object) const {
     if (value.is_int64()) {
       *object = value.as_int64();
     } else if (value.is_uint64()) {
@@ -723,8 +742,8 @@ struct Read<std::int64_t> {
  */
 template <>
 struct Read<std::uint64_t> {
-  void operator()(const boost::json::value& value,
-                  std::uint64_t* object) const {
+  inline void operator()(const boost::json::value& value,
+                         std::uint64_t* object) const {
     if (value.is_uint64()) {
       *object = value.as_uint64();
     } else if (value.is_int64()) {
@@ -741,7 +760,8 @@ struct Read<std::uint64_t> {
  */
 template <>
 struct Read<double> {
-  void operator()(const boost::json::value& value, double* object) const {
+  inline void operator()(const boost::json::value& value,
+                         double* object) const {
     if (value.is_double()) {
       *object = value.as_double();
     }
@@ -753,7 +773,7 @@ struct Read<double> {
  */
 template <>
 struct Read<bool> {
-  void operator()(const boost::json::value& value, bool* object) const {
+  inline void operator()(const boost::json::value& value, bool* object) const {
     if (value.is_bool()) {
       *object = value.as_bool();
     }
@@ -769,8 +789,8 @@ struct Read<bool> {
  */
 template <>
 struct Read<boost::json::value> {
-  void operator()(const boost::json::value& value,
-                  boost::json::value* object) const {
+  inline void operator()(const boost::json::value& value,
+                         boost::json::value* object) const {
     *object = value;  // Pass through as-is
   }
 };
@@ -790,8 +810,8 @@ struct Read<std::vector<T>> {
       "Raw pointers are not supported in std::vector for deserialization. "
       "Use std::unique_ptr, std::shared_ptr, or std::optional instead.");
 
-  void operator()(const boost::json::value& value,
-                  std::vector<T>* object) const {
+  inline void operator()(const boost::json::value& value,
+                         std::vector<T>* object) const {
     if (!value.is_null() && value.is_array()) [[likely]] {
       const boost::json::array& arr = value.as_array();
       object->clear();
@@ -811,8 +831,8 @@ struct Read<std::vector<T>> {
  */
 template <typename T>
 struct Read<std::map<std::string, T>> {
-  void operator()(const boost::json::value& value,
-                  std::map<std::string, T>* object) const {
+  inline void operator()(const boost::json::value& value,
+                         std::map<std::string, T>* object) const {
     if (!value.is_null() && value.is_object()) [[likely]] {
       const boost::json::object& obj = value.as_object();
       object->clear();

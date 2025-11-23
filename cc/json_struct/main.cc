@@ -24,10 +24,10 @@ void encode_decode_struct() {
   try {
     // Create a Person with mixed types
     Person p1;
-    p1.name_ = "John Doe";                                 // direct string
-    p1.age_ = std::make_unique<std::uint64_t>(30);         // unique_ptr
-    p1.city_ = std::make_shared<std::string>("New York");  // shared_ptr
-    p1.email_ = "john@example.com";                        // optional
+    p1.name_ = "John Doe";                            // direct string
+    p1.age_ = MAKE_UNIQUE(std::uint64_t, 30);         // unique_ptr
+    p1.city_ = MAKE_SHARED(std::string, "New York");  // shared_ptr
+    p1.email_ = "john@example.com";                   // optional
 
     // Marshal to JSON
     boost::json::value json_value = Marshal(p1);
