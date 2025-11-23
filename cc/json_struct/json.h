@@ -103,6 +103,13 @@ using opt_t = typename opt<T>::type;
 // 3. Avoid unnecessary copies through efficient memory management
 // 4. Compile-time reflection minimizes runtime overhead
 //
+// Error Handling:
+// - Type mismatches throw std::runtime_error with descriptive messages
+// - Invalid JSON structures throw std::runtime_error
+// - JSON parsing errors throw std::runtime_error with Boost error details
+// - Missing required fields throw std::runtime_error
+// - Null values for non-nullable fields throw std::runtime_error
+//
 // Usage:
 //   struct MyStruct {
 //     std::unique_ptr<std::string> name;
@@ -197,6 +204,29 @@ constexpr void for_each(std::integer_sequence<T, S...>, F&& f) {
   std::string msg;
   msg.reserve(25 + std::strlen(field_name));  // Pre-allocate space
   msg.append("Field '").append(field_name).append("' is missing");
+  throw std::runtime_error(msg);
+}
+
+[[noreturn]] inline void throw_type_mismatch(const char* expected_type,
+                                             const boost::json::value& value) {
+  std::string msg;
+  msg.reserve(100);  // Pre-allocate space
+  msg.append("Type mismatch: expected ")
+      .append(expected_type)
+      .append(", got ")
+      .append(boost::json::to_string(value.kind()));
+  throw std::runtime_error(msg);
+}
+
+[[noreturn]] inline void throw_invalid_json_object() {
+  throw std::runtime_error(
+      "Invalid JSON: expected object for struct deserialization");
+}
+
+[[noreturn]] inline void throw_json_parse_error(const std::string& error_msg) {
+  std::string msg;
+  msg.reserve(20 + error_msg.size());
+  msg.append("JSON parse error: ").append(error_msg);
   throw std::runtime_error(msg);
 }
 
@@ -572,7 +602,7 @@ struct Read {
    */
   inline void operator()(const boost::json::value& value, T* object) const {
     if (!value.is_object()) {
-      return;  // Invalid JSON type for object deserialization
+      throw_invalid_json_object();
     }
 
     const boost::json::object& obj = value.as_object();
@@ -712,9 +742,10 @@ template <>
 struct Read<std::string> {
   inline void operator()(const boost::json::value& value,
                          std::string* object) const {
-    if (value.is_string()) {
-      *object = value.as_string();  // Direct assignment, no c_str() conversion
+    if (!value.is_string()) {
+      throw_type_mismatch("string", value);
     }
+    *object = value.as_string();  // Direct assignment, no c_str() conversion
   }
 };
 
@@ -732,7 +763,11 @@ struct Read<std::int64_t> {
       if (val <= static_cast<std::uint64_t>(
                      std::numeric_limits<std::int64_t>::max())) {
         *object = static_cast<std::int64_t>(val);
+      } else {
+        throw std::runtime_error("Value too large for int64_t");
       }
+    } else {
+      throw_type_mismatch("integer", value);
     }
   }
 };
@@ -750,7 +785,12 @@ struct Read<std::uint64_t> {
       auto val = value.as_int64();
       if (val >= 0) {
         *object = static_cast<std::uint64_t>(val);
+      } else {
+        throw std::runtime_error(
+            "Negative value cannot be converted to uint64_t");
       }
+    } else {
+      throw_type_mismatch("unsigned integer", value);
     }
   }
 };
@@ -764,6 +804,12 @@ struct Read<double> {
                          double* object) const {
     if (value.is_double()) {
       *object = value.as_double();
+    } else if (value.is_int64()) {
+      *object = static_cast<double>(value.as_int64());
+    } else if (value.is_uint64()) {
+      *object = static_cast<double>(value.as_uint64());
+    } else {
+      throw_type_mismatch("number", value);
     }
   }
 };
@@ -776,6 +822,8 @@ struct Read<bool> {
   inline void operator()(const boost::json::value& value, bool* object) const {
     if (value.is_bool()) {
       *object = value.as_bool();
+    } else {
+      throw_type_mismatch("boolean", value);
     }
   }
 };
@@ -812,7 +860,9 @@ struct Read<std::vector<T>> {
 
   inline void operator()(const boost::json::value& value,
                          std::vector<T>* object) const {
-    if (!value.is_null() && value.is_array()) [[likely]] {
+    if (value.is_null()) {
+      object->clear();
+    } else if (value.is_array()) [[likely]] {
       const boost::json::array& arr = value.as_array();
       object->clear();
       object->reserve(arr.size());
@@ -821,6 +871,8 @@ struct Read<std::vector<T>> {
         object->emplace_back();  // Construct in-place for better performance
         Read<T>{}(item, &object->back());
       }
+    } else {
+      throw_type_mismatch("array", value);
     }
   }
 };
@@ -833,7 +885,9 @@ template <typename T>
 struct Read<std::map<std::string, T>> {
   inline void operator()(const boost::json::value& value,
                          std::map<std::string, T>* object) const {
-    if (!value.is_null() && value.is_object()) [[likely]] {
+    if (value.is_null()) {
+      object->clear();
+    } else if (value.is_object()) [[likely]] {
       const boost::json::object& obj = value.as_object();
       object->clear();
       // Note: std::map doesn't support reserve() as it's tree-based, not
@@ -844,6 +898,8 @@ struct Read<std::map<std::string, T>> {
         Read<T>{}(item.value(), &temp);
         (*object)[std::string(item.key())] = std::move(temp);
       }
+    } else {
+      throw_type_mismatch("object", value);
     }
   }
 };
@@ -869,10 +925,15 @@ void Unmarshal(const boost::json::value& value, T& object) {
  * @tparam T Type to deserialize
  * @param json_string JSON string to deserialize from
  * @param object Reference to the object to populate
+ * @throws std::runtime_error if JSON parsing fails or type mismatches occur
  */
 template <typename T>
 void UnmarshalFromString(const std::string& json_string, T& object) {
-  boost::json::value value = boost::json::parse(json_string);
+  boost::system::error_code ec;
+  boost::json::value value = boost::json::parse(json_string, ec);
+  if (ec) {
+    throw_json_parse_error(ec.message());
+  }
   Read<T>{}(value, &object);
 }
 
