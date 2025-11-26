@@ -1,9 +1,7 @@
-//go:build ignore
-
 package main
 
 import (
-	"errors"
+	"encoding/json"
 	"fmt"
 	"io"
 	"log"
@@ -11,6 +9,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"sort"
 	"strings"
 
 	"google.golang.org/protobuf/encoding/protojson"
@@ -32,6 +31,15 @@ const (
 	X86_V02_CSV_URL  = "https://raw.githubusercontent.com/golang/arch/refs/heads/master/x86/x86.v0.2.csv"
 	X86_CSV_FILE     = "x86.csv"
 	X86_V02_CSV_FILE = "x86.v0.2.csv"
+)
+
+const (
+	KIND_NULL   = "NULL"
+	KIND_NUMBER = "NUMBER"
+	KIND_STRING = "STRING"
+	KIND_BOOL   = "BOOL"
+	KIND_STRUCT = "STRUCT"
+	KIND_LIST   = "LIST"
 )
 
 func join(parts ...string) string {
@@ -66,24 +74,26 @@ func generateX86JSON() {
 	run("sh", "-c", join(TBLGEN_BIN, "-dump-json", X86_TD, "-I", INCLUDE_DIR, "-I", X86_INCLUDE_DIR, ">", X86_JSON))
 }
 
-func printKind(x *structpb.Value) error {
+func printKind(x *structpb.Value) string {
+	if x == nil {
+		return ""
+	}
 	switch x.GetKind().(type) {
 	case *structpb.Value_NullValue:
-		log.Println("Kind: Null")
+		return KIND_NULL
 	case *structpb.Value_NumberValue:
-		log.Println("Kind: Number")
+		return KIND_NUMBER
 	case *structpb.Value_StringValue:
-		log.Println("Kind: String")
+		return KIND_STRING
 	case *structpb.Value_BoolValue:
-		log.Println("Kind: Bool")
+		return KIND_BOOL
 	case *structpb.Value_StructValue:
-		log.Println("Kind: Struct")
+		return KIND_STRUCT
 	case *structpb.Value_ListValue:
-		log.Println("Kind: List")
+		return KIND_LIST
 	default:
-		return errors.New("unknown value kind")
+		return ""
 	}
-	return nil
 }
 
 func getKey(val *structpb.Value, key string) *structpb.Value {
@@ -97,6 +107,19 @@ func getKey(val *structpb.Value, key string) *structpb.Value {
 	return nil
 }
 
+func getKeyString(val *structpb.Value, key string) string {
+	if v := getKey(val, key); v != nil {
+		if printKind(v) == KIND_STRING {
+			return v.GetStringValue()
+		} else {
+			if data, err := v.MarshalJSON(); err == nil {
+				return string(data)
+			}
+		}
+	}
+	return ""
+}
+
 func parseJSON() {
 	data, err := os.ReadFile(X86_JSON)
 	if err != nil {
@@ -106,13 +129,20 @@ func parseJSON() {
 	if err := value.UnmarshalJSON(data); err != nil {
 		log.Fatalln("Failed to parse JSON to structpb.Value:", err)
 	}
-	if err := printKind(value); err != nil {
-		log.Fatalln("Failed to print value kind:", err)
+	kind := printKind(value)
+	if kind == "" {
+		log.Fatalln("Failed to get value kind: unknown or nil")
 	}
+	log.Println("Kind:", kind)
 
 	if dict := value.GetStructValue(); nil != dict {
 		filtered := make(map[string]*structpb.Value)
 		for key, val := range dict.GetFields() {
+			kopc := printKind(getKey(val, "Opcode"))
+			kasm := printKind(getKey(val, "AsmString"))
+			if kopc != KIND_LIST && kasm != KIND_STRING {
+				continue
+			}
 			if opcode := getKey(val, "Opcode"); opcode != nil {
 				filtered[key] = val
 			} else {
@@ -171,6 +201,49 @@ func downloadCSV() error {
 	return nil
 }
 
+func formatOpcode(opcodeStr string) string {
+	var bits []int
+	if err := json.Unmarshal([]byte(opcodeStr), &bits); err != nil {
+		// If not valid JSON array, return empty
+		return ""
+	}
+	// Convert bits to integer (MSB first)
+	var num int
+	for _, bit := range bits {
+		num = (num << 1) | bit
+	}
+	return fmt.Sprintf("%d", num)
+}
+
+func makeCSV() {
+	data, err := os.ReadFile(X86_JSON)
+	if err != nil {
+		log.Fatalln("Failed to read JSON:", err)
+	}
+	value := new(structpb.Value)
+	if err := value.UnmarshalJSON(data); err != nil {
+		log.Fatalln("Failed to parse JSON to structpb.Value:", err)
+	}
+	dict := value.GetStructValue()
+	if dict == nil || dict.Fields == nil {
+		log.Fatalln("Parsed JSON is not a dictionary")
+	}
+	keys := make([]string, 0, len(dict.Fields))
+	for k := range dict.Fields {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+	for _, key := range keys {
+		value := dict.Fields[key]
+		opc := formatOpcode(getKeyString(value, "Opcode"))
+		asm := getKeyString(value, "AsmString")
+		if len(opc) == 0 {
+			opc = getKeyString(value, "Opcode")
+			log.Fatalln("Failed to process opcode: ", key, "|", opc, "|", asm)
+		}
+	}
+}
+
 func main() {
 	if err := downloadCSV(); err != nil {
 		log.Fatalln("Failed to download CSVs:", err)
@@ -183,4 +256,5 @@ func main() {
 	buildLLVM()
 	generateX86JSON()
 	parseJSON()
+	makeCSV()
 }
