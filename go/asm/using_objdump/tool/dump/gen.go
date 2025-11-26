@@ -60,6 +60,10 @@ func cloneLLVM() {
 	run("git", "clone", "https://github.com/llvm/llvm-project.git", LLVM_DIR)
 }
 
+func pullLLVM() {
+	run("sh", "-c", join("cd", LLVM_DIR, "&&", "git", "pull"))
+}
+
 func findTD() {
 	run("sh", "-c", join("find", LLVM_DIR, "-name", "*.td", ">", FILES_TXT))
 }
@@ -140,14 +144,22 @@ func parseJSON() {
 		for key, val := range dict.GetFields() {
 			kopc := printKind(getKey(val, "Opcode"))
 			kasm := printKind(getKey(val, "AsmString"))
-			if kopc != KIND_LIST && kasm != KIND_STRING {
+			if kopc != KIND_LIST || kasm != KIND_STRING {
 				continue
 			}
-			if opcode := getKey(val, "Opcode"); opcode != nil {
-				filtered[key] = val
-			} else {
-				// fmt.Println("Key: ", key)
+			opcode := getKey(val, "Opcode")
+			if opcode == nil {
+				continue
 			}
+			list := opcode.GetListValue()
+			if list == nil || len(list.Values) == 0 {
+				continue
+			}
+			asm := getKey(val, "AsmString")
+			if asm == nil || len(asm.GetStringValue()) == 0 {
+				continue
+			}
+			filtered[key] = val
 		}
 		opcodes := structpb.NewStructValue(&structpb.Struct{
 			Fields: filtered,
@@ -201,18 +213,23 @@ func downloadCSV() error {
 	return nil
 }
 
-func formatOpcode(opcodeStr string) string {
+func formatOpcode(opc string) string {
 	var bits []int
-	if err := json.Unmarshal([]byte(opcodeStr), &bits); err != nil {
-		// If not valid JSON array, return empty
+	if err := json.Unmarshal([]byte(opc), &bits); err != nil {
 		return ""
 	}
-	// Convert bits to integer (MSB first)
+	// Convert bits to integer (LSB first - LLVM convention)
+	// Index 0 = bit position 0 (LSB), Index N = bit position N
 	var num int
-	for _, bit := range bits {
-		num = (num << 1) | bit
+	for i, bit := range bits {
+		num = num + (bit << i)
 	}
+	// fmt.Println("Len: ", len(bits), num)
 	return fmt.Sprintf("%d", num)
+}
+
+func processASM(asm string) {
+	//fmt.Println(asm)
 }
 
 func makeCSV() {
@@ -241,6 +258,14 @@ func makeCSV() {
 			opc = getKeyString(value, "Opcode")
 			log.Fatalln("Failed to process opcode: ", key, "|", opc, "|", asm)
 		}
+		if len(asm) == 0 {
+			var bits []int
+			if err := json.Unmarshal([]byte(getKeyString(value, "Opcode")), &bits); err != nil {
+				// Do Nothing ...
+			}
+			log.Println(key, "|", opc, "|", asm, "|", len(bits), "|", getKeyString(value, "Opcode"))
+		}
+		processASM(asm)
 	}
 }
 
@@ -251,6 +276,8 @@ func main() {
 	// Check if .llvm exists
 	if _, err := os.Stat(LLVM_DIR); os.IsNotExist(err) {
 		cloneLLVM()
+	} else {
+		pullLLVM()
 	}
 	findTD()
 	buildLLVM()
