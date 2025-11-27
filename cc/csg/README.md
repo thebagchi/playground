@@ -463,5 +463,5 @@ Source: [`optional_smart_ptr_example.cc`](optional_smart_ptr_example.cc)
 
 References
 
-[C++ Core Guidelines](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines)
-[cppreference.com - Smart Pointers](https://en.cppreference.com/w/cpp/memory)
+- [C++ Core Guidelines](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines)
+- [cppreference.com - Smart Pointers](https://en.cppreference.com/w/cpp/memory)
