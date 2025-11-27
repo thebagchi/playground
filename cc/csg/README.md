@@ -1,4 +1,4 @@
-# Smart Pointer Usage Guidelines in C++
+# Smart Pointer Safety Guidelines in C++
 
 ---
 
