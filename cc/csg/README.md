@@ -10,6 +10,7 @@
 
 Source: `exception_safety_example.cc`
 
+```
 +-------------------+
 |    Object         |
 +-------------------+
@@ -18,6 +19,7 @@ Source: `exception_safety_example.cc`
 +-------------------+    +-------------------+
 | std::unique_ptr   |    | std::shared_ptr   |
 +-------------------+    +-------------------+
+```
 
 ## 2. Passing Objects to Functions
 a) Non-owning Access
@@ -32,11 +34,13 @@ Source: `non_owning_access_example.cc`
 
 ### Non-owning Access
 
+```
 +----------------+      +------------------+
 | Caller         | ---> | Function uses    |
 | (owns via      |      | reference/pointer|
 | smart ptr)     |      +------------------+
 +----------------+
+```
 
 b) Ownership Transfer
 
@@ -46,10 +50,12 @@ b) Ownership Transfer
 
 ### Ownership Transfer
 
+```
 +-------------------+      +-------------------+
 | Caller owns via   | ---> | Function takes    |
 | unique_ptr        |      | ownership         |
 +-------------------+      +-------------------+
+```
 
 Move semantics enhance efficiency when transferring ownership of smart pointers, particularly with std::unique_ptr. Using std::move allows transferring ownership without copying the underlying object, which is crucial for performance in resource-intensive applications.
 
@@ -61,6 +67,7 @@ c) Avoid Passing Smart Pointers Everywhere
 
 ### Avoid Passing Everywhere
 
+```
 +-------------------+
 | Function          |
 +-------------------+
@@ -70,6 +77,7 @@ c) Avoid Passing Smart Pointers Everywhere
 | Smart Pointer     |
 | (only if needed)  |
 +-------------------+
+```
 
 d) Lambda Captures
 
@@ -164,14 +172,17 @@ const std::string& get_reference(const std::string& str) {
 
 ### Cycle Problem
 
+```
 +-----------+      +-----------+
 | shared A  | <--> | shared B  |
 +-----------+      +-----------+
+```
 
 This diagram illustrates a cyclic reference between two shared_ptr objects, preventing automatic memory deallocation and causing memory leaks.
 
 ### Break Cycle
 
+```
 +-----------+      +-----------+
 | shared A  | ---> | weak B    |
 +-----------+      +-----------+
@@ -179,6 +190,7 @@ This diagram illustrates a cyclic reference between two shared_ptr objects, prev
 +-----------+      +-----------+
 | shared B  | ---> | weak A    |
 +-----------+      +-----------+
+```
 
 The cycle can be broken by making either pointer weak, depending on the ownership semantics.
 
