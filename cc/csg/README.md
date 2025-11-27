@@ -207,8 +207,12 @@ Source: [`counter_example.cc`](counter_example.cc)
 
 Key Points in Example:
 
-Demonstrates const correctness and ownership semantics.
-Shows std::unique_ptr with std::move for ownership transfer.
+- Demonstrates const correctness and ownership semantics.
+- Shows std::unique_ptr with std::move for ownership transfer.
+- Illustrates non-owning access patterns using raw pointers safely.
+- Demonstrates shared ownership with std::shared_ptr for multiple references.
+- Shows proper class design with const member functions for read-only access.
+- Highlights safe handling of nullable objects to prevent null pointer dereference.
 
 
 ## 7. Example: Using std::weak_ptr to Avoid Cyclic Dependency
@@ -217,9 +221,9 @@ Source: [`weak_ptr_example.cc`](weak_ptr_example.cc)
 
 Key Points:
 
-std::weak_ptr does not increase reference count, preventing memory leaks from cyclic references.
-Use .lock() to safely convert weak_ptr to shared_ptr before accessing the object.
-Always check if .lock() returns a non-null pointer before using it.
+- std::weak_ptr does not increase reference count, preventing memory leaks from cyclic references.
+- Use .lock() to safely convert weak_ptr to shared_ptr before accessing the object.
+- Always check if .lock() returns a non-null pointer before using it.
 
 
 ## 8. Advanced Usage: Placement New with std::unique_ptr
