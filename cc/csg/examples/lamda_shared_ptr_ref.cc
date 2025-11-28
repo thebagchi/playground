@@ -17,7 +17,7 @@ void demonstrate_shared_ptr_lambda_ref() {
   auto shared_data = std::make_shared<std::string>("Shared Data");
 
   // Lambda capturing shared_ptr by reference - thread-safe reference counting
-  auto lambda_ref = [&shared_data]() {
+  auto lambda_ref = [&]() {
     // Access is safe due to shared_ptr's thread-safe reference counting
     safe_print("Lambda ref - Data: " + *shared_data);
   };

@@ -2,13 +2,47 @@
 
 ---
 
+## Table of Contents
+
+- [Forward](#forward)
+- [1. Ownership Principles](#1-ownership-principles)
+- [2. Passing Objects to Functions](#2-passing-objects-to-functions)
+- [3. Returning Objects](#3-returning-objects)
+- [4. Safety Rules](#4-safety-rules)
+- [5. Performance Considerations](#5-performance-considerations)
+- [6. Example Pattern (Detailed)](#6-example-pattern-detailed)
+- [7. Example: Using std::weak_ptr to Avoid Cyclic Dependency](#7-example-using-stdweak_ptr-to-avoid-cyclic-dependency)
+- [8. Advanced Usage: Placement New with std::unique_ptr](#8-advanced-usage-placement-new-with-stdunique_ptr)
+- [9. Advanced Topics and Edge Cases](#9-advanced-topics-and-edge-cases)
+- [10. RAII with Shared Pointers](#10-raii-with-shared-pointers)
+- [11. Integration with Containers](#11-integration-with-containers)
+- [12. Object Pooling with Smart Pointers](#12-object-pooling-with-smart-pointers)
+- [13. Best Practices Checklist](#13-best-practices-checklist)
+- [14. Building and Running](#14-building-and-running)
+- [15. Decision Tree for Function Parameters](#15-decision-tree-for-function-parameters)
+- [16. Integration with std::optional](#16-integration-with-stdoptional)
+- [References](#references)
+
+---
+
+## Forward
+
+This document provides comprehensive guidelines for safe and effective use of smart pointers in C++. Manual memory management in C++ is notoriously error-prone, leading to critical issues such as:
+
+- **Memory leaks**: Forgetting to delete dynamically allocated objects
+- **Dangling pointers**: Accessing memory after it has been freed
+- **Double deletion**: Deleting the same pointer twice, causing undefined behavior
+- **Exception safety**: Resource leaks when exceptions occur during manual cleanup
+
+Smart pointers (`std::unique_ptr`, `std::shared_ptr`, `std::weak_ptr`) automate resource management through RAII (Resource Acquisition Is Initialization), preventing these memory safety issues and ensuring exception-safe code. Proper use of smart pointers is essential for writing robust, maintainable C++ code.
+
 ## 1. Ownership Principles
 
 - Always use **smart pointers** (`std::unique_ptr` or `std::shared_ptr`) for objects with dynamic lifetime.
 - Avoid raw `new` and `delete`. Use `std::make_unique` or `std::make_shared` for creation.
 - Ensure exception safety: Smart pointers provide RAII, ensuring cleanup even if constructors throw. Prefer `std::make_unique` and `std::make_shared` for exception-safe object creation.
 
-Source: [`exception_safety_example.cc`](exception_safety_example.cc)
+Source: [`exception_safety.cc`](examples/exception_safety.cc)
 
 ```
 +-------------------+
@@ -22,7 +56,7 @@ Source: [`exception_safety_example.cc`](exception_safety_example.cc)
 ```
 
 ## 2. Passing Objects to Functions
-a) Non-owning Access
+### a) Non-owning Access
 
 - Prefer const T& or T& when the object must exist (i.e. it is required).
 - Use T* or const T* only when nullptr is a meaningful, valid input (i.e. the parameter is truly optional).
@@ -30,9 +64,7 @@ a) Non-owning Access
 
 For safe reference access from smart pointers, use utility functions like `Ref()` that check for null before dereferencing.
 
-Source: [`non_owning_access_example.cc`](non_owning_access_example.cc)
-
-### Non-owning Access
+Source: [`non_owning_access.cc`](examples/non_owning_access.cc)
 
 ```
 +----------------+      +------------------+
@@ -42,13 +74,11 @@ Source: [`non_owning_access_example.cc`](non_owning_access_example.cc)
 +----------------+
 ```
 
-b) Ownership Transfer
+### b) Ownership Transfer
 
 - Use std::unique_ptr<T> when transferring ownership.
 - Use std::shared_ptr<T> only when shared ownership is truly needed.
 - Leverage move semantics for efficient ownership transfer with std::unique_ptr, avoiding unnecessary copies.
-
-### Ownership Transfer
 
 ```
 +-------------------+      +-------------------+
@@ -59,13 +89,11 @@ b) Ownership Transfer
 
 Move semantics enhance efficiency when transferring ownership of smart pointers, particularly with std::unique_ptr. Using std::move allows transferring ownership without copying the underlying object, which is crucial for performance in resource-intensive applications.
 
-Source: [`ownership_transfer_example.cc`](ownership_transfer_example.cc)
+Source: [`ownership_transfer.cc`](examples/ownership_transfer.cc)
 
-c) Avoid Passing Smart Pointers Everywhere
+### c) Avoid Passing Smart Pointers Everywhere
 
 - Pass smart pointers only when ownership semantics matter.
-
-### Avoid Passing Everywhere
 
 ```
 +-------------------+
@@ -79,7 +107,7 @@ c) Avoid Passing Smart Pointers Everywhere
 +-------------------+
 ```
 
-d) Lambda Captures
+### d) Lambda Captures
 
 Use lambda captures when you need to create callable objects that maintain references to smart pointers. This is particularly useful for asynchronous operations, callbacks, event handlers, and algorithms requiring custom comparators or operations on smart pointer-managed objects.
 
@@ -139,7 +167,76 @@ auto lambda_unique_ptr_value = [ptr = std::move(unique_ptr)]() mutable {
 // null and should not be used.
 ```
 
-Source: [`lamda_capture.cc`](lamda_capture.cc)
+Source: [`lamda_capture.cc`](examples/lamda_capture.cc)
+
+### e) std::function with Callbacks
+
+Use `std::function` to create uniform callable objects that can wrap free functions, lambdas, functors, and bound functions. This is particularly useful for callbacks, event handlers, and asynchronous operations.
+
+**Key Points:**
+- `std::function` provides type erasure for callable objects
+- Requires callable objects to be copy-constructible
+- Can be used with smart pointers, but has limitations with move-only types like `std::unique_ptr`
+
+**Examples:**
+
+```cpp
+#include <functional>
+#include <memory>
+#include <iostream>
+
+void free_function(int value) {
+  std::cout << "Free function called with: " << value << std::endl;
+}
+
+// Function that takes a callback
+void process_with_callback(std::function<void(int)> callback, int value) {
+  std::cout << "Processing with callback..." << std::endl;
+  callback(value);
+  std::cout << "Callback processed." << std::endl;
+}
+
+int main() {
+  // Using std::function with free function
+  process_with_callback(free_function, 42);
+
+  // Using std::function with lambda
+  auto lambda_callback = [](int value) {
+    std::cout << "Lambda callback called with: " << value << std::endl;
+  };
+  process_with_callback(lambda_callback, 100);
+
+  // Using std::function with bound function
+  auto bound_callback = std::bind(free_function, std::placeholders::_1);
+  process_with_callback(bound_callback, 200);
+
+  // Using shared_ptr in lambda callback - works because shared_ptr is copyable
+  auto shared_ptr = std::make_shared<int>(300);
+  auto shared_callback = [ptr = shared_ptr](int value) {
+    std::cout << "Smart pointer callback with value: " << value
+              << ", ptr value: " << *ptr << std::endl;
+  };
+  process_with_callback(shared_callback, 400);
+
+  // Using unique_ptr in lambda callback - NOT POSSIBLE with std::function
+  // std::function requires copyable callables, so using unique_ptr with
+  // std::function is not possible. We call it directly instead.
+  auto unique_ptr = std::make_unique<int>(500);
+  auto unique_callback = [ptr = std::move(unique_ptr)](int value) mutable {
+    if (ptr) {
+      std::cout << "Unique pointer callback with value: " << value
+                << ", ptr value: " << *ptr << std::endl;
+    }
+  };
+  unique_callback(600);  // Called directly, not through std::function
+
+  return 0;
+}
+```
+
+**Important Note:** `std::function` cannot be used with move-only types like `std::unique_ptr` because it requires callable objects to be copy-constructible. For move-only callables, you must invoke them directly rather than wrapping them in `std::function`.
+
+Source: [`functor_bind.cc`](examples/functor_bind.cc)
 
 ## 3. Returning Objects
 
@@ -203,9 +300,9 @@ The cycle can be broken by making either pointer weak, depending on the ownershi
 
 ## 6. Example Pattern (Detailed)
 
-Source: [`counter_example.cc`](counter_example.cc)
+Source: [`counter.cc`](examples/counter.cc)
 
-Key Points in Example:
+### Key Points
 
 - Demonstrates const correctness and ownership semantics.
 - Shows std::unique_ptr with std::move for ownership transfer.
@@ -217,9 +314,9 @@ Key Points in Example:
 
 ## 7. Example: Using std::weak_ptr to Avoid Cyclic Dependency
 
-Source: [`weak_ptr_example.cc`](weak_ptr_example.cc)
+Source: [`weak_ptr.cc`](examples/weak_ptr.cc)
 
-Key Points:
+### Key Points
 
 - std::weak_ptr does not increase reference count, preventing memory leaks from cyclic references.
 - Use .lock() to safely convert weak_ptr to shared_ptr before accessing the object.
@@ -229,10 +326,10 @@ Key Points:
 ## 8. Advanced Usage: Placement New with std::unique_ptr
 
 Both std::unique_ptr and std::shared_ptr can be combined with placement new for custom memory management. Use a wrapper function with a lambda deleter to handle destruction and deallocation.
-Source: [`placement_new_example.cc`](placement_new_example.cc)
+Source: [`placement_new.cc`](examples/placement_new.cc)
 
 
-### Key Points:
+### Key Points
 
 - The lambda deleter ensures proper destruction and deallocation.
 - Use std::function<void(T*)> for the deleter type to handle the lambda.
@@ -244,7 +341,7 @@ Source: [`placement_new_example.cc`](placement_new_example.cc)
 
 
 ## 9. Advanced Topics and Edge Cases
-Custom Deleters
+### Custom Deleters
 
 Custom deleters allow std::unique_ptr to manage resources that require special cleanup logic, such as FILE pointers that need fclose() instead of delete.
 
@@ -257,15 +354,15 @@ auto custom_deleter = [](int* ptr) {
 std::unique_ptr<int, decltype(custom_deleter)> ptr(new int(42), custom_deleter);
 ```
 
-Source: [`unique_ptr_deleter_example.cc`](unique_ptr_deleter_example.cc)
+Source: [`unique_ptr_deleter.cc`](examples/unique_ptr_deleter.cc)
 
 ## 10. RAII with Shared Pointers
 
 RAII (Resource Acquisition Is Initialization) ensures resources are properly managed through object lifetime. With `std::shared_ptr`, RAII provides thread-safe reference counting and automatic cleanup.
 
-Source: [`raii_shared_ptr_example.cc`](raii_shared_ptr_example.cc)
+Source: [`raii_shared_ptr.cc`](examples/raii_shared_ptr.cc)
 
-Key Points:
+### Key Points
 
 - RAII ensures resources are cleaned up when objects go out of scope
 - `std::shared_ptr` provides thread-safe reference counting
@@ -279,7 +376,7 @@ Key Points:
 - **Note:** Multiple threads may access the same shared_ptr instance safely (control block is atomic), but never access the same shared_ptr from different threads without synchronization if one modifies it (e.g., reset(), assignment).
 - std::unique_ptr and std::weak_ptr are not thread-safe; use external synchronization
 
-RAII Mutex Locking
+#### RAII Mutex Locking
 To ensure thread-safe access to shared objects managed by smart pointers, use RAII with std::lock_guard or std::unique_lock for automatic mutex unlocking:
 ```cpp
 #include <mutex>
@@ -312,7 +409,7 @@ This ensures the mutex is released automatically when the scope ends, preventing
 
 Double-checked locking is a thread-safe singleton pattern that minimizes locking overhead by checking the initialization flag twice - once without locking and once with locking.
 
-Source: [`double_check_lock_example.cc`](double_check_lock_example.cc)
+Source: [`double_check_lock.cc`](examples/double_check_lock.cc)
 
 ## 11. Integration with Containers
 
@@ -327,7 +424,7 @@ Use custom deleters in std::shared_ptr or std::unique_ptr to implement object po
 Example: ObjectPool for efficient string management. This demonstrates object pooling with smart pointers, using custom deleters for automatic recycling.
 Objects need not be put back in the pool manually - they are recycled automatically when the smart pointer goes out of scope using custom deleters.
 
-Source: [`memory_pool_example.cc`](memory_pool_example.cc)
+Source: [`memory_pool.cc`](examples/memory_pool.cc)
 
 ## 13. Best Practices Checklist
 
@@ -357,8 +454,8 @@ This project uses CMake for building. All examples require C++17 or later.
 mkdir build
 cd build
 
-# Configure with CMake
-cmake ..
+# Configure with CMake (pointing to examples directory)
+cmake ../examples
 
 # Build all examples
 make
@@ -459,7 +556,7 @@ This example demonstrates three approaches for handling potentially unavailable 
 - Always check if the optional has a value before dereferencing.
 - Use std::move when transferring ownership from optional unique_ptr.
 
-Source: [`optional_smart_ptr_example.cc`](optional_smart_ptr_example.cc)
+Source: [`optional_smart_ptr.cc`](examples/optional_smart_ptr.cc)
 
 References
 
