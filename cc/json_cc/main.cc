@@ -3,10 +3,12 @@
 #include <thread>
 
 #include "tsc.hpp"
-#include "value_v1.hpp"
+#include "value.hpp"
 
 // Utility function to convert bool to string
-const char* bool_to_string(bool value) { return value ? "true" : "false"; }
+const char* bool_to_string(bool value) {
+  return value ? "true" : "false";
+}
 
 void test_tsc() {
   uint64_t tsc_value = read_tsc();
@@ -18,8 +20,7 @@ void test_tsc_difference() {
   std::this_thread::sleep_for(std::chrono::seconds(1));
   uint64_t etsc = read_tsc();
   uint64_t difference = etsc - stsc;
-  std::cout << "TSC difference over 1 second: " << difference << " cycles"
-            << std::endl;
+  std::cout << "TSC difference over 1 second: " << difference << " cycles" << std::endl;
 }
 
 void test_value_bool() {
@@ -41,28 +42,25 @@ void test_value_null() {
 void test_value_string() {
   // Test String constructor with std::string
   json::Value string_value_1(std::string("Hello, World!"));
-  std::cout << "string_value_1 type: " << string_value_1.type_name()
-            << std::endl;
+  std::cout << "string_value_1 type: " << string_value_1.type_name() << std::endl;
 
   // Test String constructor with const char*
   json::Value string_value_2("JSON Library");
-  std::cout << "string_value_2 type: " << string_value_2.type_name()
-            << std::endl;
+  std::cout << "string_value_2 type: " << string_value_2.type_name() << std::endl;
 
   // Test String constructor with StringView
   json::Value string_value_3(std::string_view("StringView Test"));
-  std::cout << "string_value_3 type: " << string_value_3.type_name()
-            << std::endl;
+  std::cout << "string_value_3 type: " << string_value_3.type_name() << std::endl;
 }
 
 void test_value_list() {
   // Test List constructor using MakePtr
   {
     json::List data = {
-        json::MakePtr(42),       // Number
-        json::MakePtr("hello"),  // String
-        json::MakePtr(true),     // Bool
-        json::MakePtr(nullptr)   // Null
+      json::MakePtr(42), // Number
+      json::MakePtr("hello"), // String
+      json::MakePtr(true), // Bool
+      json::MakePtr(nullptr) // Null
     };
 
     json::Value value(data);
@@ -73,10 +71,10 @@ void test_value_list() {
   // Test List move constructor
   {
     json::List data = {
-        json::MakePtr(99),       // Number
-        json::MakePtr("world"),  // String
-        json::MakePtr(false),    // Bool
-        json::MakePtr(nullptr)   // Null
+      json::MakePtr(99), // Number
+      json::MakePtr("world"), // String
+      json::MakePtr(false), // Bool
+      json::MakePtr(nullptr) // Null
     };
 
     json::Value value(std::move(data));
@@ -87,17 +85,16 @@ void test_value_list() {
   // Test inline List initialization
   {
     json::Value value(json::List{
-        json::MakePtr(123),       // Number
-        json::MakePtr("inline"),  // String
-        json::MakePtr(true)       // Bool
+        json::MakePtr(123), // Number
+        json::MakePtr("inline"), // String
+        json::MakePtr(true) // Bool
     });
     std::cout << "inline value type: " << value.type_name() << std::endl;
   }
 
   // Test as_list and for_each methods
   {
-    json::List test_data = {json::MakePtr(100), json::MakePtr("test"),
-                            json::MakePtr(false)};
+    json::List test_data = { json::MakePtr(100), json::MakePtr("test"), json::MakePtr(false) };
 
     json::Value list_value(test_data);
 
@@ -116,9 +113,9 @@ void test_value_list() {
 void test_value_dict() {
   // Test Dict constructor using MakePtr
   {
-    json::Dict data = {{"name", json::MakePtr("John")},
-                       {"age", json::MakePtr(30)},
-                       {"active", json::MakePtr(true)}};
+    json::Dict data = { { "name", json::MakePtr("John") },
+                        { "age", json::MakePtr(30) },
+                        { "active", json::MakePtr(true) } };
 
     json::Value value(data);
     std::cout << "dict value type: " << value.type_name() << std::endl;
@@ -127,17 +124,17 @@ void test_value_dict() {
 
   // Test inline Dict initialization
   {
-    json::Value value(json::Dict{{"key1", json::MakePtr(123)},
-                                 {"key2", json::MakePtr("value")},
-                                 {"key3", json::MakePtr(false)}});
+    json::Value value(json::Dict{ { "key1", json::MakePtr(123) },
+                                  { "key2", json::MakePtr("value") },
+                                  { "key3", json::MakePtr(false) } });
     std::cout << "inline dict value type: " << value.type_name() << std::endl;
   }
 
   // Test as_dict and for_each methods
   {
-    json::Dict test_data = {{"number", json::MakePtr(42.5)},
-                            {"text", json::MakePtr("hello")},
-                            {"flag", json::MakePtr(true)}};
+    json::Dict test_data = { { "number", json::MakePtr(42.5) },
+                             { "text", json::MakePtr("hello") },
+                             { "flag", json::MakePtr(true) } };
 
     json::Value dict_value(test_data);
 
@@ -147,8 +144,7 @@ void test_value_dict() {
 
     // Test for_each method
     std::cout << "for_each iteration:" << std::endl;
-    dict_value.for_each([](const std::string& key,
-                           const json::ValuePtr& value) {
+    dict_value.for_each([](const std::string& key, const json::ValuePtr& value) {
       std::cout << "  \"" << key << "\": " << value->DebugString() << std::endl;
     });
   }
@@ -156,10 +152,10 @@ void test_value_dict() {
 
 void test_make_ptr() {
   // Test MakePtr helper function
-  auto ptr1 = json::MakePtr(42);       // Number
-  auto ptr2 = json::MakePtr(true);     // Bool
-  auto ptr3 = json::MakePtr(nullptr);  // Null
-  auto ptr4 = json::MakePtr("Hello");  // String
+  auto ptr1 = json::MakePtr(42); // Number
+  auto ptr2 = json::MakePtr(true); // Bool
+  auto ptr3 = json::MakePtr(nullptr); // Null
+  auto ptr4 = json::MakePtr("Hello"); // String
 
   std::cout << "MakePtr(42) type:        " << ptr1->type_name() << std::endl;
   std::cout << "MakePtr(true) type:      " << ptr2->type_name() << std::endl;
@@ -262,14 +258,10 @@ void test_as_number() {
     json::Value value_3(0.0);
     json::Value value_4(5.5);
 
-    std::cout << "value_1.as_bool(): " << bool_to_string(value_1.as_bool())
-              << std::endl;
-    std::cout << "value_2.as_bool(): " << bool_to_string(value_2.as_bool())
-              << std::endl;
-    std::cout << "value_3.as_bool(): " << bool_to_string(value_3.as_bool())
-              << std::endl;
-    std::cout << "value_4.as_bool(): " << bool_to_string(value_4.as_bool())
-              << std::endl;
+    std::cout << "value_1.as_bool(): " << bool_to_string(value_1.as_bool()) << std::endl;
+    std::cout << "value_2.as_bool(): " << bool_to_string(value_2.as_bool()) << std::endl;
+    std::cout << "value_3.as_bool(): " << bool_to_string(value_3.as_bool()) << std::endl;
+    std::cout << "value_4.as_bool(): " << bool_to_string(value_4.as_bool()) << std::endl;
   }
 
   // Test as_string conversion
@@ -310,16 +302,14 @@ void test_debug_string() {
 
   // Test list
   {
-    json::List test_list = {json::MakePtr(1), json::MakePtr("test"),
-                            json::MakePtr(true)};
+    json::List test_list = { json::MakePtr(1), json::MakePtr("test"), json::MakePtr(true) };
     json::Value list_value(test_list);
     std::cout << "list: " << list_value.DebugString() << std::endl;
   }
 
   // Test dict
   {
-    json::Dict test_dict = {{"key1", json::MakePtr("value1")},
-                            {"key2", json::MakePtr(42)}};
+    json::Dict test_dict = { { "key1", json::MakePtr("value1") }, { "key2", json::MakePtr(42) } };
     json::Value dict_value(test_dict);
     std::cout << "dict: " << dict_value.DebugString() << std::endl;
   }
@@ -327,10 +317,9 @@ void test_debug_string() {
   // Test nested structures
   {
     json::Dict nested_dict = {
-        {"array",
-         json::MakePtr(json::List{json::MakePtr(1), json::MakePtr(2)})},
-        {"object",
-         json::MakePtr(json::Dict{{"nested", json::MakePtr("value")}})}};
+      { "array", json::MakePtr(json::List{ json::MakePtr(1), json::MakePtr(2) }) },
+      { "object", json::MakePtr(json::Dict{ { "nested", json::MakePtr("value") } }) }
+    };
     json::Value nested_value(nested_dict);
     std::cout << "nested: " << nested_value.DebugString() << std::endl;
   }
@@ -359,8 +348,7 @@ void test_setters() {
   {
     json::Value value;
     value.set_string("Hello World");
-    std::cout << "set_string(\"Hello World\"): " << value.DebugString()
-              << std::endl;
+    std::cout << "set_string(\"Hello World\"): " << value.DebugString() << std::endl;
     value.set_string(std::string("Moved String"));
     std::cout << "set_string(move): " << value.DebugString() << std::endl;
   }
@@ -368,21 +356,20 @@ void test_setters() {
   // Test set_list
   {
     json::Value value;
-    json::List test_list = {json::MakePtr(1), json::MakePtr("test")};
+    json::List test_list = { json::MakePtr(1), json::MakePtr("test") };
     value.set_list(test_list);
     std::cout << "set_list: " << value.DebugString() << std::endl;
-    value.set_list(json::List{json::MakePtr(3), json::MakePtr(4)});
+    value.set_list(json::List{ json::MakePtr(3), json::MakePtr(4) });
     std::cout << "set_list(move): " << value.DebugString() << std::endl;
   }
 
   // Test set_dict
   {
     json::Value value;
-    json::Dict test_dict = {{"key", json::MakePtr("value")}};
+    json::Dict test_dict = { { "key", json::MakePtr("value") } };
     value.set_dict(test_dict);
     std::cout << "set_dict: " << value.DebugString() << std::endl;
-    value.set_dict(
-        json::Dict{{"a", json::MakePtr(1)}, {"b", json::MakePtr(2)}});
+    value.set_dict(json::Dict{ { "a", json::MakePtr(1) }, { "b", json::MakePtr(2) } });
     std::cout << "set_dict(move): " << value.DebugString() << std::endl;
   }
 
@@ -423,7 +410,7 @@ void test_mutable_accessors() {
 
   // Test mutable_list
   {
-    json::Value value(json::List{json::MakePtr(1), json::MakePtr(2)});
+    json::Value value(json::List{ json::MakePtr(1), json::MakePtr(2) });
     std::cout << "before: " << value.DebugString() << std::endl;
 
     json::List& list = value.mutable_list();
@@ -434,7 +421,7 @@ void test_mutable_accessors() {
 
   // Test mutable_dict
   {
-    json::Value value(json::Dict{{"key1", json::MakePtr("value1")}});
+    json::Value value(json::Dict{ { "key1", json::MakePtr("value1") } });
     std::cout << "before: " << value.DebugString() << std::endl;
 
     json::Dict& dict = value.mutable_dict();
@@ -450,8 +437,7 @@ void test_mutable_accessors() {
       value.mutable_string();
       std::cout << "ERROR: Should have thrown exception" << std::endl;
     } catch (const std::runtime_error& e) {
-      std::cout << "Correctly caught exception for wrong type: " << e.what()
-                << std::endl;
+      std::cout << "Correctly caught exception for wrong type: " << e.what() << std::endl;
     }
   }
 }
