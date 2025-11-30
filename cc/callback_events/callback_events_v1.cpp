@@ -15,7 +15,7 @@ std::atomic_bool executing_callbacks_(false);
 std::atomic_uint64_t register_count_(0);
 std::atomic_uint64_t executed_count_(0);
 
-void execFunc(const CallbackFunc &func) {
+void execFunc(const CallbackFunc& func) {
   func();
   executed_count_.fetch_add(1, std::memory_order_relaxed);
 }
@@ -40,7 +40,7 @@ void executeCallbacks() {
   }
 }
 
-void registerCallback(const CallbackFunc &func) {
+void registerCallback(const CallbackFunc& func) {
   register_count_.fetch_add(1, std::memory_order_relaxed);
   {
     std::lock_guard<std::mutex> lock(callback_mutex_);
@@ -54,15 +54,14 @@ void registerCallback(const CallbackFunc &func) {
 
 void fireEvent() {
   auto expected = false;
-  if (event_occured_.compare_exchange_strong(expected, true,
-                                             std::memory_order_acq_rel)) {
+  if (event_occured_.compare_exchange_strong(expected, true, std::memory_order_acq_rel)) {
     executeCallbacks();
   } else {
     std::cout << "event has already occurred" << std::endl;
   }
 }
 
-int main(int argc, char **argv) {
+int main(int argc, char** argv) {
   registerCallback([]() {
     std::cout << "callback#1 executed!" << std::endl;
     registerCallback([]() {
@@ -96,14 +95,13 @@ int main(int argc, char **argv) {
   for (auto i = 0; i < 1000 * 1000; i++) {
     registerCallback([i]() {
       std::cout << "callback#" << i << " executed!" << std::endl;
-      registerCallback(
-          [i]() { std::cout << "inner callback#" << i << std::endl; });
+      registerCallback([i]() {
+        std::cout << "inner callback#" << i << std::endl;
+      });
     });
   }
 
-  std::cout << "register_count_: "
-            << register_count_.load(std::memory_order_acquire) << std::endl;
-  std::cout << "executed_count_: "
-            << executed_count_.load(std::memory_order_acquire) << std::endl;
+  std::cout << "register_count_: " << register_count_.load(std::memory_order_acquire) << std::endl;
+  std::cout << "executed_count_: " << executed_count_.load(std::memory_order_acquire) << std::endl;
   return 0;
 }

@@ -1,4 +1,14 @@
 ---
+# ============================================================================
+# CLANG-TIDY CONFIGURATION WITH EXAMPLES
+# ============================================================================
+# This file enables code analysis and automatic fixes for C++ code
+# Run with: clang-tidy -checks=<checks> -fix <files>
+# See before/after examples inline with each category
+
+# ============================================================================
+# ENABLED CHECK CATEGORIES
+# ============================================================================
 Checks: >
   -*,
   clang-analyzer-*,
@@ -12,99 +22,414 @@ Checks: >
   llvm-*,
   misc-*,
   -readability-magic-numbers,
+  # EXAMPLE: Magic numbers should be extracted to named constants
+  # BEFORE: if (count > 100) { /* ... */ }
+  # AFTER:  const int MAX_ITEMS = 100;
+  #         if (count > MAX_ITEMS) { /* ... */ }
+
   -readability-identifier-length,
+  # EXAMPLE: Identifier names must have minimum length
+  # BEFORE: for (int i = 0; i < n; ++i) { }
+  # AFTER:  for (int idx = 0; idx < n; ++idx) { }
+
   -google-readability-braces-around-statements,
+  # EXAMPLE: Requires braces around all control statements
+  # BEFORE: if (foo) bar();
+  # AFTER:  if (foo) { bar(); }
+
   -google-readability-todo,
+  # EXAMPLE: TODO comments must follow specific format
+  # BEFORE: // TODO fix this
+  # AFTER:  // TODO(username): fix this
+
   -cppcoreguidelines-avoid-magic-numbers,
+  # Similar to readability-magic-numbers
+
   -cppcoreguidelines-pro-bounds-constant-array-index,
+  # EXAMPLE: Don't use C-style array indexing
+  # BEFORE: int arr[10]; int x = arr[5];
+  # AFTER:  std::array<int, 10> arr; int x = arr.at(5);
+
   -modernize-use-trailing-return-type,
+  # EXAMPLE: Use C++11 trailing return types
+  # BEFORE: int getValue() { return 42; }
+  # AFTER:  auto getValue() -> int { return 42; }
+
   -performance-unnecessary-value-param,
+  # EXAMPLE: Pass heavy objects by const reference
+  # BEFORE: void process(std::vector<int> vec) { }
+  # AFTER:  void process(const std::vector<int>& vec) { }
+
   -performance-avoid-endl,
+  # EXAMPLE: Use '\n' instead of std::endl (faster)
+  # BEFORE: std::cout << "Hello" << std::endl;
+  # AFTER:  std::cout << "Hello\n";
+
   -misc-non-private-member-variables-in-classes,
+  # EXAMPLE: All class members should be private
+  # BEFORE: class Foo { public: int x; };
+  # AFTER:  class Foo { private: int x; public: int getX() const; };
+
   -bugprone-easily-swappable-parameters,
+  # EXAMPLE: Avoid parameters that could be easily swapped
+  # BEFORE: void setPosition(int x, int y) { }
+  # AFTER:  struct Point { int x, y; };
+  #         void setPosition(Point p) { }
+
   -readability-function-cognitive-complexity,
+  # EXAMPLE: Functions shouldn't have high cognitive complexity
+  # Break complex logic into smaller functions
+
   -readability-convert-member-functions-to-static,
+  # EXAMPLE: Member functions not using 'this' should be static
+  # BEFORE: class Util { public: int calculate(int x) { return x * 2; } };
+  # AFTER:  class Util { public: static int calculate(int x) { return x * 2; } };
+
   -google-build-using-namespace,
+  # EXAMPLE: Don't use 'using namespace'
+  # BEFORE: using namespace std;
+  # AFTER:  std::vector<int> v;
+
   -llvm-header-guard,
+  # EXAMPLE: Use specific header guard format
+  # Uses #ifndef/#define style instead of #pragma once
+
   -misc-definitions-in-headers,
+  # EXAMPLE: Don't put function definitions in header files
+  # BEFORE: (in .h) void foo() { /* implementation */ }
+  # AFTER:  (in .h) void foo(); (in .cpp) void foo() { /* implementation */ }
+
   -misc-unused-parameters,
+  # EXAMPLE: Remove unused function parameters
+  # BEFORE: void process(int value, int unused) { /* uses only value */ }
+  # AFTER:  void process(int value) { /* uses only value */ }
+
   -modernize-pass-by-value,
+  # EXAMPLE: Use move semantics for parameters
+  # BEFORE: Foo(const std::string& s) : m_s(s) { }
+  # AFTER:  Foo(std::string s) : m_s(std::move(s)) { }
+
   -modernize-return-brace-on-own-line,
+  # EXAMPLE: Brace positioning in return statements
+  # BEFORE: return {x, y};
+  # AFTER:  return {
+  #   x, y
+  # };
+
   -readability-named-parameter,
+  # EXAMPLE: Name all function parameters (even in declarations)
+  # BEFORE: void foo(int);
+  # AFTER:  void foo(int value);
+
   -readability-redundant-member-init,
+  # EXAMPLE: Remove redundant member initializations
+  # BEFORE: int x = int();
+  # AFTER:  int x = 0;
+
   -readability-else-after-return,
+  # EXAMPLE: Remove else after return
+  # BEFORE: if (foo) { return; } else { bar(); }
+  # AFTER:  if (foo) { return; } bar();
+
   -readability-implicit-bool-conversion,
+  # EXAMPLE: Be explicit about bool conversions
+  # BEFORE: if (ptr) { }
+  # AFTER:  if (ptr != nullptr) { }
+
   -readability-qualified-auto,
+  # EXAMPLE: Auto should be qualified with const/reference
+  # BEFORE: auto x = getValue();
+  # AFTER:  const auto& x = getValue();
+
   -readability-uppercase-literal-suffix,
+  # EXAMPLE: Use uppercase for integer/float suffixes
+  # BEFORE: auto x = 1l;
+  # AFTER:  auto x = 1L;
+
   -readability-isolate-declaration,
+  # EXAMPLE: Declare one variable per line
+  # BEFORE: int x, y, z;
+  # AFTER:  int x;
+  #         int y;
+  #         int z;
+
   -readability-suspicious-call-argument,
+  # EXAMPLE: Warn about potentially swapped parameters
+  # BEFORE: setSize(height, width);  // parameters might be swapped
+  # AFTER:  setSize(width, height);  // parameters in correct order
+
   -readability-make-member-function-const,
+  # EXAMPLE: Member functions that don't modify state should be const
+  # BEFORE: class Foo { int getValue() { return m_x; } };
+  # AFTER:  class Foo { int getValue() const { return m_x; } };
+
   -readability-use-anyofallof,
+  # EXAMPLE: Use std::any_of/all_of instead of loops
+  # BEFORE: bool found = false;
+  #         for (auto x : vec) if (x > 10) found = true;
+  # AFTER:  bool found = std::any_of(vec.begin(), vec.end(),
+  #                                  [](int x) { return x > 10; });
+
   -readability-container-data-pointer,
+  # EXAMPLE: Use .data() on containers instead of &[0]
+  # BEFORE: int* ptr = &vec[0];
+  # AFTER:  int* ptr = vec.data();
+
   -readability-reference-to-constructed-temporary,
+  # EXAMPLE: Don't bind temporaries to references
+  # BEFORE: const std::string& s = std::string("hello");  // dangerous!
+  # AFTER:  std::string s = "hello";
+
   -readability-string-compare,
+  # EXAMPLE: Use string comparison operators
+  # BEFORE: if (str.compare(other) == 0) { }
+  # AFTER:  if (str == other) { }
+
   -readability-uniqueptr-delete-release,
+  # EXAMPLE: Use unique_ptr correctly
+  # BEFORE: ptr.reset(ptr.release());
+  # AFTER:  ptr = std::move(other_ptr);
+
   -readability-const-return-type,
+  # EXAMPLE: Return types shouldn't be const
+  # BEFORE: const int getValue() { return 42; }
+  # AFTER:  int getValue() { return 42; }
+
   -readability-static-accessed-through-instance,
+  # EXAMPLE: Access static members through class, not instance
+  # BEFORE: obj.staticFunc();
+  # AFTER:  MyClass::staticFunc();
+
   -readability-static-definition-in-anonymous-namespace,
+  # EXAMPLE: Use anonymous namespace instead of static
+  # BEFORE: static int global_var;
+  # AFTER:  namespace { int global_var; }
+
   -readability-redundant-control-flow,
+  # EXAMPLE: Remove redundant control flow
+  # BEFORE: if (x) { return true; } else { return false; }
+  # AFTER:  return x;
+
   -readability-redundant-preprocessor,
+  # EXAMPLE: Remove redundant preprocessor directives
+  # BEFORE: #if 1 \n ... \n #endif
+  # AFTER:  (remove the directives)
+
   -readability-simplify-boolean-expr,
+  # EXAMPLE: Simplify boolean expressions
+  # BEFORE: if (x == true) { }
+  # AFTER:  if (x) { }
+
   -readability-redundant-smartptr-get,
+  # EXAMPLE: Don't use .get() on smart pointers unnecessarily
+  # BEFORE: if (ptr.get() != nullptr) { }
+  # AFTER:  if (ptr) { }
+
   -readability-inconsistent-declaration-parameter-name,
+  # EXAMPLE: Parameter names must match in declaration and definition
+  # BEFORE: (in .h) void foo(int x);
+  #         (in .cpp) void foo(int value) { }
+  # AFTER:  (in .h) void foo(int value);
+  #         (in .cpp) void foo(int value) { }
+
   -readability-redundant-declaration,
-  -readability-convert-member-functions-to-static,
+  # EXAMPLE: Don't declare the same thing twice
+  # BEFORE: void foo();
+  #         void foo();  // redundant
+  # AFTER:  void foo();  // only once
+
   -readability-use-std-min-max,
+  # EXAMPLE: Use std::min/max instead of ternary
+  # BEFORE: int m = x < y ? x : y;
+  # AFTER:  int m = std::min(x, y);
+
   -readability-redundant-function-ptr-dereference,
+  # EXAMPLE: Don't dereference function pointers unnecessarily
+  # BEFORE: (*func_ptr)();
+  # AFTER:  func_ptr();
+
   -readability-redundant-string-init,
+  # EXAMPLE: Don't initialize strings redundantly
+  # BEFORE: std::string s = "";
+  # AFTER:  std::string s;
+
   -readability-redundant-casting,
+  # EXAMPLE: Remove unnecessary casts
+  # BEFORE: int x = (int)42;
+  # AFTER:  int x = 42;
+
   -readability-avoid-const-params-in-decls,
+  # EXAMPLE: const in declarations is meaningless (use in definitions)
+  # BEFORE: (in .h) void foo(const int x);
+  # AFTER:  (in .h) void foo(int x);
+  #         (in .cpp) void foo(const int x) { }
+
   -readability-redundant-inline-specifier,
+  # EXAMPLE: Remove redundant inline keyword (implicit for member functions)
+  # BEFORE: class Foo { inline void bar() { } };
+  # AFTER:  class Foo { void bar() { } };
+
   -readability-redundant-void-arg,
+  # EXAMPLE: Use () instead of (void) in C++
+  # BEFORE: void foo(void);
+  # AFTER:  void foo();
+
   -readability-redundant-access-specifiers,
+  # EXAMPLE: Remove redundant access specifiers
+  # BEFORE: class Foo { public: int x; public: int y; };
+  # AFTER:  class Foo { public: int x, y; };
+
   -readability-braces-around-statements,
+  # EXAMPLE: Use braces around all statements
+  # BEFORE: if (x) y++;
+  # AFTER:  if (x) { y++; }
+
   -readability-identifier-naming
 
+# ============================================================================
+# CHECK OPTIONS WITH EXAMPLES
+# ============================================================================
 CheckOptions:
+  # ---- readability-identifier-naming: Enforce consistent naming conventions ----
+  # EXAMPLE: Class names should be CamelCase
+  # BEFORE: class my_class { };
+  # AFTER:  class MyClass { };
   - key: readability-identifier-naming.ClassCase
     value: CamelCase
+
+  # EXAMPLE: Function names should be camelBack (camelCase)
+  # BEFORE: void my_function() { }
+  # AFTER:  void myFunction() { }
   - key: readability-identifier-naming.FunctionCase
     value: camelBack
+
+  # EXAMPLE: Variable names should be camelBack
+  # BEFORE: int my_variable;
+  # AFTER:  int myVariable;
   - key: readability-identifier-naming.VariableCase
     value: camelBack
+
+  # EXAMPLE: Global constants should be UPPER_CASE
+  # BEFORE: const int max_items = 100;
+  # AFTER:  const int MAX_ITEMS = 100;
   - key: readability-identifier-naming.GlobalConstantCase
     value: UPPER_CASE
+
+  # EXAMPLE: Class members should be camelBack
+  # BEFORE: int member_var;
+  # AFTER:  int memberVar;
   - key: readability-identifier-naming.MemberCase
     value: camelBack
+
+  # EXAMPLE: Function parameters should be camelBack
+  # BEFORE: void foo(int user_id) { }
+  # AFTER:  void foo(int userId) { }
   - key: readability-identifier-naming.ParameterCase
     value: camelBack
+
+  # EXAMPLE: Local constants should be camelBack
+  # BEFORE: const int max_size = 10;
+  # AFTER:  const int maxSize = 10;
   - key: readability-identifier-naming.LocalConstantCase
     value: camelBack
+
+  # EXAMPLE: Local variables should be camelBack
+  # BEFORE: int loop_counter;
+  # AFTER:  int loopCounter;
   - key: readability-identifier-naming.LocalVariableCase
     value: camelBack
+
+  # EXAMPLE: Namespace names should be lower_case
+  # BEFORE: namespace MyNamespace { }
+  # AFTER:  namespace my_namespace { }
   - key: readability-identifier-naming.NamespaceCase
     value: lower_case
+
+  # EXAMPLE: Type aliases should be CamelCase
+  # BEFORE: using my_type = int;
+  # AFTER:  using MyType = int;
   - key: readability-identifier-naming.TypeAliasCase
     value: CamelCase
+
+  # EXAMPLE: Enum names should be CamelCase
+  # BEFORE: enum my_enum { A, B };
+  # AFTER:  enum MyEnum { A, B };
   - key: readability-identifier-naming.EnumCase
     value: CamelCase
+
+  # EXAMPLE: Enum constants should be UPPER_CASE
+  # BEFORE: enum Status { active, inactive };
+  # AFTER:  enum Status { ACTIVE, INACTIVE };
   - key: readability-identifier-naming.EnumConstantCase
     value: UPPER_CASE
+
+  # EXAMPLE: Macro definitions should be UPPER_CASE
+  # BEFORE: #define my_macro 42
+  # AFTER:  #define MY_MACRO 42
   - key: readability-identifier-naming.MacroDefinitionCase
     value: UPPER_CASE
+
+  # ---- modernize-use-auto: Encourage use of auto keyword ----
+  # EXAMPLE: Use auto for obvious types
+  # BEFORE: std::vector<int>::iterator it = vec.begin();
+  # AFTER:  auto it = vec.begin();
+  # MinTypeNameLength: 0 means apply auto even for short types
   - key: modernize-use-auto.MinTypeNameLength
     value: 0
+
+  # EXAMPLE: Remove * and & from auto (let auto deduce them)
+  # BEFORE: int* ptr = new int(42);  // after modernize-pass-by-value
+  # AFTER:  auto ptr = std::make_unique<int>(42);
+  # RemoveStars: true means auto will handle pointers correctly
   - key: modernize-use-auto.RemoveStars
     value: true
 
+# ============================================================================
+# WARNINGS AS ERRORS - These checks are treated as errors (fail the build)
+# ============================================================================
 WarningsAsErrors: >
   clang-analyzer-core.NullDereference,
-  clang-analyzer-core.DivideZero,
-  clang-analyzer-security.insecureAPI.UncheckedReturn,
-  bugprone-use-after-move,
-  misc-use-after-move,
-  modernize-use-auto
+  # EXAMPLE: Treat null pointer dereference as error
+  # BAD: int* ptr = nullptr; int x = *ptr;  // CRASH!
+  # GOOD: int* ptr = nullptr; if (ptr) { int x = *ptr; }
 
+  clang-analyzer-core.DivideZero,
+  # EXAMPLE: Treat division by zero as error
+  # BAD: int result = 10 / 0;  // undefined behavior
+  # GOOD: if (denominator != 0) { int result = 10 / denominator; }
+
+  clang-analyzer-security.insecureAPI.UncheckedReturn,
+  # EXAMPLE: Check return values from security-sensitive functions
+  # BAD: malloc(size);  // ignore return value
+  # GOOD: void* ptr = malloc(size); if (!ptr) { /* handle error */ }
+
+  bugprone-use-after-move,
+  # EXAMPLE: Prevent use after std::move
+  # BAD: std::string s = "hello";
+  #      std::string t = std::move(s);
+  #      std::cout << s;  // s is now empty!
+  # GOOD: std::string s = "hello";
+  #       std::string t = std::move(s);
+  #       std::cout << t;  // use t instead
+
+  misc-use-after-move,
+  # Similar to bugprone-use-after-move
+
+  modernize-use-auto
+  # EXAMPLE: Enforce using auto for type deduction
+  # BAD: std::vector<int>::iterator it = vec.begin();
+  # GOOD: auto it = vec.begin();
+
+# ============================================================================
+# ADDITIONAL OPTIONS
+# ============================================================================
+
+# HeaderFilterRegex: Apply checks only to files matching this regex
+# ".*" = apply to all files
+# You can use patterns like "src/.*" to exclude specific directories
 HeaderFilterRegex: ".*"
 
+# FormatStyle: Use external formatting configuration
+# "file" = use .clang-format file in the repository
+# Other values: "LLVM", "Google", "Chromium", "Mozilla", "WebKit"
 FormatStyle: file

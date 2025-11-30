@@ -6,14 +6,14 @@
 #include <vector>
 
 using CallbackFunc = std::function<void(void)>;
-std::atomic_bool event_fired_{false};
+std::atomic_bool event_fired_{ false };
 std::vector<CallbackFunc> callback_queue_;
 std::mutex callback_mutex_;
 
 std::atomic_uint64_t register_count_(0);
 std::atomic_uint64_t executed_count_(0);
 
-void executeFunc(const CallbackFunc &func) {
+void executeFunc(const CallbackFunc& func) {
   func();
   executed_count_.fetch_add(1, std::memory_order_relaxed);
 }
@@ -32,33 +32,32 @@ void executeFunc(const CallbackFunc &func) {
 //   }
 // }
 
-void registerCallback(const CallbackFunc &func) {
-    register_count_.fetch_add(1, std::memory_order_relaxed);
-    bool should_execute = false;
-    do {
-        should_execute = event_fired_.load(std::memory_order_acquire);
-        if (!should_execute) {
-            std::lock_guard<std::mutex> lock(callback_mutex_);
-            should_execute = event_fired_.load(std::memory_order_acquire);
-            if (!should_execute) {
-                callback_queue_.push_back(func);
-                break;
-            }
-        }
-        executeFunc(func);
-    } while (0);
+void registerCallback(const CallbackFunc& func) {
+  register_count_.fetch_add(1, std::memory_order_relaxed);
+  bool should_execute = false;
+  do {
+    should_execute = event_fired_.load(std::memory_order_acquire);
+    if (!should_execute) {
+      std::lock_guard<std::mutex> lock(callback_mutex_);
+      should_execute = event_fired_.load(std::memory_order_acquire);
+      if (!should_execute) {
+        callback_queue_.push_back(func);
+        break;
+      }
+    }
+    executeFunc(func);
+  } while (0);
 }
 
 void fireEvent() {
   bool expected = false;
-  if (event_fired_.compare_exchange_strong(expected, true,
-                                           std::memory_order_acq_rel)) {
+  if (event_fired_.compare_exchange_strong(expected, true, std::memory_order_acq_rel)) {
     std::vector<CallbackFunc> local_callbacks;
     {
       std::lock_guard<std::mutex> lock(callback_mutex_);
       local_callbacks.swap(callback_queue_);
     }
-    for (auto &cb : local_callbacks) {
+    for (auto& cb : local_callbacks) {
       cb();
     }
   } else {
@@ -66,7 +65,7 @@ void fireEvent() {
   }
 }
 
-int main(int argc, char **argv) {
+int main(int argc, char** argv) {
   registerCallback([]() {
     std::cout << "callback#1 executed!" << std::endl;
     registerCallback([]() {
@@ -102,9 +101,7 @@ int main(int argc, char **argv) {
       });
     });
   }
-  std::cout << "register_count_: "
-            << register_count_.load(std::memory_order_acquire) << std::endl;
-  std::cout << "executed_count_: "
-            << executed_count_.load(std::memory_order_acquire) << std::endl;
+  std::cout << "register_count_: " << register_count_.load(std::memory_order_acquire) << std::endl;
+  std::cout << "executed_count_: " << executed_count_.load(std::memory_order_acquire) << std::endl;
   return 0;
 }

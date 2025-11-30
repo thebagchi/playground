@@ -13,12 +13,12 @@ std::mutex mutex_;
 std::atomic_uint64_t register_count_(0);
 std::atomic_uint64_t executed_count_(0);
 
-void executeFunc(const CallbackFunc &func) {
+void executeFunc(const CallbackFunc& func) {
   func();
   executed_count_.fetch_add(1, std::memory_order_relaxed);
 }
 
-void registerCallback(const CallbackFunc &func) {
+void registerCallback(const CallbackFunc& func) {
   register_count_.fetch_add(1, std::memory_order_relaxed);
   std::vector<CallbackFunc> temp;
   do {
@@ -38,7 +38,7 @@ void registerCallback(const CallbackFunc &func) {
       }
     }
   } while (0);
-  for (const auto &func : temp) {
+  for (const auto& func : temp) {
     executeFunc(func);
   }
 }
@@ -61,12 +61,12 @@ void fireEvent() {
       } while (0);
     }
   } while (0);
-  for (const auto &func : temp) {
+  for (const auto& func : temp) {
     executeFunc(func);
   }
 }
 
-int main(int argc, char **argv) {
+int main(int argc, char** argv) {
   registerCallback([]() {
     std::cout << "callback#1 executed!" << std::endl;
     registerCallback([]() {
@@ -102,9 +102,7 @@ int main(int argc, char **argv) {
       });
     });
   }
-  std::cout << "register_count_: "
-            << register_count_.load(std::memory_order_acquire) << std::endl;
-  std::cout << "executed_count_: "
-            << executed_count_.load(std::memory_order_acquire) << std::endl;
+  std::cout << "register_count_: " << register_count_.load(std::memory_order_acquire) << std::endl;
+  std::cout << "executed_count_: " << executed_count_.load(std::memory_order_acquire) << std::endl;
   return 0;
 }

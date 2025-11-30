@@ -17,13 +17,13 @@ std::atomic_uint64_t register_count_(0);
 std::atomic_uint64_t executed_count_(0);
 
 // Wrapper to execute a callback and increment executed_count_
-void executeCallbackFunc(const CallbackFunc &func) {
+void executeCallbackFunc(const CallbackFunc& func) {
   func();
   executed_count_.fetch_add(1, std::memory_order_relaxed);
 }
 
 // Unified function for registering and executing callbacks
-void registerOrExecuteCallback(const CallbackFunc &func) {
+void registerOrExecuteCallback(const CallbackFunc& func) {
   register_count_.fetch_add(1, std::memory_order_relaxed);
   if (event_occured_.load(std::memory_order_acquire)) {
     // Event has occurred, execute immediately
@@ -37,8 +37,7 @@ void registerOrExecuteCallback(const CallbackFunc &func) {
 
 void fireEvent() {
   auto expected = false;
-  if (event_occured_.compare_exchange_strong(expected, true,
-                                             std::memory_order_acq_rel)) {
+  if (event_occured_.compare_exchange_strong(expected, true, std::memory_order_acq_rel)) {
     // Execute all queued callbacks
     std::queue<CallbackFunc> local_callbacks;
     {
@@ -55,7 +54,7 @@ void fireEvent() {
   }
 }
 
-int main(int argc, char **argv) {
+int main(int argc, char** argv) {
   registerOrExecuteCallback([]() {
     std::cout << "callback#1 executed!" << std::endl;
     registerOrExecuteCallback([]() {
@@ -91,9 +90,7 @@ int main(int argc, char **argv) {
       });
     });
   }
-  std::cout << "register_count_: "
-            << register_count_.load(std::memory_order_acquire) << std::endl;
-  std::cout << "executed_count_: "
-            << executed_count_.load(std::memory_order_acquire) << std::endl;
+  std::cout << "register_count_: " << register_count_.load(std::memory_order_acquire) << std::endl;
+  std::cout << "executed_count_: " << executed_count_.load(std::memory_order_acquire) << std::endl;
   return 0;
 }

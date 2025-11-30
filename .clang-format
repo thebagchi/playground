@@ -1,25 +1,69 @@
 ---
 Language: Cpp
 BasedOnStyle: Google
+
+# ============================================================================
+# INDENTATION & SPACING
+# ============================================================================
+
+# Indent width for each indentation level (Go-like 2-space style)
+IndentWidth: 2
+
+# Width of a tab character
+TabWidth: 8
+
+# Use spaces instead of tabs for indentation
+UseTab: Never
+
+# Indent access modifiers (public, private, protected) relative to class
 AccessModifierOffset: -2
-AlignAfterOpenBracket: Align
-AlignConsecutiveAssignments: false
-AlignConsecutiveDeclarations: false
-AlignEscapedNewlines: Left
-AlignOperands: true
-AlignTrailingComments: false
-AllowAllParametersOfDeclarationOnNextLine: true
-AllowShortBlocksOnASingleLine: false
-AllowShortCaseLabelsOnASingleLine: false
-AllowShortFunctionsOnASingleLine: false
-AllowShortIfStatementsOnASingleLine: false
-AllowShortLoopsOnASingleLine: false
-AlwaysBreakAfterDefinitionReturnType: None
-AlwaysBreakAfterReturnType: None
-AlwaysBreakBeforeMultilineStrings: false
-AlwaysBreakTemplateDeclarations: false
-BinPackArguments: false
-BinPackParameters: false
+
+# Indent wrapped function names
+IndentWrappedFunctionNames: false
+
+# Indent case labels in switch statements
+IndentCaseLabels: false
+
+# Namespace indentation: All indents code inside namespaces
+NamespaceIndentation: All
+
+# ============================================================================
+# LINE BREAKING & COLUMN LIMITS
+# ============================================================================
+
+# Maximum line length before breaking (100 characters)
+ColumnLimit: 100
+
+# Indentation width for continuation lines
+ContinuationIndentWidth: 4
+
+# Break string literals that exceed the column limit
+# BEFORE (BreakStringLiterals: false):
+#   std::string s = "veryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongString";
+# AFTER (BreakStringLiterals: true):
+#   std::string s = "veryVeryVeryVeryVeryVeryVeryVeryVeryVeryLong"
+#                   "String";
+BreakStringLiterals: true
+
+# Maximum empty lines to keep in output
+MaxEmptyLinesToKeep: 1
+
+# Penalties for breaking lines (higher = less likely to break)
+PenaltyBreakBeforeFirstCallParameter: 19
+PenaltyBreakComment: 300
+PenaltyBreakFirstLessLess: 120
+PenaltyBreakString: 1000
+PenaltyExcessCharacter: 1000000
+PenaltyReturnTypeOnItsOwnLine: 60
+
+# ============================================================================
+# BRACE PLACEMENT & STYLE
+# ============================================================================
+
+# Attach opening brace to preceding token (K&R style)
+BreakBeforeBraces: Attach
+
+# Configuration for where to place braces
 BraceWrapping:
   AfterClass: false
   AfterControlStatement: false
@@ -32,56 +76,288 @@ BraceWrapping:
   BeforeCatch: false
   BeforeElse: false
   IndentBraces: false
-BreakBeforeBinaryOperators: None
-BreakBeforeBraces: Attach
-BreakBeforeTernaryOperators: false
-BreakConstructorInitializersBeforeComma: false
-BreakAfterJavaFieldAnnotations: false
-BreakStringLiterals: false
-ColumnLimit: 100
-CommentPragmas: "^ IWYU pragma:"
+
+# Don't allow short blocks on a single line
+AllowShortBlocksOnASingleLine: false
+
+# Don't allow short case labels on a single line
+AllowShortCaseLabelsOnASingleLine: false
+
+# Don't allow short functions on a single line
+# BEFORE (AllowShortFunctionsOnASingleLine: InlineOnly):
+#   class Foo { void f() { foo(); } };
+# AFTER (AllowShortFunctionsOnASingleLine: false):
+#   class Foo {
+#     void f() {
+#       foo();
+#     }
+#   };
+AllowShortFunctionsOnASingleLine: false
+
+# Don't allow short if statements on a single line
+AllowShortIfStatementsOnASingleLine: false
+
+# Don't allow short loops on a single line
+AllowShortLoopsOnASingleLine: false
+
+# Don't remove braces from single-statement blocks (LLVM style)
+RemoveBracesLLVM: false
+
+# ============================================================================
+# PARAMETER & ARGUMENT PACKING
+# ============================================================================
+
+# Don't pack arguments tightly - break them to separate lines if needed
+BinPackArguments: false
+
+# Don't pack parameters tightly - break them to separate lines if needed
+BinPackParameters: false
+
+# Allow all parameters of a declaration on next line
+AllowAllParametersOfDeclarationOnNextLine: true
+
+# ============================================================================
+# FUNCTION & METHOD FORMATTING
+# ============================================================================
+
+# Constructor initializer formatting
 ConstructorInitializerAllOnOneLineOrOnePerLine: false
 ConstructorInitializerIndentWidth: 4
-ContinuationIndentWidth: 4
-Cpp11BracedListStyle: false
+
+# Break before binary operators
+# BEFORE (BreakBeforeBinaryOperators: None):
+#   x = very_long_name_one + very_long_name_two;
+# AFTER (BreakBeforeBinaryOperators: All):
+#   x = very_long_name_one
+#       + very_long_name_two;
+BreakBeforeBinaryOperators: None
+
+# Break before ternary operators
+BreakBeforeTernaryOperators: false
+
+# Break before comma in constructor initializers
+BreakConstructorInitializersBeforeComma: false
+
+# ============================================================================
+# POINTER & ALIGNMENT
+# ============================================================================
+
+# Align pointers to the left
+PointerAlignment: Left
+
+# Derive pointer alignment from other settings
 DerivePointerAlignment: false
-DisableFormat: false
-ExperimentalAutoDetectBinPacking: false
-ForEachMacros: [foreach, Q_FOREACH, BOOST_FOREACH]
-IncludeIsMainRegex: "([-_](test|unittest))?$"
-IndentCaseLabels: false
-IndentWidth: 2
-IndentWrappedFunctionNames: false
-JavaScriptQuotes: Leave
-JavaScriptWrapImports: true
+
+# Align after opening bracket
+AlignAfterOpenBracket: Align
+
+# Align operands in expressions
+AlignOperands: true
+
+# Don't align consecutive assignments (uncomment to enable)
+# BEFORE (AlignConsecutiveAssignments: false):
+#   int a = 1;
+#   int somelongname = 2;
+#   double c = 3;
+# AFTER (AlignConsecutiveAssignments: Consecutive):
+#   int a            = 1;
+#   int somelongname = 2;
+#   double c         = 3;
+AlignConsecutiveAssignments: false
+
+# Don't align consecutive declarations (uncomment to enable)
+# BEFORE (AlignConsecutiveDeclarations: false):
+#   int aaaa;
+#   float b;
+#   std::string ccc;
+# AFTER (AlignConsecutiveDeclarations: Consecutive):
+#   int         aaaa;
+#   float       b;
+#   std::string ccc;
+AlignConsecutiveDeclarations: false
+
+# Align escaped newlines to the left
+AlignEscapedNewlines: Left
+
+# Don't align trailing comments (uncomment to enable)
+# BEFORE (AlignTrailingComments: false):
+#   int a;  // comment
+#   int ab; // comment
+# AFTER (AlignTrailingComments: Always):
+#   int a;  // comment
+#   int ab; // comment
+AlignTrailingComments: false
+
+# ============================================================================
+# COMMENTS & SPECIAL OPTIONS
+# ============================================================================
+
+# Pattern for IWYU pragma comments
+CommentPragmas: "^ IWYU pragma:"
+
+# Don't reflow comments to fit within column limit (uncomment to enable)
+# BEFORE (ReflowComments: false):
+#   // veryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongComment with plenty of information
+# AFTER (ReflowComments: true):
+#   // veryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongComment with plenty of
+#   // information
+ReflowComments: false
+
+# Space before trailing comments
+SpacesBeforeTrailingComments: 1
+
+# ============================================================================
+# LANGUAGE-SPECIFIC OPTIONS
+# ============================================================================
+
+# Lambda body indentation style: Signature (indent with the signature)
 LambdaBodyIndentation: Signature
+
+# Never put lambdas on a single line (all lambda bodies break to new line)
+# BEFORE (AllowShortLambdasOnASingleLine: Inline):
+#   registerCallback([]() { std::cout << "hello"; });
+# AFTER (AllowShortLambdasOnASingleLine: None):
+#   registerCallback([]() {
+#     std::cout << "hello";
+#   });
+AllowShortLambdasOnASingleLine: None
+
+# C++ standard: Auto-detect
+Standard: Auto
+
+# C++11 braced list style
+Cpp11BracedListStyle: false
+
+# ============================================================================
+# SPACING OPTIONS
+# ============================================================================
+
+# Add space after C-style casts
+SpaceAfterCStyleCast: false
+
+# Add space after template keyword
+SpaceAfterTemplateKeyword: true
+
+# Add space before assignment operators
+SpaceBeforeAssignmentOperators: true
+
+# Space before parentheses in control statements
+SpaceBeforeParens: ControlStatements
+
+# Space in empty parentheses
+SpaceInEmptyParentheses: false
+
+# Space in angle brackets (templates)
+SpacesInAngles: false
+
+# Space in container literals
+SpacesInContainerLiterals: false
+
+# Space in C-style cast parentheses
+SpacesInCStyleCastParentheses: false
+
+# Space inside parentheses
+SpacesInParentheses: false
+
+# Space in square brackets
+SpacesInSquareBrackets: false
+
+# ============================================================================
+# INCLUDE & MACRO OPTIONS
+# ============================================================================
+
+# Don't sort #include directives - preserve original order
+# BEFORE (SortIncludes: true):
+#   #include <vector>
+#   #include <algorithm>
+#   #include <iostream>
+# AFTER (SortIncludes: false - current setting):
+#   #include <vector>
+#   #include <algorithm>
+#   #include <iostream>
+SortIncludes: false
+
+# Regex for identifying main include file
+IncludeIsMainRegex: "([-_](test|unittest))?$"
+
+# Macros that are treated as foreach
+ForEachMacros: [foreach, Q_FOREACH, BOOST_FOREACH]
+
+# Macro block begin/end markers
 MacroBlockBegin: ""
 MacroBlockEnd: ""
-MaxEmptyLinesToKeep: 1
-NamespaceIndentation: All
+
+# ============================================================================
+# OBJECTIVE-C OPTIONS
+# ============================================================================
+
 ObjCBlockIndentWidth: 2
 ObjCSpaceAfterProperty: false
 ObjCSpaceBeforeProtocolList: false
-PenaltyBreakBeforeFirstCallParameter: 19
-PenaltyBreakComment: 300
-PenaltyBreakFirstLessLess: 120
-PenaltyBreakString: 1000
-PenaltyExcessCharacter: 1000000
-PenaltyReturnTypeOnItsOwnLine: 60
-PointerAlignment: Left
-ReflowComments: false
-SortIncludes: false
-SpaceAfterCStyleCast: false
-SpaceAfterTemplateKeyword: true
-SpaceBeforeAssignmentOperators: true
-SpaceBeforeParens: ControlStatements
-SpaceInEmptyParentheses: false
-SpacesBeforeTrailingComments: 1
-SpacesInAngles: false
-SpacesInContainerLiterals: false
-SpacesInCStyleCastParentheses: false
-SpacesInParentheses: false
-SpacesInSquareBrackets: false
-Standard: Auto
-TabWidth: 8
-UseTab: Never
+
+# ============================================================================
+# JAVASCRIPT OPTIONS
+# ============================================================================
+
+JavaScriptQuotes: Leave
+JavaScriptWrapImports: true
+
+# ============================================================================
+# JAVA OPTIONS
+# ============================================================================
+
+# Break after Java field annotations
+BreakAfterJavaFieldAnnotations: false
+
+# ============================================================================
+# RETURN TYPE FORMATTING
+# ============================================================================
+
+# Don't always break after definition return type
+AlwaysBreakAfterDefinitionReturnType: None
+
+# Don't always break after return type
+AlwaysBreakAfterReturnType: None
+
+# Don't always break before multiline strings
+AlwaysBreakBeforeMultilineStrings: false
+
+# Don't always break before template declarations
+AlwaysBreakTemplateDeclarations: false
+
+# ============================================================================
+# OTHER OPTIONS
+# ============================================================================
+
+# Disable formatting (can be overridden with format pragmas)
+DisableFormat: false
+
+# Experimental auto detection of bin packing
+ExperimentalAutoDetectBinPacking: false
+
+# Don't insert braces automatically (uncomment to enable)
+# BEFORE (InsertBraces: false):
+#   if (foo())
+#     handleFunctionDecl();
+# AFTER (InsertBraces: true):
+#   if (foo()) {
+#     handleFunctionDecl();
+#   }
+InsertBraces: false
+
+# Compact namespace declarations
+CompactNamespaces: false
+# # Uncomment to add empty line before access modifiers (e.g., public:, private:)
+# EmptyLineBeforeAccessModifier: LogicalBlock
+
+# ============================================================================
+# ADDITIONAL OPTIONS - See examples above where each option is used
+# ============================================================================
+# Other useful options to explore (uncomment and modify as needed):
+# - IndentPPDirectives: AfterHash (indent preprocessor directives)
+# - SortUsingDeclarations: Lexicographic (sort using statements)
+# - FixNamespaceComments: true (add namespace end comments)
+# - SeparateDefinitionBlocks: Always (blank lines between definitions)
+# - BreakAfterReturnType: All (break long return types)
+# - BreakBeforeConceptDeclarations: Always (break C++20 concepts)
+# - BreakTemplateDeclarations: MultiLine (break template declarations)
