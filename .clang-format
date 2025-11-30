@@ -108,6 +108,13 @@ RemoveBracesLLVM: false
 # ============================================================================
 
 # Don't pack arguments tightly - break them to separate lines if needed
+# BEFORE (BinPackArguments: true):
+#   std::vector<std::string> args = { "echo", "Hello from CMD class!" };
+# AFTER (BinPackArguments: false):
+#   std::vector<std::string> args = {
+#     "echo",
+#     "Hello from CMD class!"
+#   };
 BinPackArguments: false
 
 # Don't pack parameters tightly - break them to separate lines if needed
@@ -131,6 +138,15 @@ ConstructorInitializerIndentWidth: 4
 #   x = very_long_name_one
 #       + very_long_name_two;
 BreakBeforeBinaryOperators: None
+
+# Break template declarations to separate lines (for complex multi-line templates)
+# BEFORE (BreakTemplateDeclarations: Leave):
+#   template <typename T, typename U, typename V> class Foo {};
+# AFTER (BreakTemplateDeclarations: MultiLine):
+#   template <typename T, typename U, typename V>
+#   class Foo {};
+# Note: Simple single-parameter templates like 'template <typename U>' stay on one line
+# (BreakTemplateDeclarations not supported in clang-format 18)
 
 # Break before ternary operators
 BreakBeforeTernaryOperators: false
@@ -179,14 +195,16 @@ AlignConsecutiveDeclarations: false
 # Align escaped newlines to the left
 AlignEscapedNewlines: Left
 
-# Don't align trailing comments (uncomment to enable)
+# Align trailing comments (uncomment to enable)
 # BEFORE (AlignTrailingComments: false):
 #   int a;  // comment
 #   int ab; // comment
-# AFTER (AlignTrailingComments: Always):
-#   int a;  // comment
-#   int ab; // comment
-AlignTrailingComments: false
+#   int abc; // comment
+# AFTER (AlignTrailingComments with Kind: Always):
+#   int a;   // comment
+#   int ab;  // comment
+#   int abc; // comment
+AlignTrailingComments: true
 
 # ============================================================================
 # COMMENTS & SPECIAL OPTIONS
@@ -335,7 +353,7 @@ DisableFormat: false
 # Experimental auto detection of bin packing
 ExperimentalAutoDetectBinPacking: false
 
-# Don't insert braces automatically (uncomment to enable)
+# Insert braces automatically around all control statements
 # BEFORE (InsertBraces: false):
 #   if (foo())
 #     handleFunctionDecl();
@@ -343,13 +361,29 @@ ExperimentalAutoDetectBinPacking: false
 #   if (foo()) {
 #     handleFunctionDecl();
 #   }
-InsertBraces: false
+InsertBraces: true
 
 # Compact namespace declarations
 CompactNamespaces: false
-# # Uncomment to add empty line before access modifiers (e.g., public:, private:)
-# EmptyLineBeforeAccessModifier: LogicalBlock
 
+# Add empty line before access modifiers (e.g., public:, private:)
+# BEFORE (EmptyLineBeforeAccessModifier: Never):
+#   class Foo {
+#   private:
+#     int x;
+#   public:
+#     void foo();
+#   };
+# AFTER (EmptyLineBeforeAccessModifier: LogicalBlock):
+#   class Foo {
+#
+#   private:
+#     int x;
+#
+#   public:
+#     void foo();
+#   };
+EmptyLineBeforeAccessModifier: Never
 # ============================================================================
 # ADDITIONAL OPTIONS - See examples above where each option is used
 # ============================================================================

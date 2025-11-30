@@ -13,12 +13,12 @@ std::mutex mtx;
 std::condition_variable cv;
 int current_thread = 0;
 
-void matrix_multiply_section(const Matrix &A, const Matrix &B, Matrix &C,
-                             Section section, int thread_id) {
+void matrix_multiply_section(
+    const Matrix& A, const Matrix& B, Matrix& C, Section section, int thread_id) {
   std::unique_lock<std::mutex> lock(mtx);
   cv.wait(lock, [thread_id] {
     // Wait for this thread's turn ...
-    return current_thread == thread_id+1;
+    return current_thread == thread_id + 1;
   });
   // std::cout << "running thread_id: " << thread_id << std::endl;
   // Not thinking about optimization ...
@@ -53,8 +53,12 @@ void parallel_matrix_multiply(std::uint64_t size, std::uint64_t num) {
   for (auto i = 0; i < num; ++i) {
     auto srow = i * rows_per_thread;
     auto erow = (i == num - 1) ? size : srow + rows_per_thread;
-    threads.emplace_back(matrix_multiply_section, std::cref(A), std::cref(B),
-                         std::ref(C), std::make_tuple(srow, erow, size), i);
+    threads.emplace_back(matrix_multiply_section,
+                         std::cref(A),
+                         std::cref(B),
+                         std::ref(C),
+                         std::make_tuple(srow, erow, size),
+                         i);
   }
   {
     // signal the first thread ...
@@ -64,22 +68,21 @@ void parallel_matrix_multiply(std::uint64_t size, std::uint64_t num) {
     }
     cv.notify_all();
   }
-  for (auto &thread : threads) {
+  for (auto& thread : threads) {
     thread.join();
   }
 }
 
-int main(int argc, char **argv) {
+int main(int argc, char** argv) {
   std::uint64_t size = 256 * 4 * 2 * 1;
-  std::vector<std::uint64_t> counts = {1, 2, 4, 8, 16, 32, 64, 128, 256};
+  std::vector<std::uint64_t> counts = { 1, 2, 4, 8, 16, 32, 64, 128, 256 };
   for (auto count : counts) {
     auto start_time = std::chrono::high_resolution_clock::now();
     parallel_matrix_multiply(size, count);
     auto end_time = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> time_taken = end_time - start_time;
-    std::cout << "Time taken using: " << std::setw(4) << count
-              << " threads is: " << std::fixed << std::setprecision(4)
-              << time_taken.count() << " seconds ..." << std::endl;
+    std::cout << "Time taken using: " << std::setw(4) << count << " threads is: " << std::fixed
+              << std::setprecision(4) << time_taken.count() << " seconds ..." << std::endl;
   }
   return 0;
 }

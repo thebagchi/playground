@@ -34,62 +34,48 @@
 /**
  * @brief Trait to check if a type has a static properties member
  */
-template <typename T, typename = void>
-struct has_properties : std::false_type {};
+template <typename T, typename = void> struct has_properties : std::false_type {};
 
 template <typename T>
-struct has_properties<T, std::void_t<decltype(T::properties)>>
-    : std::true_type {};
+struct has_properties<T, std::void_t<decltype(T::properties)>> : std::true_type {};
 
-template <typename T>
-inline constexpr bool has_properties_v = has_properties<T>::value;
+template <typename T> inline constexpr bool has_properties_v = has_properties<T>::value;
 
 /**
  * @brief Trait to check if a type is optional (has operator bool)
  */
-template <typename T>
-struct is_optional : std::false_type {};
+template <typename T> struct is_optional : std::false_type {};
 
-template <typename T>
-struct is_optional<std::optional<T>> : std::true_type {};
+template <typename T> struct is_optional<std::optional<T>> : std::true_type {};
 
-template <typename T>
-struct is_optional<std::unique_ptr<T>> : std::true_type {};
+template <typename T> struct is_optional<std::unique_ptr<T>> : std::true_type {};
 
-template <typename T>
-struct is_optional<std::shared_ptr<T>> : std::true_type {};
+template <typename T> struct is_optional<std::shared_ptr<T>> : std::true_type {};
 
-template <typename T>
-inline constexpr bool is_optional_v = is_optional<T>::value;
+template <typename T> inline constexpr bool is_optional_v = is_optional<T>::value;
 
 /**
  * @brief Trait to get the value type from a optional type
  */
-template <typename T, typename = void>
-struct opt {
+template <typename T, typename = void> struct opt {
   using type = T;
 };
 
-template <typename T>
-struct opt<std::optional<T>> {
+template <typename T> struct opt<std::optional<T>> {
   using type = T;
 };
 
-template <typename T>
-struct opt<std::unique_ptr<T>> {
+template <typename T> struct opt<std::unique_ptr<T>> {
   using type = T;
 };
 
-template <typename T>
-struct opt<std::shared_ptr<T>> {
+template <typename T> struct opt<std::shared_ptr<T>> {
   using type = T;
 };
 
-template <typename T>
-struct opt<const T> : opt<T> {};
+template <typename T> struct opt<const T> : opt<T> {};
 
-template <typename T>
-using opt_t = typename opt<T>::type;
+template <typename T> using opt_t = typename opt<T>::type;
 
 // =============================================================================
 // JSON Serialization Library
@@ -133,28 +119,25 @@ using opt_t = typename opt<T>::type;
  * @tparam Nullable Whether this field can be null
  * @tparam Required Whether this field is required
  */
-template <typename C, typename T, bool Nullable = false, bool Required = false>
-struct Props {
+template <typename C, typename T, bool Nullable = false, bool Required = false> struct Props {
   static_assert(!Nullable || is_optional_v<T>,
                 "If Nullable is true, T must be a pointer or optional type");
-  static_assert(!std::is_pointer_v<T>,
-                "Naked pointers are not allowed as member types");
+  static_assert(!std::is_pointer_v<T>, "Naked pointers are not allowed as member types");
 
   /**
    * @brief Constructor for property descriptor
    * @param member Pointer to member variable
    * @param name JSON field name
    */
-  constexpr Props(T C::* member, const char* name)
-      : member_{member}, name_{name} {
+  constexpr Props(T C::*member, const char* name) : member_{ member }, name_{ name } {
     // Do Nothing ...
   }
 
-  using Type = T;                              ///< The smart pointer type
-  T C::* member_;                              ///< Pointer to member variable
-  const char* name_;                           ///< JSON field name
-  static constexpr bool nullable_ = Nullable;  ///< Whether field can be null
-  static constexpr bool required_ = Required;  ///< Whether field is required
+  using Type = T;                             ///< The smart pointer type
+  T C::*member_;                              ///< Pointer to member variable
+  const char* name_;                          ///< JSON field name
+  static constexpr bool nullable_ = Nullable; ///< Whether field can be null
+  static constexpr bool required_ = Required; ///< Whether field is required
 };
 
 /**
@@ -168,9 +151,8 @@ struct Props {
  * @return Props descriptor
  */
 template <bool Nullable = false, bool Required = false, typename C, typename T>
-constexpr Props<C, T, Nullable, Required> prop(T C::* member,
-                                               const char* name) {
-  return Props<C, T, Nullable, Required>{member, name};
+constexpr Props<C, T, Nullable, Required> prop(T C::*member, const char* name) {
+  return Props<C, T, Nullable, Required>{ member, name };
 }
 
 // =============================================================================
@@ -195,14 +177,14 @@ constexpr void for_each(std::integer_sequence<T, S...>, F&& f) {
  */
 [[noreturn]] inline void throw_field_null_not_nullable(const char* field_name) {
   std::string msg;
-  msg.reserve(50 + std::strlen(field_name));  // Pre-allocate space
+  msg.reserve(50 + std::strlen(field_name)); // Pre-allocate space
   msg.append("Field '").append(field_name).append("' is null but not nullable");
   throw std::runtime_error(msg);
 }
 
 [[noreturn]] inline void throw_field_missing(const char* field_name) {
   std::string msg;
-  msg.reserve(25 + std::strlen(field_name));  // Pre-allocate space
+  msg.reserve(25 + std::strlen(field_name)); // Pre-allocate space
   msg.append("Field '").append(field_name).append("' is missing");
   throw std::runtime_error(msg);
 }
@@ -210,7 +192,7 @@ constexpr void for_each(std::integer_sequence<T, S...>, F&& f) {
 [[noreturn]] inline void throw_type_mismatch(const char* expected_type,
                                              const boost::json::value& value) {
   std::string msg;
-  msg.reserve(100);  // Pre-allocate space
+  msg.reserve(100); // Pre-allocate space
   msg.append("Type mismatch: expected ")
       .append(expected_type)
       .append(", got ")
@@ -219,8 +201,7 @@ constexpr void for_each(std::integer_sequence<T, S...>, F&& f) {
 }
 
 [[noreturn]] inline void throw_invalid_json_object() {
-  throw std::runtime_error(
-      "Invalid JSON: expected object for struct deserialization");
+  throw std::runtime_error("Invalid JSON: expected object for struct deserialization");
 }
 
 [[noreturn]] inline void throw_json_parse_error(const std::string& error_msg) {
@@ -237,8 +218,7 @@ constexpr void for_each(std::integer_sequence<T, S...>, F&& f) {
 /**
  * @brief Forward declaration of primary template for JSON serialization
  */
-template <typename T>
-struct Write;
+template <typename T> struct Write;
 
 // =============================================================================
 // Specializations for Basic Types
@@ -247,10 +227,8 @@ struct Write;
 /**
  * @brief Specialization for std::string
  */
-template <>
-struct Write<std::string> {
-  inline boost::json::value operator()(
-      const std::string* object) const noexcept {
+template <> struct Write<std::string> {
+  inline boost::json::value operator()(const std::string* object) const noexcept {
     if (object) {
       return boost::json::string_view(*object);
     } else {
@@ -262,10 +240,8 @@ struct Write<std::string> {
 /**
  * @brief Specialization for const std::string
  */
-template <>
-struct Write<const std::string> {
-  inline boost::json::value operator()(
-      const std::string* object) const noexcept {
+template <> struct Write<const std::string> {
+  inline boost::json::value operator()(const std::string* object) const noexcept {
     if (object) {
       return boost::json::string_view(*object);
     } else {
@@ -277,10 +253,8 @@ struct Write<const std::string> {
 /**
  * @brief Specialization for int64_t
  */
-template <>
-struct Write<std::int64_t> {
-  inline boost::json::value operator()(
-      const std::int64_t* object) const noexcept {
+template <> struct Write<std::int64_t> {
+  inline boost::json::value operator()(const std::int64_t* object) const noexcept {
     if (object) {
       return *object;
     } else {
@@ -292,10 +266,8 @@ struct Write<std::int64_t> {
 /**
  * @brief Specialization for const int64_t
  */
-template <>
-struct Write<const std::int64_t> {
-  inline boost::json::value operator()(
-      const std::int64_t* object) const noexcept {
+template <> struct Write<const std::int64_t> {
+  inline boost::json::value operator()(const std::int64_t* object) const noexcept {
     if (object) {
       return *object;
     } else {
@@ -307,10 +279,8 @@ struct Write<const std::int64_t> {
 /**
  * @brief Specialization for uint64_t
  */
-template <>
-struct Write<std::uint64_t> {
-  inline boost::json::value operator()(
-      const std::uint64_t* object) const noexcept {
+template <> struct Write<std::uint64_t> {
+  inline boost::json::value operator()(const std::uint64_t* object) const noexcept {
     if (object) {
       return *object;
     } else {
@@ -322,10 +292,8 @@ struct Write<std::uint64_t> {
 /**
  * @brief Specialization for const uint64_t
  */
-template <>
-struct Write<const std::uint64_t> {
-  inline boost::json::value operator()(
-      const std::uint64_t* object) const noexcept {
+template <> struct Write<const std::uint64_t> {
+  inline boost::json::value operator()(const std::uint64_t* object) const noexcept {
     if (object) {
       return *object;
     } else {
@@ -337,8 +305,7 @@ struct Write<const std::uint64_t> {
 /**
  * @brief Specialization for double
  */
-template <>
-struct Write<double> {
+template <> struct Write<double> {
   inline boost::json::value operator()(const double* object) const noexcept {
     if (object) {
       return *object;
@@ -351,8 +318,7 @@ struct Write<double> {
 /**
  * @brief Specialization for const double
  */
-template <>
-struct Write<const double> {
+template <> struct Write<const double> {
   inline boost::json::value operator()(const double* object) const noexcept {
     if (object) {
       return *object;
@@ -365,8 +331,7 @@ struct Write<const double> {
 /**
  * @brief Specialization for bool
  */
-template <>
-struct Write<bool> {
+template <> struct Write<bool> {
   inline boost::json::value operator()(const bool* object) const noexcept {
     if (object) {
       return *object;
@@ -379,8 +344,7 @@ struct Write<bool> {
 /**
  * @brief Specialization for const bool
  */
-template <>
-struct Write<const bool> {
+template <> struct Write<const bool> {
   inline boost::json::value operator()(const bool* object) const noexcept {
     if (object) {
       return *object;
@@ -397,20 +361,18 @@ struct Write<const bool> {
 /**
  * @brief Specialization for boost::json::value (pass-through)
  */
-template <>
-struct Write<boost::json::value> {
+template <> struct Write<boost::json::value> {
   inline boost::json::value operator()(const boost::json::value* object) const {
-    return *object;  // Pass through as-is
+    return *object; // Pass through as-is
   }
 };
 
 /**
  * @brief Specialization for const boost::json::value (pass-through)
  */
-template <>
-struct Write<const boost::json::value> {
+template <> struct Write<const boost::json::value> {
   inline boost::json::value operator()(const boost::json::value* object) const {
-    return *object;  // Pass through as-is
+    return *object; // Pass through as-is
   }
 };
 
@@ -422,19 +384,17 @@ struct Write<const boost::json::value> {
  * @brief Primary template for JSON serialization
  * @tparam T Type to serialize (must have static properties member)
  */
-template <typename T>
-struct Write {
+template <typename T> struct Write {
   /**
    * @brief Serialize object to JSON value
    * @param object Pointer to object to serialize
    * @return JSON value representation
    */
   inline boost::json::value operator()(const T* object) const {
-    static_assert(has_properties_v<T>,
-                  "T must have a static properties member for serialization");
+    static_assert(has_properties_v<T>, "T must have a static properties member for serialization");
     boost::json::object obj;
     constexpr auto props = std::tuple_size<decltype(T::properties)>::value;
-    obj.reserve(props);  // Pre-allocate space for better performance
+    obj.reserve(props); // Pre-allocate space for better performance
 
     for_each(std::make_index_sequence<props>{}, [&](auto i) {
       constexpr auto property = std::get<i>(T::properties);
@@ -472,16 +432,15 @@ struct Write {
  * @brief Specialization for std::vector<T>
  * @tparam T Element type (can be basic or complex)
  */
-template <typename T>
-struct Write<std::vector<T>> {
-  static_assert(
-      !std::is_pointer_v<T>,
-      "Raw pointers are not supported in std::vector for serialization. "
-      "Use std::unique_ptr, std::shared_ptr, or std::optional instead.");
+template <typename T> struct Write<std::vector<T>> {
+  static_assert(!std::is_pointer_v<T>,
+                "Raw pointers are not supported in std::vector for serialization. "
+                "Use std::unique_ptr, std::shared_ptr, or std::optional instead.");
 
   inline boost::json::value operator()(const std::vector<T>* object) const {
-    if (!object) [[unlikely]]
+    if (!object) [[unlikely]] {
       return nullptr;
+    }
 
     boost::json::array arr;
     arr.reserve(object->size());
@@ -498,15 +457,14 @@ struct Write<std::vector<T>> {
  * @brief Specialization for std::map<std::string, T>
  * @tparam T Value type (can be basic or complex)
  */
-template <typename T>
-struct Write<std::map<std::string, T>> {
-  inline boost::json::value operator()(
-      const std::map<std::string, T>* object) const {
-    if (!object) [[unlikely]]
+template <typename T> struct Write<std::map<std::string, T>> {
+  inline boost::json::value operator()(const std::map<std::string, T>* object) const {
+    if (!object) [[unlikely]] {
       return nullptr;
+    }
 
     boost::json::object obj;
-    obj.reserve(object->size());  // Pre-allocate space for better performance
+    obj.reserve(object->size()); // Pre-allocate space for better performance
 
     for (const auto& item : *object) {
       obj[boost::json::string_view(item.first)] = Write<T>{}(&item.second);
@@ -524,11 +482,11 @@ struct Write<std::map<std::string, T>> {
  * @brief Specialization for std::unique_ptr<T>
  * @tparam T Pointed-to type
  */
-template <typename T>
-struct Write<std::unique_ptr<T>> {
+template <typename T> struct Write<std::unique_ptr<T>> {
   inline boost::json::value operator()(const std::unique_ptr<T>* object) const {
-    if (!object || !*object) [[unlikely]]
+    if (!object || !*object) [[unlikely]] {
       return nullptr;
+    }
     return Write<T>{}(object->get());
   }
 };
@@ -537,11 +495,11 @@ struct Write<std::unique_ptr<T>> {
  * @brief Specialization for std::shared_ptr<T>
  * @tparam T Pointed-to type
  */
-template <typename T>
-struct Write<std::shared_ptr<T>> {
+template <typename T> struct Write<std::shared_ptr<T>> {
   inline boost::json::value operator()(const std::shared_ptr<T>* object) const {
-    if (!object || !*object) [[unlikely]]
+    if (!object || !*object) [[unlikely]] {
       return nullptr;
+    }
     return Write<T>{}(object->get());
   }
 };
@@ -550,11 +508,11 @@ struct Write<std::shared_ptr<T>> {
  * @brief Specialization for std::optional<T>
  * @tparam T Contained type
  */
-template <typename T>
-struct Write<std::optional<T>> {
+template <typename T> struct Write<std::optional<T>> {
   inline boost::json::value operator()(const std::optional<T>* object) const {
-    if (!object || !*object) [[unlikely]]
+    if (!object || !*object) [[unlikely]] {
       return nullptr;
+    }
     return Write<T>{}(&**object);
   }
 };
@@ -569,8 +527,7 @@ struct Write<std::optional<T>> {
  * @param object Reference to the object to serialize
  * @return JSON value representation
  */
-template <typename T>
-boost::json::value Marshal(const T& object) {
+template <typename T> boost::json::value Marshal(const T& object) {
   return Write<T>{}(&object);
 }
 
@@ -580,8 +537,7 @@ boost::json::value Marshal(const T& object) {
  * @param object Reference to the object to serialize
  * @return JSON string representation
  */
-template <typename T>
-std::string MarshalToString(const T& object) {
+template <typename T> std::string MarshalToString(const T& object) {
   return boost::json::serialize(Marshal(object));
 }
 
@@ -593,8 +549,7 @@ std::string MarshalToString(const T& object) {
  * @brief Primary template for JSON deserialization
  * @tparam T Type to deserialize (must have static properties member)
  */
-template <typename T>
-struct Read {
+template <typename T> struct Read {
   /**
    * @brief Deserialize JSON value to object
    * @param value JSON value to deserialize from
@@ -624,8 +579,7 @@ struct Read {
         if constexpr (is_optional_v<B>) {
           if (val.is_null()) {
             if (property.nullable_) {
-              if constexpr (std::is_same_v<std::decay_t<decltype(ptr)>,
-                                           std::optional<P>>) {
+              if constexpr (std::is_same_v<std::decay_t<decltype(ptr)>, std::optional<P>>) {
                 ptr = std::nullopt;
               } else {
                 ptr = nullptr;
@@ -634,8 +588,7 @@ struct Read {
               throw_field_null_not_nullable(property.name_);
             }
           } else {
-            if constexpr (std::is_same_v<std::decay_t<decltype(ptr)>,
-                                         std::optional<P>>) {
+            if constexpr (std::is_same_v<std::decay_t<decltype(ptr)>, std::optional<P>>) {
               P temp;
               Read<P>{}(val, &temp);
               ptr = std::move(temp);
@@ -659,8 +612,7 @@ struct Read {
           using B = std::remove_const_t<M>;
           if constexpr (is_optional_v<B>) {
             using P = opt_t<B>;
-            if constexpr (std::is_same_v<std::decay_t<decltype(ptr)>,
-                                         std::optional<P>>) {
+            if constexpr (std::is_same_v<std::decay_t<decltype(ptr)>, std::optional<P>>) {
               ptr = std::nullopt;
             } else {
               ptr = nullptr;
@@ -683,10 +635,8 @@ struct Read {
  * @brief Specialization for std::unique_ptr<T>
  * @tparam T Pointed-to type
  */
-template <typename T>
-struct Read<std::unique_ptr<T>> {
-  inline void operator()(const boost::json::value& value,
-                         std::unique_ptr<T>* object) const {
+template <typename T> struct Read<std::unique_ptr<T>> {
+  inline void operator()(const boost::json::value& value, std::unique_ptr<T>* object) const {
     if (value.is_null()) [[unlikely]] {
       *object = nullptr;
     } else [[likely]] {
@@ -700,10 +650,8 @@ struct Read<std::unique_ptr<T>> {
  * @brief Specialization for std::shared_ptr<T>
  * @tparam T Pointed-to type
  */
-template <typename T>
-struct Read<std::shared_ptr<T>> {
-  inline void operator()(const boost::json::value& value,
-                         std::shared_ptr<T>* object) const {
+template <typename T> struct Read<std::shared_ptr<T>> {
+  inline void operator()(const boost::json::value& value, std::shared_ptr<T>* object) const {
     if (value.is_null()) [[unlikely]] {
       *object = nullptr;
     } else [[likely]] {
@@ -717,10 +665,8 @@ struct Read<std::shared_ptr<T>> {
  * @brief Specialization for std::optional<T>
  * @tparam T Contained type
  */
-template <typename T>
-struct Read<std::optional<T>> {
-  inline void operator()(const boost::json::value& value,
-                         std::optional<T>* object) const {
+template <typename T> struct Read<std::optional<T>> {
+  inline void operator()(const boost::json::value& value, std::optional<T>* object) const {
     if (value.is_null()) [[unlikely]] {
       *object = std::nullopt;
     } else [[likely]] {
@@ -738,30 +684,25 @@ struct Read<std::optional<T>> {
 /**
  * @brief Specialization for std::string
  */
-template <>
-struct Read<std::string> {
-  inline void operator()(const boost::json::value& value,
-                         std::string* object) const {
+template <> struct Read<std::string> {
+  inline void operator()(const boost::json::value& value, std::string* object) const {
     if (!value.is_string()) {
       throw_type_mismatch("string", value);
     }
-    *object = value.as_string();  // Direct assignment, no c_str() conversion
+    *object = value.as_string(); // Direct assignment, no c_str() conversion
   }
 };
 
 /**
  * @brief Specialization for int64_t
  */
-template <>
-struct Read<std::int64_t> {
-  inline void operator()(const boost::json::value& value,
-                         std::int64_t* object) const {
+template <> struct Read<std::int64_t> {
+  inline void operator()(const boost::json::value& value, std::int64_t* object) const {
     if (value.is_int64()) {
       *object = value.as_int64();
     } else if (value.is_uint64()) {
       auto val = value.as_uint64();
-      if (val <= static_cast<std::uint64_t>(
-                     std::numeric_limits<std::int64_t>::max())) {
+      if (val <= static_cast<std::uint64_t>(std::numeric_limits<std::int64_t>::max())) {
         *object = static_cast<std::int64_t>(val);
       } else {
         throw std::runtime_error("Value too large for int64_t");
@@ -775,10 +716,8 @@ struct Read<std::int64_t> {
 /**
  * @brief Specialization for uint64_t
  */
-template <>
-struct Read<std::uint64_t> {
-  inline void operator()(const boost::json::value& value,
-                         std::uint64_t* object) const {
+template <> struct Read<std::uint64_t> {
+  inline void operator()(const boost::json::value& value, std::uint64_t* object) const {
     if (value.is_uint64()) {
       *object = value.as_uint64();
     } else if (value.is_int64()) {
@@ -786,8 +725,7 @@ struct Read<std::uint64_t> {
       if (val >= 0) {
         *object = static_cast<std::uint64_t>(val);
       } else {
-        throw std::runtime_error(
-            "Negative value cannot be converted to uint64_t");
+        throw std::runtime_error("Negative value cannot be converted to uint64_t");
       }
     } else {
       throw_type_mismatch("unsigned integer", value);
@@ -798,10 +736,8 @@ struct Read<std::uint64_t> {
 /**
  * @brief Specialization for double
  */
-template <>
-struct Read<double> {
-  inline void operator()(const boost::json::value& value,
-                         double* object) const {
+template <> struct Read<double> {
+  inline void operator()(const boost::json::value& value, double* object) const {
     if (value.is_double()) {
       *object = value.as_double();
     } else if (value.is_int64()) {
@@ -817,8 +753,7 @@ struct Read<double> {
 /**
  * @brief Specialization for bool
  */
-template <>
-struct Read<bool> {
+template <> struct Read<bool> {
   inline void operator()(const boost::json::value& value, bool* object) const {
     if (value.is_bool()) {
       *object = value.as_bool();
@@ -835,11 +770,9 @@ struct Read<bool> {
 /**
  * @brief Specialization for boost::json::value (pass-through)
  */
-template <>
-struct Read<boost::json::value> {
-  inline void operator()(const boost::json::value& value,
-                         boost::json::value* object) const {
-    *object = value;  // Pass through as-is
+template <> struct Read<boost::json::value> {
+  inline void operator()(const boost::json::value& value, boost::json::value* object) const {
+    *object = value; // Pass through as-is
   }
 };
 
@@ -851,15 +784,12 @@ struct Read<boost::json::value> {
  * @brief Specialization for std::vector<T>
  * @tparam T Element type
  */
-template <typename T>
-struct Read<std::vector<T>> {
-  static_assert(
-      !std::is_pointer_v<T>,
-      "Raw pointers are not supported in std::vector for deserialization. "
-      "Use std::unique_ptr, std::shared_ptr, or std::optional instead.");
+template <typename T> struct Read<std::vector<T>> {
+  static_assert(!std::is_pointer_v<T>,
+                "Raw pointers are not supported in std::vector for deserialization. "
+                "Use std::unique_ptr, std::shared_ptr, or std::optional instead.");
 
-  inline void operator()(const boost::json::value& value,
-                         std::vector<T>* object) const {
+  inline void operator()(const boost::json::value& value, std::vector<T>* object) const {
     if (value.is_null()) {
       object->clear();
     } else if (value.is_array()) [[likely]] {
@@ -868,7 +798,7 @@ struct Read<std::vector<T>> {
       object->reserve(arr.size());
 
       for (const auto& item : arr) {
-        object->emplace_back();  // Construct in-place for better performance
+        object->emplace_back(); // Construct in-place for better performance
         Read<T>{}(item, &object->back());
       }
     } else {
@@ -881,10 +811,8 @@ struct Read<std::vector<T>> {
  * @brief Specialization for std::map<std::string, T>
  * @tparam T Value type
  */
-template <typename T>
-struct Read<std::map<std::string, T>> {
-  inline void operator()(const boost::json::value& value,
-                         std::map<std::string, T>* object) const {
+template <typename T> struct Read<std::map<std::string, T>> {
+  inline void operator()(const boost::json::value& value, std::map<std::string, T>* object) const {
     if (value.is_null()) {
       object->clear();
     } else if (value.is_object()) [[likely]] {
@@ -914,8 +842,7 @@ struct Read<std::map<std::string, T>> {
  * @param value JSON value to deserialize from
  * @param object Reference to the object to populate
  */
-template <typename T>
-void Unmarshal(const boost::json::value& value, T& object) {
+template <typename T> void Unmarshal(const boost::json::value& value, T& object) {
   Read<T>{}(value, &object);
 }
 
@@ -927,8 +854,7 @@ void Unmarshal(const boost::json::value& value, T& object) {
  * @param object Reference to the object to populate
  * @throws std::runtime_error if JSON parsing fails or type mismatches occur
  */
-template <typename T>
-void UnmarshalFromString(const std::string& json_string, T& object) {
+template <typename T> void UnmarshalFromString(const std::string& json_string, T& object) {
   boost::system::error_code ec;
   boost::json::value value = boost::json::parse(json_string, ec);
   if (ec) {
@@ -937,4 +863,4 @@ void UnmarshalFromString(const std::string& json_string, T& object) {
   Read<T>{}(value, &object);
 }
 
-#endif  // JSON_H_INCLUDED
+#endif // JSON_H_INCLUDED

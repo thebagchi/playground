@@ -8,26 +8,26 @@
 #include "json.h"
 
 class Person {
- public:
+public:
   std::string name_;
   std::unique_ptr<std::uint64_t> age_;
   std::shared_ptr<std::string> city_;
   std::optional<std::string> email_;
-
- public:
-  constexpr const static auto properties = std::make_tuple(
-      prop(&Person::name_, "name"), prop(&Person::age_, "age"),
-      prop(&Person::city_, "city"), prop(&Person::email_, "email"));
+public:
+  constexpr const static auto properties = std::make_tuple(prop(&Person::name_, "name"),
+                                                           prop(&Person::age_, "age"),
+                                                           prop(&Person::city_, "city"),
+                                                           prop(&Person::email_, "email"));
 };
 
 void encode_decode_struct() {
   try {
     // Create a Person with mixed types
     Person p1;
-    p1.name_ = "John Doe";                            // direct string
-    p1.age_ = MAKE_UNIQUE(std::uint64_t, 30);         // unique_ptr
-    p1.city_ = MAKE_SHARED(std::string, "New York");  // shared_ptr
-    p1.email_ = "john@example.com";                   // optional
+    p1.name_ = "John Doe";                           // direct string
+    p1.age_ = MAKE_UNIQUE(std::uint64_t, 30);        // unique_ptr
+    p1.city_ = MAKE_SHARED(std::string, "New York"); // shared_ptr
+    p1.email_ = "john@example.com";                  // optional
 
     // Marshal to JSON
     boost::json::value json_value = Marshal(p1);
@@ -80,8 +80,7 @@ void encode_decode_uint64() {
     std::cout << "Decoded uint64_t:" << std::endl;
     std::cout << "  Original: " << original_value << std::endl;
     std::cout << "  Decoded:  " << decoded_value << std::endl;
-    std::cout << "  Match: " << (original_value == decoded_value ? "Yes" : "No")
-              << std::endl;
+    std::cout << "  Match: " << (original_value == decoded_value ? "Yes" : "No") << std::endl;
 
   } catch (const std::exception& e) {
     std::cout << "Error in encode_decode_uint64: " << e.what() << std::endl;
@@ -109,8 +108,7 @@ void encode_decode_string() {
     std::cout << "Decoded string:" << std::endl;
     std::cout << "  Original: \"" << original_value << "\"" << std::endl;
     std::cout << "  Decoded:  \"" << decoded_value << "\"" << std::endl;
-    std::cout << "  Match: " << (original_value == decoded_value ? "Yes" : "No")
-              << std::endl;
+    std::cout << "  Match: " << (original_value == decoded_value ? "Yes" : "No") << std::endl;
 
   } catch (const std::exception& e) {
     std::cout << "Error in encode_decode_string: " << e.what() << std::endl;
@@ -138,8 +136,7 @@ void encode_decode_double() {
     std::cout << "Decoded double:" << std::endl;
     std::cout << "  Original: " << original_value << std::endl;
     std::cout << "  Decoded:  " << decoded_value << std::endl;
-    std::cout << "  Match: " << (original_value == decoded_value ? "Yes" : "No")
-              << std::endl;
+    std::cout << "  Match: " << (original_value == decoded_value ? "Yes" : "No") << std::endl;
 
   } catch (const std::exception& e) {
     std::cout << "Error in encode_decode_double: " << e.what() << std::endl;
@@ -165,12 +162,9 @@ void encode_decode_bool() {
 
     // Display decoded results
     std::cout << "Decoded bool:" << std::endl;
-    std::cout << "  Original: " << (original_value ? "true" : "false")
-              << std::endl;
-    std::cout << "  Decoded:  " << (decoded_value ? "true" : "false")
-              << std::endl;
-    std::cout << "  Match: " << (original_value == decoded_value ? "Yes" : "No")
-              << std::endl;
+    std::cout << "  Original: " << (original_value ? "true" : "false") << std::endl;
+    std::cout << "  Decoded:  " << (decoded_value ? "true" : "false") << std::endl;
+    std::cout << "  Match: " << (original_value == decoded_value ? "Yes" : "No") << std::endl;
 
   } catch (const std::exception& e) {
     std::cout << "Error in encode_decode_bool: " << e.what() << std::endl;
@@ -180,8 +174,7 @@ void encode_decode_bool() {
 void encode_decode_int64() {
   try {
     // Create int64_t values (negative number)
-    std::int64_t original_value =
-        -9223372036854775807LL;  // Large negative number
+    std::int64_t original_value = -9223372036854775807LL; // Large negative number
     std::int64_t decoded_value = 0;
 
     // Marshal to JSON
@@ -199,8 +192,7 @@ void encode_decode_int64() {
     std::cout << "Decoded int64_t:" << std::endl;
     std::cout << "  Original: " << original_value << std::endl;
     std::cout << "  Decoded:  " << decoded_value << std::endl;
-    std::cout << "  Match: " << (original_value == decoded_value ? "Yes" : "No")
-              << std::endl;
+    std::cout << "  Match: " << (original_value == decoded_value ? "Yes" : "No") << std::endl;
 
   } catch (const std::exception& e) {
     std::cout << "Error in encode_decode_int64: " << e.what() << std::endl;
@@ -210,8 +202,7 @@ void encode_decode_int64() {
 void encode_decode_vector() {
   try {
     // Create vector of strings
-    std::vector<std::string> original_vector = {"apple", "banana", "cherry",
-                                                "date"};
+    std::vector<std::string> original_vector = { "apple", "banana", "cherry", "date" };
     std::vector<std::string> decoded_vector;
 
     // Marshal to JSON
@@ -230,20 +221,22 @@ void encode_decode_vector() {
     std::cout << "  Original: [";
     for (size_t i = 0; i < original_vector.size(); ++i) {
       std::cout << "\"" << original_vector[i] << "\"";
-      if (i < original_vector.size() - 1) std::cout << ", ";
+      if (i < original_vector.size() - 1) {
+        std::cout << ", ";
+      }
     }
     std::cout << "]" << std::endl;
 
     std::cout << "  Decoded:  [";
     for (size_t i = 0; i < decoded_vector.size(); ++i) {
       std::cout << "\"" << decoded_vector[i] << "\"";
-      if (i < decoded_vector.size() - 1) std::cout << ", ";
+      if (i < decoded_vector.size() - 1) {
+        std::cout << ", ";
+      }
     }
     std::cout << "]" << std::endl;
 
-    std::cout << "  Match: "
-              << (original_vector == decoded_vector ? "Yes" : "No")
-              << std::endl;
+    std::cout << "  Match: " << (original_vector == decoded_vector ? "Yes" : "No") << std::endl;
 
   } catch (const std::exception& e) {
     std::cout << "Error in encode_decode_vector: " << e.what() << std::endl;
@@ -253,8 +246,9 @@ void encode_decode_vector() {
 void encode_decode_map() {
   try {
     // Create map of string to string
-    std::map<std::string, std::string> original_map = {
-        {"name", "Alice"}, {"city", "Boston"}, {"country", "USA"}};
+    std::map<std::string, std::string> original_map = { { "name", "Alice" },
+                                                        { "city", "Boston" },
+                                                        { "country", "USA" } };
     std::map<std::string, std::string> decoded_map;
 
     // Marshal to JSON
@@ -273,19 +267,22 @@ void encode_decode_map() {
     std::cout << "  Original: {";
     for (auto it = original_map.begin(); it != original_map.end(); ++it) {
       std::cout << "\"" << it->first << "\": \"" << it->second << "\"";
-      if (std::next(it) != original_map.end()) std::cout << ", ";
+      if (std::next(it) != original_map.end()) {
+        std::cout << ", ";
+      }
     }
     std::cout << "}" << std::endl;
 
     std::cout << "  Decoded:  {";
     for (auto it = decoded_map.begin(); it != decoded_map.end(); ++it) {
       std::cout << "\"" << it->first << "\": \"" << it->second << "\"";
-      if (std::next(it) != decoded_map.end()) std::cout << ", ";
+      if (std::next(it) != decoded_map.end()) {
+        std::cout << ", ";
+      }
     }
     std::cout << "}" << std::endl;
 
-    std::cout << "  Match: " << (original_map == decoded_map ? "Yes" : "No")
-              << std::endl;
+    std::cout << "  Match: " << (original_map == decoded_map ? "Yes" : "No") << std::endl;
 
   } catch (const std::exception& e) {
     std::cout << "Error in encode_decode_map: " << e.what() << std::endl;
@@ -312,16 +309,10 @@ void encode_decode_optional() {
     // Display decoded results
     std::cout << "Decoded optional:" << std::endl;
     std::cout << "  Original: "
-              << (original_optional ? "\"" + *original_optional + "\""
-                                    : "nullopt")
+              << (original_optional ? "\"" + *original_optional + "\"" : "nullopt") << std::endl;
+    std::cout << "  Decoded:  " << (decoded_optional ? "\"" + *decoded_optional + "\"" : "nullopt")
               << std::endl;
-    std::cout << "  Decoded:  "
-              << (decoded_optional ? "\"" + *decoded_optional + "\""
-                                   : "nullopt")
-              << std::endl;
-    std::cout << "  Match: "
-              << (original_optional == decoded_optional ? "Yes" : "No")
-              << std::endl;
+    std::cout << "  Match: " << (original_optional == decoded_optional ? "Yes" : "No") << std::endl;
 
   } catch (const std::exception& e) {
     std::cout << "Error in encode_decode_optional: " << e.what() << std::endl;
@@ -331,12 +322,12 @@ void encode_decode_optional() {
 void encode_decode_arbitrary() {
   try {
     // Create arbitrary JSON value (complex object)
-    boost::json::value original_arbitrary = {
-        {"message", "Hello arbitrary JSON!"},
-        {"number", 42},
-        {"boolean", true},
-        {"array", {1, 2, 3, 4, 5}},
-        {"nested", {{"key", "value"}, {"count", 100}}}};
+    boost::json::value original_arbitrary = { { "message", "Hello arbitrary JSON!" },
+                                              { "number", 42 },
+                                              { "boolean", true },
+                                              { "array", { 1, 2, 3, 4, 5 } },
+                                              { "nested",
+                                                { { "key", "value" }, { "count", 100 } } } };
     boost::json::value decoded_arbitrary;
 
     // Marshal to JSON
@@ -354,8 +345,7 @@ void encode_decode_arbitrary() {
     std::cout << "Decoded arbitrary JSON:" << std::endl;
     std::cout << "  Original: " << original_arbitrary << std::endl;
     std::cout << "  Decoded:  " << decoded_arbitrary << std::endl;
-    std::cout << "  Match: "
-              << (original_arbitrary == decoded_arbitrary ? "Yes" : "No")
+    std::cout << "  Match: " << (original_arbitrary == decoded_arbitrary ? "Yes" : "No")
               << std::endl;
 
   } catch (const std::exception& e) {

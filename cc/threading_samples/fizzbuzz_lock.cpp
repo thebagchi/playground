@@ -5,9 +5,8 @@
 class FizzBuzz {
 private:
   int max_;
-  int current_; 
+  int current_;
   std::mutex mutex_;
-
 public:
   FizzBuzz(int n) : max_(n), current_(1) {
     // Do Nothing ...
@@ -24,7 +23,7 @@ public:
           std::cout << current_ << ": Fizz" << std::endl;
           ++current_;
         }
-      } 
+      }
     }
   }
 

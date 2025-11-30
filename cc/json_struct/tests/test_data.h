@@ -52,4 +52,4 @@ const std::string data_with_optional = R"(
   }
   )";
 
-#endif  // TEST_DATA_H_INCLUDED
+#endif // TEST_DATA_H_INCLUDED

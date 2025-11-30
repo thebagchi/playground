@@ -42,8 +42,8 @@ void demonstrate_lambda_capture() {
     std::cout << "Unique ptr by ref: " << *unique_ptr << "\n";
   };
 
-  lambda_shared_ptr_ref();  // Demonstrate shared_ptr capture by reference
-  lambda_unique_ptr_ref();  // Demonstrate unique_ptr capture by reference
+  lambda_shared_ptr_ref(); // Demonstrate shared_ptr capture by reference
+  lambda_unique_ptr_ref(); // Demonstrate unique_ptr capture by reference
 
   // Capture shared_ptr by value (copy is allowed)
   auto lambda_shared_ptr_value = [=]() {

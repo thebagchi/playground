@@ -10,19 +10,17 @@ struct MyStruct {
 BOOST_DESCRIBE_STRUCT(MyStruct, (), (field_name))
 
 // Custom serialization to JSON with hyphenated key
-void tag_invoke(const boost::json::value_from_tag&, boost::json::value& jv,
-                const MyStruct& s) {
+void tag_invoke(const boost::json::value_from_tag&, boost::json::value& jv, const MyStruct& s) {
   jv = {
-      {"field-name", s.field_name}  // Custom key name
+    { "field-name", s.field_name } // Custom key name
   };
 }
 
 // Custom deserialization from JSON
-MyStruct tag_invoke(const boost::json::value_to_tag<MyStruct>&,
-                    const boost::json::value& jv) {
+MyStruct tag_invoke(const boost::json::value_to_tag<MyStruct>&, const boost::json::value& jv) {
   const auto& obj = jv.as_object();
   return MyStruct{
-      boost::json::value_to<int>(obj.at("field-name"))  // Map back to member
+    boost::json::value_to<int>(obj.at("field-name")) // Map back to member
   };
 }
 
@@ -30,7 +28,7 @@ BOOST_AUTO_TEST_SUITE(test_describe_suite)
 
 BOOST_AUTO_TEST_CASE(test_encode_decode) {
   // Create a MyStruct instance
-  MyStruct original{42};
+  MyStruct original{ 42 };
 
   // Encode to JSON
   boost::json::value jv = boost::json::value_from(original);

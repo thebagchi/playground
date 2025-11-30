@@ -11,16 +11,16 @@
 #include "test_data.h"
 
 class Person {
- public:
+public:
   std::unique_ptr<std::string> name_;
   std::unique_ptr<std::uint64_t> age_;
   std::unique_ptr<std::string> city_;
   std::unique_ptr<std::string> email_;
-
- public:
-  constexpr const static auto properties = std::make_tuple(
-      prop(&Person::name_, "name"), prop(&Person::age_, "age"),
-      prop(&Person::city_, "city"), prop<true>(&Person::email_, "email"));
+public:
+  constexpr const static auto properties = std::make_tuple(prop(&Person::name_, "name"),
+                                                           prop(&Person::age_, "age"),
+                                                           prop(&Person::city_, "city"),
+                                                           prop<true>(&Person::email_, "email"));
 };
 
 using PersonVector = std::vector<Person>;
@@ -39,20 +39,15 @@ using ArbitraryListSharedPtr = std::vector<std::shared_ptr<boost::json::value>>;
 using ArbitraryListOptional = std::vector<std::optional<boost::json::value>>;
 
 using ArbitraryMap = std::map<std::string, boost::json::value>;
-using ArbitraryMapUniquePtr =
-    std::map<std::string, std::unique_ptr<boost::json::value>>;
-using ArbitraryMapSharedPtr =
-    std::map<std::string, std::shared_ptr<boost::json::value>>;
-using ArbitraryMapOptional =
-    std::map<std::string, std::optional<boost::json::value>>;
+using ArbitraryMapUniquePtr = std::map<std::string, std::unique_ptr<boost::json::value>>;
+using ArbitraryMapSharedPtr = std::map<std::string, std::shared_ptr<boost::json::value>>;
+using ArbitraryMapOptional = std::map<std::string, std::optional<boost::json::value>>;
 
 class Arbitrary {
- public:
+public:
   boost::json::value value_;
-
- public:
-  constexpr const static auto properties =
-      std::make_tuple(prop(&Arbitrary::value_, "value"));
+public:
+  constexpr const static auto properties = std::make_tuple(prop(&Arbitrary::value_, "value"));
 };
 
 using ArbitraryUniquePtrStruct = std::unique_ptr<Arbitrary>;
@@ -60,160 +55,142 @@ using ArbitrarySharedPtrStruct = std::shared_ptr<Arbitrary>;
 using ArbitraryOptionalStruct = std::optional<Arbitrary>;
 
 class ArbitraryUniquePtr {
- public:
+public:
   std::unique_ptr<boost::json::value> value_;
-
- public:
+public:
   constexpr const static auto properties =
       std::make_tuple(prop(&ArbitraryUniquePtr::value_, "value"));
 };
 
 class ArbitrarySharedPtr {
- public:
+public:
   std::shared_ptr<boost::json::value> value_;
-
- public:
+public:
   constexpr const static auto properties =
       std::make_tuple(prop(&ArbitrarySharedPtr::value_, "value"));
 };
 
 class ArbitraryOptional {
- public:
+public:
   std::optional<boost::json::value> value_;
-
- public:
+public:
   constexpr const static auto properties =
       std::make_tuple(prop(&ArbitraryOptional::value_, "value"));
 };
 
 class ArbitraryVector {
- public:
+public:
   ArbitraryList value_;
-
- public:
-  constexpr const static auto properties =
-      std::make_tuple(prop(&ArbitraryVector::value_, "value"));
+public:
+  constexpr const static auto properties = std::make_tuple(prop(&ArbitraryVector::value_, "value"));
 };
 
 class ArbitraryDict {
- public:
+public:
   ArbitraryMap value_;
-
- public:
-  constexpr const static auto properties =
-      std::make_tuple(prop(&ArbitraryDict::value_, "value"));
+public:
+  constexpr const static auto properties = std::make_tuple(prop(&ArbitraryDict::value_, "value"));
 };
 
 class PersonList {
- public:
+public:
   std::unique_ptr<PersonVector> persons_;
-
- public:
-  constexpr const static auto properties =
-      std::make_tuple(prop(&PersonList::persons_, "persons"));
+public:
+  constexpr const static auto properties = std::make_tuple(prop(&PersonList::persons_, "persons"));
 };
 
 class PersonListUniquePtr {
- public:
+public:
   std::unique_ptr<PersonVectorUniquePtr> persons_;
-
- public:
+public:
   constexpr const static auto properties =
       std::make_tuple(prop(&PersonListUniquePtr::persons_, "persons"));
 };
 
 class PersonListSharedPtr {
- public:
+public:
   std::shared_ptr<PersonVectorSharedPtr> persons_;
-
- public:
+public:
   constexpr const static auto properties =
       std::make_tuple(prop(&PersonListSharedPtr::persons_, "persons"));
 };
 
 class PersonListOptional {
- public:
+public:
   std::optional<std::vector<std::optional<Person>>> persons_;
-
- public:
+public:
   constexpr const static auto properties =
       std::make_tuple(prop(&PersonListOptional::persons_, "persons"));
 };
 
 class PersonShared {
- public:
+public:
   std::shared_ptr<std::string> name_;
   std::shared_ptr<std::uint64_t> age_;
   std::shared_ptr<std::string> city_;
   std::shared_ptr<std::string> email_;
-
- public:
-  constexpr const static auto properties = std::make_tuple(
-      prop(&PersonShared::name_, "name"), prop(&PersonShared::age_, "age"),
-      prop(&PersonShared::city_, "city"),
-      prop<true>(&PersonShared::email_, "email"));
+public:
+  constexpr const static auto properties =
+      std::make_tuple(prop(&PersonShared::name_, "name"),
+                      prop(&PersonShared::age_, "age"),
+                      prop(&PersonShared::city_, "city"),
+                      prop<true>(&PersonShared::email_, "email"));
 };
 
 class PersonOptional {
- public:
+public:
   std::optional<std::string> name_;
   std::optional<std::uint64_t> age_;
   std::optional<std::string> city_;
   std::optional<std::string> email_;
-
- public:
-  constexpr const static auto properties = std::make_tuple(
-      prop(&PersonOptional::name_, "name"), prop(&PersonOptional::age_, "age"),
-      prop(&PersonOptional::city_, "city"),
-      prop<true>(&PersonOptional::email_, "email"));
+public:
+  constexpr const static auto properties =
+      std::make_tuple(prop(&PersonOptional::name_, "name"),
+                      prop(&PersonOptional::age_, "age"),
+                      prop(&PersonOptional::city_, "city"),
+                      prop<true>(&PersonOptional::email_, "email"));
 };
 
 class PersonScalars {
- public:
+public:
   std::string name_;
   std::uint64_t age_;
   std::string city_;
   std::string email_;
-
- public:
-  constexpr const static auto properties = std::make_tuple(
-      prop(&PersonScalars::name_, "name"), prop(&PersonScalars::age_, "age"),
-      prop(&PersonScalars::city_, "city"),
-      prop(&PersonScalars::email_, "email"));
+public:
+  constexpr const static auto properties = std::make_tuple(prop(&PersonScalars::name_, "name"),
+                                                           prop(&PersonScalars::age_, "age"),
+                                                           prop(&PersonScalars::city_, "city"),
+                                                           prop(&PersonScalars::email_, "email"));
 };
 
 class PersonDict {
- public:
+public:
   std::unique_ptr<PersonMap> persons_;
-
- public:
-  constexpr const static auto properties =
-      std::make_tuple(prop(&PersonDict::persons_, "persons"));
+public:
+  constexpr const static auto properties = std::make_tuple(prop(&PersonDict::persons_, "persons"));
 };
 
 class PersonDictUniquePtr {
- public:
+public:
   std::unique_ptr<PersonMapUniquePtr> persons_;
-
- public:
+public:
   constexpr const static auto properties =
       std::make_tuple(prop(&PersonDictUniquePtr::persons_, "persons"));
 };
 
 class PersonDictSharedPtr {
- public:
+public:
   std::shared_ptr<PersonMapSharedPtr> persons_;
-
- public:
+public:
   constexpr const static auto properties =
       std::make_tuple(prop(&PersonDictSharedPtr::persons_, "persons"));
 };
 
 class PersonDictOptional {
- public:
+public:
   std::optional<PersonMapOptional> persons_;
-
- public:
+public:
   constexpr const static auto properties =
       std::make_tuple(prop(&PersonDictOptional::persons_, "persons"));
 };
@@ -283,8 +260,7 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_PERSON_SHARED) {
       BOOST_CHECK(p2.name_.use_count() == 1);
     }
   } catch (const std::exception& e) {
-    std::cout << "Error in 'TEST_PARSE_JSON_PERSON_SHARED': " << e.what()
-              << std::endl;
+    std::cout << "Error in 'TEST_PARSE_JSON_PERSON_SHARED': " << e.what() << std::endl;
     BOOST_FAIL("Exception thrown: " + std::string(e.what()));
   }
 }
@@ -311,8 +287,7 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_PERSON_OPTIONAL) {
     BOOST_CHECK(!p2.email_.has_value());
 
   } catch (const std::exception& e) {
-    std::cout << "Error in 'TEST_PARSE_JSON_PERSON_OPTIONAL': " << e.what()
-              << std::endl;
+    std::cout << "Error in 'TEST_PARSE_JSON_PERSON_OPTIONAL': " << e.what() << std::endl;
     BOOST_FAIL("Exception thrown: " + std::string(e.what()));
   }
 }
@@ -339,8 +314,7 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_PERSON_SCALARS) {
     BOOST_CHECK(p2.email_ == "john@example.com");
 
   } catch (const std::exception& e) {
-    std::cout << "Error in 'TEST_PARSE_JSON_PERSON_SCALARS': " << e.what()
-              << std::endl;
+    std::cout << "Error in 'TEST_PARSE_JSON_PERSON_SCALARS': " << e.what() << std::endl;
     BOOST_FAIL("Exception thrown: " + std::string(e.what()));
   }
 }
@@ -375,8 +349,7 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_PERSON_LIST) {
     BOOST_CHECK(p3.city_ != nullptr && *p3.city_ == "Chicago");
     BOOST_CHECK(p3.email_ == nullptr);
   } catch (const std::exception& e) {
-    std::cout << "Error in 'TEST_PARSE_JSON_PERSON_LIST': " << e.what()
-              << std::endl;
+    std::cout << "Error in 'TEST_PARSE_JSON_PERSON_LIST': " << e.what() << std::endl;
     BOOST_FAIL("Exception thrown: " + std::string(e.what()));
   }
 }
@@ -414,8 +387,7 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_PERSON_LIST_UNIQUE_PTR) {
     BOOST_CHECK(p3->city_ != nullptr && *p3->city_ == "Chicago");
     BOOST_CHECK(p3->email_ == nullptr);
   } catch (const std::exception& e) {
-    std::cout << "Error in 'TEST_PARSE_JSON_PERSON_LIST_UNIQUE_PTR': "
-              << e.what() << std::endl;
+    std::cout << "Error in 'TEST_PARSE_JSON_PERSON_LIST_UNIQUE_PTR': " << e.what() << std::endl;
     BOOST_FAIL("Exception thrown: " + std::string(e.what()));
   }
 }
@@ -453,8 +425,7 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_PERSON_LIST_SHARED_PTR) {
     BOOST_CHECK(p3->city_ != nullptr && *p3->city_ == "Chicago");
     BOOST_CHECK(p3->email_ == nullptr);
   } catch (const std::exception& e) {
-    std::cout << "Error in 'TEST_PARSE_JSON_PERSON_LIST_SHARED_PTR': "
-              << e.what() << std::endl;
+    std::cout << "Error in 'TEST_PARSE_JSON_PERSON_LIST_SHARED_PTR': " << e.what() << std::endl;
     BOOST_FAIL("Exception thrown: " + std::string(e.what()));
   }
 }
@@ -495,8 +466,7 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_PERSON_LIST_OPTIONAL) {
     BOOST_CHECK(p4->city_ != nullptr && *p4->city_ == "Seattle");
     BOOST_CHECK(p4->email_ == nullptr);
   } catch (const std::exception& e) {
-    std::cout << "Error in 'TEST_PARSE_JSON_PERSON_LIST_OPTIONAL': " << e.what()
-              << std::endl;
+    std::cout << "Error in 'TEST_PARSE_JSON_PERSON_LIST_OPTIONAL': " << e.what() << std::endl;
     BOOST_FAIL("Exception thrown: " + std::string(e.what()));
   }
 }
@@ -533,8 +503,7 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_PERSON_VECTOR) {
     BOOST_CHECK(person1.name_ != nullptr && *person1.name_ == "Alice Cooper");
     BOOST_CHECK(person1.age_ != nullptr && *person1.age_ == 28);
     BOOST_CHECK(person1.city_ != nullptr && *person1.city_ == "Boston");
-    BOOST_CHECK(person1.email_ != nullptr &&
-                *person1.email_ == "alice@example.com");
+    BOOST_CHECK(person1.email_ != nullptr && *person1.email_ == "alice@example.com");
 
     const auto& person2 = people2[1];
     BOOST_CHECK(person2.name_ != nullptr && *person2.name_ == "David Wilson");
@@ -542,8 +511,7 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_PERSON_VECTOR) {
     BOOST_CHECK(person2.city_ != nullptr && *person2.city_ == "Seattle");
     BOOST_CHECK(person2.email_ == nullptr);
   } catch (const std::exception& e) {
-    std::cout << "Error in 'TEST_PARSE_JSON_PERSON_VECTOR': " << e.what()
-              << std::endl;
+    std::cout << "Error in 'TEST_PARSE_JSON_PERSON_VECTOR': " << e.what() << std::endl;
     BOOST_FAIL("Exception thrown: " + std::string(e.what()));
   }
 }
@@ -581,8 +549,7 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_PERSON_VECTOR_SHARED_PTR) {
     BOOST_CHECK(person1->name_ != nullptr && *person1->name_ == "Alice Cooper");
     BOOST_CHECK(person1->age_ != nullptr && *person1->age_ == 28);
     BOOST_CHECK(person1->city_ != nullptr && *person1->city_ == "Boston");
-    BOOST_CHECK(person1->email_ != nullptr &&
-                *person1->email_ == "alice@example.com");
+    BOOST_CHECK(person1->email_ != nullptr && *person1->email_ == "alice@example.com");
 
     const auto& person2 = people2[1];
     BOOST_CHECK(person2 != nullptr);
@@ -591,8 +558,7 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_PERSON_VECTOR_SHARED_PTR) {
     BOOST_CHECK(person2->city_ != nullptr && *person2->city_ == "Seattle");
     BOOST_CHECK(person2->email_ == nullptr);
   } catch (const std::exception& e) {
-    std::cout << "Error in 'TEST_PARSE_JSON_PERSON_VECTOR_SHARED_PTR': "
-              << e.what() << std::endl;
+    std::cout << "Error in 'TEST_PARSE_JSON_PERSON_VECTOR_SHARED_PTR': " << e.what() << std::endl;
     BOOST_FAIL("Exception thrown: " + std::string(e.what()));
   }
 }
@@ -630,8 +596,7 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_PERSON_VECTOR_UNIQUE_PTR) {
     BOOST_CHECK(person1->name_ != nullptr && *person1->name_ == "Alice Cooper");
     BOOST_CHECK(person1->age_ != nullptr && *person1->age_ == 28);
     BOOST_CHECK(person1->city_ != nullptr && *person1->city_ == "Boston");
-    BOOST_CHECK(person1->email_ != nullptr &&
-                *person1->email_ == "alice@example.com");
+    BOOST_CHECK(person1->email_ != nullptr && *person1->email_ == "alice@example.com");
 
     const auto& person2 = people2[1];
     BOOST_CHECK(person2 != nullptr);
@@ -640,8 +605,7 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_PERSON_VECTOR_UNIQUE_PTR) {
     BOOST_CHECK(person2->city_ != nullptr && *person2->city_ == "Seattle");
     BOOST_CHECK(person2->email_ == nullptr);
   } catch (const std::exception& e) {
-    std::cout << "Error in 'TEST_PARSE_JSON_PERSON_VECTOR_UNIQUE_PTR': "
-              << e.what() << std::endl;
+    std::cout << "Error in 'TEST_PARSE_JSON_PERSON_VECTOR_UNIQUE_PTR': " << e.what() << std::endl;
     BOOST_FAIL("Exception thrown: " + std::string(e.what()));
   }
 }
@@ -682,8 +646,7 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_PERSON_VECTOR_OPTIONAL) {
     BOOST_CHECK(person1.name_ != nullptr && *person1.name_ == "Alice Cooper");
     BOOST_CHECK(person1.age_ != nullptr && *person1.age_ == 28);
     BOOST_CHECK(person1.city_ != nullptr && *person1.city_ == "Boston");
-    BOOST_CHECK(person1.email_ != nullptr &&
-                *person1.email_ == "alice@example.com");
+    BOOST_CHECK(person1.email_ != nullptr && *person1.email_ == "alice@example.com");
 
     const auto& person2_opt = people2[1];
     BOOST_CHECK(!person2_opt.has_value());
@@ -696,8 +659,7 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_PERSON_VECTOR_OPTIONAL) {
     BOOST_CHECK(person3.city_ != nullptr && *person3.city_ == "Seattle");
     BOOST_CHECK(person3.email_ == nullptr);
   } catch (const std::exception& e) {
-    std::cout << "Error in 'TEST_PARSE_JSON_PERSON_VECTOR_OPTIONAL': "
-              << e.what() << std::endl;
+    std::cout << "Error in 'TEST_PARSE_JSON_PERSON_VECTOR_OPTIONAL': " << e.what() << std::endl;
     BOOST_FAIL("Exception thrown: " + std::string(e.what()));
   }
 }
@@ -761,8 +723,7 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_PERSON_MAP) {
     BOOST_CHECK(bob.city_ != nullptr && *bob.city_ == "Chicago");
     BOOST_CHECK(bob.email_ == nullptr);
   } catch (const std::exception& e) {
-    std::cout << "Error in 'TEST_PARSE_JSON_PERSON_MAP': " << e.what()
-              << std::endl;
+    std::cout << "Error in 'TEST_PARSE_JSON_PERSON_MAP': " << e.what() << std::endl;
     BOOST_FAIL("Exception thrown: " + std::string(e.what()));
   }
 }
@@ -829,8 +790,7 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_PERSON_MAP_UNIQUE_PTR) {
     BOOST_CHECK(bob->city_ != nullptr && *bob->city_ == "Chicago");
     BOOST_CHECK(bob->email_ == nullptr);
   } catch (const std::exception& e) {
-    std::cout << "Error in 'TEST_PARSE_JSON_PERSON_MAP_UNIQUE_PTR': "
-              << e.what() << std::endl;
+    std::cout << "Error in 'TEST_PARSE_JSON_PERSON_MAP_UNIQUE_PTR': " << e.what() << std::endl;
     BOOST_FAIL("Exception thrown: " + std::string(e.what()));
   }
 }
@@ -897,8 +857,7 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_PERSON_MAP_SHARED_PTR) {
     BOOST_CHECK(bob->city_ != nullptr && *bob->city_ == "Chicago");
     BOOST_CHECK(bob->email_ == nullptr);
   } catch (const std::exception& e) {
-    std::cout << "Error in 'TEST_PARSE_JSON_PERSON_MAP_SHARED_PTR': "
-              << e.what() << std::endl;
+    std::cout << "Error in 'TEST_PARSE_JSON_PERSON_MAP_SHARED_PTR': " << e.what() << std::endl;
     BOOST_FAIL("Exception thrown: " + std::string(e.what()));
   }
 }
@@ -974,8 +933,7 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_PERSON_MAP_OPTIONAL) {
     BOOST_CHECK(alice.city_ != nullptr && *alice.city_ == "Boston");
     BOOST_CHECK(alice.email_ == nullptr);
   } catch (const std::exception& e) {
-    std::cout << "Error in 'TEST_PARSE_JSON_PERSON_MAP_OPTIONAL': " << e.what()
-              << std::endl;
+    std::cout << "Error in 'TEST_PARSE_JSON_PERSON_MAP_OPTIONAL': " << e.what() << std::endl;
     BOOST_FAIL("Exception thrown: " + std::string(e.what()));
   }
 }
@@ -1043,8 +1001,7 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_PERSON_DICT) {
     BOOST_CHECK(bob.city_ != nullptr && *bob.city_ == "Chicago");
     BOOST_CHECK(bob.email_ == nullptr);
   } catch (const std::exception& e) {
-    std::cout << "Error in 'TEST_PARSE_JSON_PERSON_DICT': " << e.what()
-              << std::endl;
+    std::cout << "Error in 'TEST_PARSE_JSON_PERSON_DICT': " << e.what() << std::endl;
     BOOST_FAIL("Exception thrown: " + std::string(e.what()));
   }
 }
@@ -1115,8 +1072,7 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_PERSON_DICT_UNIQUE_PTR) {
     BOOST_CHECK(bob.city_ != nullptr && *bob.city_ == "Chicago");
     BOOST_CHECK(bob.email_ == nullptr);
   } catch (const std::exception& e) {
-    std::cout << "Error in 'TEST_PARSE_JSON_PERSON_DICT_UNIQUE_PTR': "
-              << e.what() << std::endl;
+    std::cout << "Error in 'TEST_PARSE_JSON_PERSON_DICT_UNIQUE_PTR': " << e.what() << std::endl;
     BOOST_FAIL("Exception thrown: " + std::string(e.what()));
   }
 }
@@ -1187,8 +1143,7 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_PERSON_DICT_SHARED_PTR) {
     BOOST_CHECK(bob.city_ != nullptr && *bob.city_ == "Chicago");
     BOOST_CHECK(bob.email_ == nullptr);
   } catch (const std::exception& e) {
-    std::cout << "Error in 'TEST_PARSE_JSON_PERSON_DICT_SHARED_PTR': "
-              << e.what() << std::endl;
+    std::cout << "Error in 'TEST_PARSE_JSON_PERSON_DICT_SHARED_PTR': " << e.what() << std::endl;
     BOOST_FAIL("Exception thrown: " + std::string(e.what()));
   }
 }
@@ -1265,8 +1220,7 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_PERSON_DICT_OPTIONAL) {
     BOOST_CHECK(alice.city_ != nullptr && *alice.city_ == "Boston");
     BOOST_CHECK(alice.email_ == nullptr);
   } catch (const std::exception& e) {
-    std::cout << "Error in 'TEST_PARSE_JSON_PERSON_DICT_OPTIONAL': " << e.what()
-              << std::endl;
+    std::cout << "Error in 'TEST_PARSE_JSON_PERSON_DICT_OPTIONAL': " << e.what() << std::endl;
     BOOST_FAIL("Exception thrown: " + std::string(e.what()));
   }
 }
@@ -1278,8 +1232,8 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_ARBITRARY_LIST) {
     values.push_back(boost::json::value("hello world"));
     values.push_back(boost::json::value(42));
     values.push_back(boost::json::value(true));
-    values.push_back(boost::json::value({{"key", "value"}, {"number", 123}}));
-    values.push_back(boost::json::value({1, 2, 3, 4, 5}));
+    values.push_back(boost::json::value({ { "key", "value" }, { "number", 123 } }));
+    values.push_back(boost::json::value({ 1, 2, 3, 4, 5 }));
 
     boost::json::value json_value = Marshal(values);
     std::cout << "==> TEST_PARSE_JSON_ARBITRARY_LIST" << std::endl;
@@ -1291,16 +1245,14 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_ARBITRARY_LIST) {
 
     BOOST_CHECK(values2.size() == 5);
 
-    BOOST_CHECK(values2[0].is_string() &&
-                values2[0].as_string() == "hello world");
+    BOOST_CHECK(values2[0].is_string() && values2[0].as_string() == "hello world");
     BOOST_CHECK(values2[1].is_int64() && values2[1].as_int64() == 42);
     BOOST_CHECK(values2[2].is_bool() && values2[2].as_bool() == true);
     BOOST_CHECK(values2[3].is_object());
     BOOST_CHECK(values2[4].is_array() && values2[4].as_array().size() == 5);
 
   } catch (const std::exception& e) {
-    std::cout << "Error in 'TEST_PARSE_JSON_ARBITRARY_LIST': " << e.what()
-              << std::endl;
+    std::cout << "Error in 'TEST_PARSE_JSON_ARBITRARY_LIST': " << e.what() << std::endl;
     BOOST_FAIL("Exception thrown: " + std::string(e.what()));
   }
 }
@@ -1313,10 +1265,8 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_ARBITRARY_LIST_UNIQUE_PTR) {
     values.push_back(MAKE_UNIQUE(boost::json::value, 42));
     values.push_back(MAKE_UNIQUE(boost::json::value, true));
     values.push_back(nullptr);
-    values.push_back(
-        MAKE_UNIQUE(boost::json::value, boost::json::object{{"key", "value"}}));
-    values.push_back(
-        MAKE_UNIQUE(boost::json::value, boost::json::array{1, 2, 3}));
+    values.push_back(MAKE_UNIQUE(boost::json::value, boost::json::object{ { "key", "value" } }));
+    values.push_back(MAKE_UNIQUE(boost::json::value, boost::json::array{ 1, 2, 3 }));
 
     boost::json::value json_value = Marshal(values);
     std::cout << "==> TEST_PARSE_JSON_ARBITRARY_LIST_UNIQUE_PTR" << std::endl;
@@ -1330,18 +1280,15 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_ARBITRARY_LIST_UNIQUE_PTR) {
 
     BOOST_CHECK(values2[0] != nullptr && values2[0]->is_string() &&
                 values2[0]->as_string() == "hello world");
-    BOOST_CHECK(values2[1] != nullptr && values2[1]->is_int64() &&
-                values2[1]->as_int64() == 42);
-    BOOST_CHECK(values2[2] != nullptr && values2[2]->is_bool() &&
-                values2[2]->as_bool() == true);
+    BOOST_CHECK(values2[1] != nullptr && values2[1]->is_int64() && values2[1]->as_int64() == 42);
+    BOOST_CHECK(values2[2] != nullptr && values2[2]->is_bool() && values2[2]->as_bool() == true);
     BOOST_CHECK(values2[3] == nullptr);
     BOOST_CHECK(values2[4] != nullptr && values2[4]->is_object());
     BOOST_CHECK(values2[5] != nullptr && values2[5]->is_array() &&
                 values2[5]->as_array().size() == 3);
 
   } catch (const std::exception& e) {
-    std::cout << "Error in 'TEST_PARSE_JSON_ARBITRARY_LIST_UNIQUE_PTR': "
-              << e.what() << std::endl;
+    std::cout << "Error in 'TEST_PARSE_JSON_ARBITRARY_LIST_UNIQUE_PTR': " << e.what() << std::endl;
     BOOST_FAIL("Exception thrown: " + std::string(e.what()));
   }
 }
@@ -1354,10 +1301,8 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_ARBITRARY_LIST_SHARED_PTR) {
     values.push_back(MAKE_SHARED(boost::json::value, 42));
     values.push_back(MAKE_SHARED(boost::json::value, true));
     values.push_back(nullptr);
-    values.push_back(
-        MAKE_SHARED(boost::json::value, boost::json::object{{"key", "value"}}));
-    values.push_back(
-        MAKE_SHARED(boost::json::value, boost::json::array{1, 2, 3}));
+    values.push_back(MAKE_SHARED(boost::json::value, boost::json::object{ { "key", "value" } }));
+    values.push_back(MAKE_SHARED(boost::json::value, boost::json::array{ 1, 2, 3 }));
 
     boost::json::value json_value = Marshal(values);
     std::cout << "==> TEST_PARSE_JSON_ARBITRARY_LIST_SHARED_PTR" << std::endl;
@@ -1371,18 +1316,15 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_ARBITRARY_LIST_SHARED_PTR) {
 
     BOOST_CHECK(values2[0] != nullptr && values2[0]->is_string() &&
                 values2[0]->as_string() == "hello world");
-    BOOST_CHECK(values2[1] != nullptr && values2[1]->is_int64() &&
-                values2[1]->as_int64() == 42);
-    BOOST_CHECK(values2[2] != nullptr && values2[2]->is_bool() &&
-                values2[2]->as_bool() == true);
+    BOOST_CHECK(values2[1] != nullptr && values2[1]->is_int64() && values2[1]->as_int64() == 42);
+    BOOST_CHECK(values2[2] != nullptr && values2[2]->is_bool() && values2[2]->as_bool() == true);
     BOOST_CHECK(values2[3] == nullptr);
     BOOST_CHECK(values2[4] != nullptr && values2[4]->is_object());
     BOOST_CHECK(values2[5] != nullptr && values2[5]->is_array() &&
                 values2[5]->as_array().size() == 3);
 
   } catch (const std::exception& e) {
-    std::cout << "Error in 'TEST_PARSE_JSON_ARBITRARY_LIST_SHARED_PTR': "
-              << e.what() << std::endl;
+    std::cout << "Error in 'TEST_PARSE_JSON_ARBITRARY_LIST_SHARED_PTR': " << e.what() << std::endl;
     BOOST_FAIL("Exception thrown: " + std::string(e.what()));
   }
 }
@@ -1395,8 +1337,8 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_ARBITRARY_LIST_OPTIONAL) {
     values.push_back(boost::json::value(42));
     values.push_back(std::nullopt);
     values.push_back(boost::json::value(true));
-    values.push_back(boost::json::value(boost::json::object{{"key", "value"}}));
-    values.push_back(boost::json::value(boost::json::array{1, 2, 3}));
+    values.push_back(boost::json::value(boost::json::object{ { "key", "value" } }));
+    values.push_back(boost::json::value(boost::json::array{ 1, 2, 3 }));
 
     boost::json::value json_value = Marshal(values);
     std::cout << "==> TEST_PARSE_JSON_ARBITRARY_LIST_OPTIONAL" << std::endl;
@@ -1410,18 +1352,15 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_ARBITRARY_LIST_OPTIONAL) {
 
     BOOST_CHECK(values2[0].has_value() && values2[0]->is_string() &&
                 values2[0]->as_string() == "hello world");
-    BOOST_CHECK(values2[1].has_value() && values2[1]->is_int64() &&
-                values2[1]->as_int64() == 42);
+    BOOST_CHECK(values2[1].has_value() && values2[1]->is_int64() && values2[1]->as_int64() == 42);
     BOOST_CHECK(!values2[2].has_value());
-    BOOST_CHECK(values2[3].has_value() && values2[3]->is_bool() &&
-                values2[3]->as_bool() == true);
+    BOOST_CHECK(values2[3].has_value() && values2[3]->is_bool() && values2[3]->as_bool() == true);
     BOOST_CHECK(values2[4].has_value() && values2[4]->is_object());
     BOOST_CHECK(values2[5].has_value() && values2[5]->is_array() &&
                 values2[5]->as_array().size() == 3);
 
   } catch (const std::exception& e) {
-    std::cout << "Error in 'TEST_PARSE_JSON_ARBITRARY_LIST_OPTIONAL': "
-              << e.what() << std::endl;
+    std::cout << "Error in 'TEST_PARSE_JSON_ARBITRARY_LIST_OPTIONAL': " << e.what() << std::endl;
     BOOST_FAIL("Exception thrown: " + std::string(e.what()));
   }
 }
@@ -1433,8 +1372,8 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_ARBITRARY_MAP) {
     values["string"] = boost::json::value("hello world");
     values["number"] = boost::json::value(42);
     values["boolean"] = boost::json::value(true);
-    values["object"] = boost::json::value({{"key", "value"}, {"number", 123}});
-    values["array"] = boost::json::value({1, 2, 3, 4, 5});
+    values["object"] = boost::json::value({ { "key", "value" }, { "number", 123 } });
+    values["array"] = boost::json::value({ 1, 2, 3, 4, 5 });
 
     boost::json::value json_value = Marshal(values);
     std::cout << "==> TEST_PARSE_JSON_ARBITRARY_MAP" << std::endl;
@@ -1446,19 +1385,14 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_ARBITRARY_MAP) {
 
     BOOST_CHECK(values2.size() == 5);
 
-    BOOST_CHECK(values2["string"].is_string() &&
-                values2["string"].as_string() == "hello world");
-    BOOST_CHECK(values2["number"].is_int64() &&
-                values2["number"].as_int64() == 42);
-    BOOST_CHECK(values2["boolean"].is_bool() &&
-                values2["boolean"].as_bool() == true);
+    BOOST_CHECK(values2["string"].is_string() && values2["string"].as_string() == "hello world");
+    BOOST_CHECK(values2["number"].is_int64() && values2["number"].as_int64() == 42);
+    BOOST_CHECK(values2["boolean"].is_bool() && values2["boolean"].as_bool() == true);
     BOOST_CHECK(values2["object"].is_object());
-    BOOST_CHECK(values2["array"].is_array() &&
-                values2["array"].as_array().size() == 5);
+    BOOST_CHECK(values2["array"].is_array() && values2["array"].as_array().size() == 5);
 
   } catch (const std::exception& e) {
-    std::cout << "Error in 'TEST_PARSE_JSON_ARBITRARY_MAP': " << e.what()
-              << std::endl;
+    std::cout << "Error in 'TEST_PARSE_JSON_ARBITRARY_MAP': " << e.what() << std::endl;
     BOOST_FAIL("Exception thrown: " + std::string(e.what()));
   }
 }
@@ -1471,10 +1405,8 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_ARBITRARY_MAP_UNIQUE_PTR) {
     values["number"] = MAKE_UNIQUE(boost::json::value, 42);
     values["boolean"] = MAKE_UNIQUE(boost::json::value, true);
     values["null"] = nullptr;
-    values["object"] =
-        MAKE_UNIQUE(boost::json::value, boost::json::object{{"key", "value"}});
-    values["array"] =
-        MAKE_UNIQUE(boost::json::value, boost::json::array{1, 2, 3});
+    values["object"] = MAKE_UNIQUE(boost::json::value, boost::json::object{ { "key", "value" } });
+    values["array"] = MAKE_UNIQUE(boost::json::value, boost::json::array{ 1, 2, 3 });
 
     boost::json::value json_value = Marshal(values);
     std::cout << "==> TEST_PARSE_JSON_ARBITRARY_MAP_UNIQUE_PTR" << std::endl;
@@ -1486,13 +1418,11 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_ARBITRARY_MAP_UNIQUE_PTR) {
 
     BOOST_CHECK(values2.size() == 6);
 
-    BOOST_CHECK(values2["string"] != nullptr &&
-                values2["string"]->is_string() &&
+    BOOST_CHECK(values2["string"] != nullptr && values2["string"]->is_string() &&
                 values2["string"]->as_string() == "hello world");
     BOOST_CHECK(values2["number"] != nullptr && values2["number"]->is_int64() &&
                 values2["number"]->as_int64() == 42);
-    BOOST_CHECK(values2["boolean"] != nullptr &&
-                values2["boolean"]->is_bool() &&
+    BOOST_CHECK(values2["boolean"] != nullptr && values2["boolean"]->is_bool() &&
                 values2["boolean"]->as_bool() == true);
     BOOST_CHECK(values2["null"] == nullptr);
     BOOST_CHECK(values2["object"] != nullptr && values2["object"]->is_object());
@@ -1500,8 +1430,7 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_ARBITRARY_MAP_UNIQUE_PTR) {
                 values2["array"]->as_array().size() == 3);
 
   } catch (const std::exception& e) {
-    std::cout << "Error in 'TEST_PARSE_JSON_ARBITRARY_MAP_UNIQUE_PTR': "
-              << e.what() << std::endl;
+    std::cout << "Error in 'TEST_PARSE_JSON_ARBITRARY_MAP_UNIQUE_PTR': " << e.what() << std::endl;
     BOOST_FAIL("Exception thrown: " + std::string(e.what()));
   }
 }
@@ -1514,10 +1443,8 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_ARBITRARY_MAP_SHARED_PTR) {
     values["number"] = MAKE_SHARED(boost::json::value, 42);
     values["boolean"] = MAKE_SHARED(boost::json::value, true);
     values["null"] = nullptr;
-    values["object"] =
-        MAKE_SHARED(boost::json::value, boost::json::object{{"key", "value"}});
-    values["array"] =
-        MAKE_SHARED(boost::json::value, boost::json::array{1, 2, 3});
+    values["object"] = MAKE_SHARED(boost::json::value, boost::json::object{ { "key", "value" } });
+    values["array"] = MAKE_SHARED(boost::json::value, boost::json::array{ 1, 2, 3 });
 
     boost::json::value json_value = Marshal(values);
     std::cout << "==> TEST_PARSE_JSON_ARBITRARY_MAP_SHARED_PTR" << std::endl;
@@ -1529,13 +1456,11 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_ARBITRARY_MAP_SHARED_PTR) {
 
     BOOST_CHECK(values2.size() == 6);
 
-    BOOST_CHECK(values2["string"] != nullptr &&
-                values2["string"]->is_string() &&
+    BOOST_CHECK(values2["string"] != nullptr && values2["string"]->is_string() &&
                 values2["string"]->as_string() == "hello world");
     BOOST_CHECK(values2["number"] != nullptr && values2["number"]->is_int64() &&
                 values2["number"]->as_int64() == 42);
-    BOOST_CHECK(values2["boolean"] != nullptr &&
-                values2["boolean"]->is_bool() &&
+    BOOST_CHECK(values2["boolean"] != nullptr && values2["boolean"]->is_bool() &&
                 values2["boolean"]->as_bool() == true);
     BOOST_CHECK(values2["null"] == nullptr);
     BOOST_CHECK(values2["object"] != nullptr && values2["object"]->is_object());
@@ -1543,8 +1468,7 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_ARBITRARY_MAP_SHARED_PTR) {
                 values2["array"]->as_array().size() == 3);
 
   } catch (const std::exception& e) {
-    std::cout << "Error in 'TEST_PARSE_JSON_ARBITRARY_MAP_SHARED_PTR': "
-              << e.what() << std::endl;
+    std::cout << "Error in 'TEST_PARSE_JSON_ARBITRARY_MAP_SHARED_PTR': " << e.what() << std::endl;
     BOOST_FAIL("Exception thrown: " + std::string(e.what()));
   }
 }
@@ -1557,9 +1481,8 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_ARBITRARY_MAP_OPTIONAL) {
     values["number"] = boost::json::value(42);
     values["null"] = std::nullopt;
     values["boolean"] = boost::json::value(true);
-    values["object"] =
-        boost::json::value(boost::json::object{{"key", "value"}});
-    values["array"] = boost::json::value(boost::json::array{1, 2, 3});
+    values["object"] = boost::json::value(boost::json::object{ { "key", "value" } });
+    values["array"] = boost::json::value(boost::json::array{ 1, 2, 3 });
 
     boost::json::value json_value = Marshal(values);
     std::cout << "==> TEST_PARSE_JSON_ARBITRARY_MAP_OPTIONAL" << std::endl;
@@ -1571,24 +1494,19 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_ARBITRARY_MAP_OPTIONAL) {
 
     BOOST_CHECK(values2.size() == 6);
 
-    BOOST_CHECK(values2["string"].has_value() &&
-                values2["string"]->is_string() &&
+    BOOST_CHECK(values2["string"].has_value() && values2["string"]->is_string() &&
                 values2["string"]->as_string() == "hello world");
-    BOOST_CHECK(values2["number"].has_value() &&
-                values2["number"]->is_int64() &&
+    BOOST_CHECK(values2["number"].has_value() && values2["number"]->is_int64() &&
                 values2["number"]->as_int64() == 42);
     BOOST_CHECK(!values2["null"].has_value());
-    BOOST_CHECK(values2["boolean"].has_value() &&
-                values2["boolean"]->is_bool() &&
+    BOOST_CHECK(values2["boolean"].has_value() && values2["boolean"]->is_bool() &&
                 values2["boolean"]->as_bool() == true);
-    BOOST_CHECK(values2["object"].has_value() &&
-                values2["object"]->is_object());
+    BOOST_CHECK(values2["object"].has_value() && values2["object"]->is_object());
     BOOST_CHECK(values2["array"].has_value() && values2["array"]->is_array() &&
                 values2["array"]->as_array().size() == 3);
 
   } catch (const std::exception& e) {
-    std::cout << "Error in 'TEST_PARSE_JSON_ARBITRARY_MAP_OPTIONAL': "
-              << e.what() << std::endl;
+    std::cout << "Error in 'TEST_PARSE_JSON_ARBITRARY_MAP_OPTIONAL': " << e.what() << std::endl;
     BOOST_FAIL("Exception thrown: " + std::string(e.what()));
   }
 }
@@ -1606,12 +1524,10 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_ARBITRARY) {
     Arbitrary value2;
     Unmarshal(json_value, value2);
 
-    BOOST_CHECK(value2.value_.is_string() &&
-                value2.value_.as_string() == "hello world");
+    BOOST_CHECK(value2.value_.is_string() && value2.value_.as_string() == "hello world");
 
   } catch (const std::exception& e) {
-    std::cout << "Error in 'TEST_PARSE_JSON_ARBITRARY': " << e.what()
-              << std::endl;
+    std::cout << "Error in 'TEST_PARSE_JSON_ARBITRARY': " << e.what() << std::endl;
     BOOST_FAIL("Exception thrown: " + std::string(e.what()));
   }
 }
@@ -1629,12 +1545,10 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_ARBITRARY_UNIQUE_PTR) {
     ArbitraryUniquePtrStruct value2;
     Unmarshal(json_value, value2);
 
-    BOOST_CHECK(value2 != nullptr && value2->value_.is_int64() &&
-                value2->value_.as_int64() == 42);
+    BOOST_CHECK(value2 != nullptr && value2->value_.is_int64() && value2->value_.as_int64() == 42);
 
   } catch (const std::exception& e) {
-    std::cout << "Error in 'TEST_PARSE_JSON_ARBITRARY_UNIQUE_PTR': " << e.what()
-              << std::endl;
+    std::cout << "Error in 'TEST_PARSE_JSON_ARBITRARY_UNIQUE_PTR': " << e.what() << std::endl;
     BOOST_FAIL("Exception thrown: " + std::string(e.what()));
   }
 }
@@ -1652,12 +1566,10 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_ARBITRARY_SHARED_PTR) {
     ArbitrarySharedPtrStruct value2;
     Unmarshal(json_value, value2);
 
-    BOOST_CHECK(value2 != nullptr && value2->value_.is_bool() &&
-                value2->value_.as_bool() == true);
+    BOOST_CHECK(value2 != nullptr && value2->value_.is_bool() && value2->value_.as_bool() == true);
 
   } catch (const std::exception& e) {
-    std::cout << "Error in 'TEST_PARSE_JSON_ARBITRARY_SHARED_PTR': " << e.what()
-              << std::endl;
+    std::cout << "Error in 'TEST_PARSE_JSON_ARBITRARY_SHARED_PTR': " << e.what() << std::endl;
     BOOST_FAIL("Exception thrown: " + std::string(e.what()));
   }
 }
@@ -1666,7 +1578,7 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_ARBITRARY_OPTIONAL) {
   try {
     ArbitraryOptionalStruct value;
     value.emplace();
-    value->value_ = boost::json::value({{"key", "value"}});
+    value->value_ = boost::json::value({ { "key", "value" } });
 
     boost::json::value json_value = Marshal(value);
     std::cout << "==> TEST_PARSE_JSON_ARBITRARY_OPTIONAL" << std::endl;
@@ -1679,8 +1591,7 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_ARBITRARY_OPTIONAL) {
     BOOST_CHECK(value2.has_value() && value2->value_.is_object());
 
   } catch (const std::exception& e) {
-    std::cout << "Error in 'TEST_PARSE_JSON_ARBITRARY_OPTIONAL': " << e.what()
-              << std::endl;
+    std::cout << "Error in 'TEST_PARSE_JSON_ARBITRARY_OPTIONAL': " << e.what() << std::endl;
     BOOST_FAIL("Exception thrown: " + std::string(e.what()));
   }
 }
@@ -1702,8 +1613,8 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_ARBITRARY_UNIQUE_PTR_MEMBER) {
                 value2.value_->as_string() == "hello world");
 
   } catch (const std::exception& e) {
-    std::cout << "Error in 'TEST_PARSE_JSON_ARBITRARY_UNIQUE_PTR_MEMBER': "
-              << e.what() << std::endl;
+    std::cout << "Error in 'TEST_PARSE_JSON_ARBITRARY_UNIQUE_PTR_MEMBER': " << e.what()
+              << std::endl;
     BOOST_FAIL("Exception thrown: " + std::string(e.what()));
   }
 }
@@ -1725,8 +1636,8 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_ARBITRARY_SHARED_PTR_MEMBER) {
                 value2.value_->as_int64() == 42);
 
   } catch (const std::exception& e) {
-    std::cout << "Error in 'TEST_PARSE_JSON_ARBITRARY_SHARED_PTR_MEMBER': "
-              << e.what() << std::endl;
+    std::cout << "Error in 'TEST_PARSE_JSON_ARBITRARY_SHARED_PTR_MEMBER': " << e.what()
+              << std::endl;
     BOOST_FAIL("Exception thrown: " + std::string(e.what()));
   }
 }
@@ -1748,8 +1659,7 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_ARBITRARY_OPTIONAL_MEMBER) {
                 value2.value_->as_bool() == true);
 
   } catch (const std::exception& e) {
-    std::cout << "Error in 'TEST_PARSE_JSON_ARBITRARY_OPTIONAL_MEMBER': "
-              << e.what() << std::endl;
+    std::cout << "Error in 'TEST_PARSE_JSON_ARBITRARY_OPTIONAL_MEMBER': " << e.what() << std::endl;
     BOOST_FAIL("Exception thrown: " + std::string(e.what()));
   }
 }
@@ -1770,16 +1680,12 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_ARBITRARY_VECTOR) {
     Unmarshal(json_value, value2);
 
     BOOST_CHECK(value2.value_.size() == 3);
-    BOOST_CHECK(value2.value_[0].is_string() &&
-                value2.value_[0].as_string() == "hello");
-    BOOST_CHECK(value2.value_[1].is_int64() &&
-                value2.value_[1].as_int64() == 42);
-    BOOST_CHECK(value2.value_[2].is_bool() &&
-                value2.value_[2].as_bool() == true);
+    BOOST_CHECK(value2.value_[0].is_string() && value2.value_[0].as_string() == "hello");
+    BOOST_CHECK(value2.value_[1].is_int64() && value2.value_[1].as_int64() == 42);
+    BOOST_CHECK(value2.value_[2].is_bool() && value2.value_[2].as_bool() == true);
 
   } catch (const std::exception& e) {
-    std::cout << "Error in 'TEST_PARSE_JSON_ARBITRARY_VECTOR': " << e.what()
-              << std::endl;
+    std::cout << "Error in 'TEST_PARSE_JSON_ARBITRARY_VECTOR': " << e.what() << std::endl;
     BOOST_FAIL("Exception thrown: " + std::string(e.what()));
   }
 }
@@ -1802,14 +1708,11 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_ARBITRARY_DICT) {
     BOOST_CHECK(value2.value_.size() == 3);
     BOOST_CHECK(value2.value_["string"].is_string() &&
                 value2.value_["string"].as_string() == "hello");
-    BOOST_CHECK(value2.value_["number"].is_int64() &&
-                value2.value_["number"].as_int64() == 42);
-    BOOST_CHECK(value2.value_["boolean"].is_bool() &&
-                value2.value_["boolean"].as_bool() == true);
+    BOOST_CHECK(value2.value_["number"].is_int64() && value2.value_["number"].as_int64() == 42);
+    BOOST_CHECK(value2.value_["boolean"].is_bool() && value2.value_["boolean"].as_bool() == true);
 
   } catch (const std::exception& e) {
-    std::cout << "Error in 'TEST_PARSE_JSON_ARBITRARY_DICT': " << e.what()
-              << std::endl;
+    std::cout << "Error in 'TEST_PARSE_JSON_ARBITRARY_DICT': " << e.what() << std::endl;
     BOOST_FAIL("Exception thrown: " + std::string(e.what()));
   }
 }

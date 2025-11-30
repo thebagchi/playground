@@ -5,7 +5,7 @@
 #include <thread>
 
 class Resource {
- public:
+public:
   Resource() {
     std::cout << "Resource created (expensive operation)" << std::endl;
   }
@@ -15,7 +15,7 @@ class Resource {
   }
 };
 
-std::atomic<bool> initialized{false};
+std::atomic<bool> initialized{ false };
 std::mutex mtx;
 std::shared_ptr<Resource> resource;
 

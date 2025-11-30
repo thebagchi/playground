@@ -1,10 +1,10 @@
 #include <iostream>
 #include <memory>
 
-class B;  // Forward declaration
+class B; // Forward declaration
 
 class A {
- public:
+public:
   void SetPartner(const std::shared_ptr<B>& partner) {
     // B is partner of A
     partner_ = partner;
@@ -17,13 +17,12 @@ class A {
       std::cout << "Partner B no longer exists." << std::endl;
     }
   }
-
- private:
+private:
   std::weak_ptr<B> partner_;
 };
 
 class B {
- public:
+public:
   void SetPartner(const std::shared_ptr<A>& partner) {
     // A is partner of B
     partner_ = partner;
@@ -36,8 +35,7 @@ class B {
       std::cout << "Partner A no longer exists." << std::endl;
     }
   }
-
- private:
+private:
   std::weak_ptr<A> partner_;
 };
 
@@ -51,7 +49,7 @@ int main() {
   a->ShowPartner();
   b->ShowPartner();
 
-  b.reset();  // Destroy one object
+  b.reset(); // Destroy one object
 
-  a->ShowPartner();  // Safe check using weak_ptr
+  a->ShowPartner(); // Safe check using weak_ptr
 }

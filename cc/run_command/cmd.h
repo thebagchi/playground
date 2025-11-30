@@ -14,21 +14,21 @@
 #include <vector>
 
 class CMD {
- private:
+private:
   std::vector<std::string> args_;
   pid_t pid_;
-  int stdi_[2];  // For writing to child
-  int stdo_[2];  // For reading from child
-  int stde_[2];  // For reading stderr from child
+  int stdi_[2]; // For writing to child
+  int stdo_[2]; // For reading from child
+  int stde_[2]; // For reading stderr from child
   bool running_;
   std::string dir_;
   std::map<std::string, std::string> env_;
 
   void setup_child_pipes() {
     // Close unused pipe ends
-    close(stdi_[1]);  // Close write end of stdin pipe
-    close(stdo_[0]);  // Close read end of stdout pipe
-    close(stde_[0]);  // Close read end of stderr pipe
+    close(stdi_[1]); // Close write end of stdin pipe
+    close(stdo_[0]); // Close read end of stdout pipe
+    close(stde_[0]); // Close read end of stderr pipe
 
     // Redirect stdin, stdout, stderr
     dup2(stdi_[0], STDIN_FILENO);
@@ -43,16 +43,15 @@ class CMD {
 
   void setup_parent_pipes() {
     // Close unused pipe ends in parent
-    close(stdi_[0]);  // Close read end of stdin pipe
-    close(stdo_[1]);  // Close write end of stdout pipe
-    close(stde_[1]);  // Close write end of stderr pipe
+    close(stdi_[0]); // Close read end of stdin pipe
+    close(stdo_[1]); // Close write end of stdout pipe
+    close(stde_[1]); // Close write end of stderr pipe
 
     // Set pipes to non-blocking mode for reading
     fcntl(stdo_[0], F_SETFL, O_NONBLOCK);
     fcntl(stde_[0], F_SETFL, O_NONBLOCK);
   }
-
- public:
+public:
   CMD(const std::vector<std::string>& args)
       : args_(args), pid_(-1), running_(false), dir_(""), env_() {
     // Constructor
@@ -65,12 +64,24 @@ class CMD {
   ~CMD() {
     // Destructor
     // Close any open pipes
-    if (stdi_[0] != -1) close(stdi_[0]);
-    if (stdi_[1] != -1) close(stdi_[1]);
-    if (stdo_[0] != -1) close(stdo_[0]);
-    if (stdo_[1] != -1) close(stdo_[1]);
-    if (stde_[0] != -1) close(stde_[0]);
-    if (stde_[1] != -1) close(stde_[1]);
+    if (stdi_[0] != -1) {
+      close(stdi_[0]);
+    }
+    if (stdi_[1] != -1) {
+      close(stdi_[1]);
+    }
+    if (stdo_[0] != -1) {
+      close(stdo_[0]);
+    }
+    if (stdo_[1] != -1) {
+      close(stdo_[1]);
+    }
+    if (stde_[0] != -1) {
+      close(stde_[0]);
+    }
+    if (stde_[1] != -1) {
+      close(stde_[1]);
+    }
 
     // If still running, terminate the process
     if (running_ && pid_ > 0) {
@@ -94,7 +105,7 @@ class CMD {
       return false;
     }
 
-    if (pid_ == 0) {  // Child process
+    if (pid_ == 0) { // Child process
       setup_child_pipes();
 
       // Change working directory if set
@@ -122,7 +133,7 @@ class CMD {
       // If we reach here, execvp failed
       std::cerr << "Failed to execute command: " << args_[0] << std::endl;
       _exit(1);
-    } else {  // Parent process
+    } else { // Parent process
       running_ = true;
 
       setup_parent_pipes();
@@ -272,7 +283,7 @@ class CMD {
         return -WTERMSIG(status);
       }
     } else if (result == 0) {
-      return -2;  // Still running
+      return -2; // Still running
     }
 
     return -1;
@@ -282,12 +293,24 @@ class CMD {
     // Detach the child process so it runs independently
     if (running_) {
       // Close all pipes
-      if (stdi_[0] != -1) close(stdi_[0]);
-      if (stdi_[1] != -1) close(stdi_[1]);
-      if (stdo_[0] != -1) close(stdo_[0]);
-      if (stdo_[1] != -1) close(stdo_[1]);
-      if (stde_[0] != -1) close(stde_[0]);
-      if (stde_[1] != -1) close(stde_[1]);
+      if (stdi_[0] != -1) {
+        close(stdi_[0]);
+      }
+      if (stdi_[1] != -1) {
+        close(stdi_[1]);
+      }
+      if (stdo_[0] != -1) {
+        close(stdo_[0]);
+      }
+      if (stdo_[1] != -1) {
+        close(stdo_[1]);
+      }
+      if (stde_[0] != -1) {
+        close(stde_[0]);
+      }
+      if (stde_[1] != -1) {
+        close(stde_[1]);
+      }
 
       // Reset state so parent no longer manages the process
       running_ = false;
@@ -319,4 +342,4 @@ class CMD {
   }
 };
 
-#endif  // CMD_H_INCLUDED
+#endif // CMD_H_INCLUDED

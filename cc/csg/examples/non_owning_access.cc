@@ -4,7 +4,7 @@
 #include <stdexcept>
 
 class Object {
- public:
+public:
   Object(int value) : value_(value) {
     // Constructor ...
     std::cout << "Object created with value: " << value_ << std::endl;
@@ -22,30 +22,26 @@ class Object {
     value_ = value;
     std::cout << "Object value set to: " << value_ << std::endl;
   }
-
- private:
+private:
   int value_;
 };
 
 // Utility function to safely get reference from smart pointer
-template <typename T>
-T& Ref(const std::unique_ptr<T>& ptr) {
+template <typename T> T& Ref(const std::unique_ptr<T>& ptr) {
   if (!ptr) {
     throw std::runtime_error("Cannot dereference null unique_ptr");
   }
   return *ptr;
 }
 
-template <typename T>
-T& Ref(const std::shared_ptr<T>& ptr) {
+template <typename T> T& Ref(const std::shared_ptr<T>& ptr) {
   if (!ptr) {
     throw std::runtime_error("Cannot dereference null shared_ptr");
   }
   return *ptr;
 }
 
-template <typename T>
-const T& Ref(const std::optional<T>& opt) {
+template <typename T> const T& Ref(const std::optional<T>& opt) {
   if (!opt.has_value()) {
     throw std::runtime_error("Cannot dereference empty optional");
   }
@@ -54,8 +50,7 @@ const T& Ref(const std::optional<T>& opt) {
 
 // Required → reference
 void Process(const Object& w) {
-  std::cout << "Processing read-only object with value: " << w.getValue()
-            << std::endl;
+  std::cout << "Processing read-only object with value: " << w.getValue() << std::endl;
 }
 
 // Required and modifiable → non-const reference
@@ -67,8 +62,7 @@ void ProcessMutable(Object& w) {
 // Truly optional → raw pointer (acceptable)
 void ProcessOptional(const Object* w) {
   if (w) {
-    std::cout << "Processing optional object with value: " << w->getValue()
-              << std::endl;
+    std::cout << "Processing optional object with value: " << w->getValue() << std::endl;
   } else {
     std::cout << "No object provided (nullptr)" << std::endl;
   }
@@ -80,13 +74,13 @@ int main() {
 
   // Demonstrate non-owning access patterns using Ref utility
   try {
-    Process(Ref(obj));         // Required → reference
-    ProcessMutable(Ref(obj));  // Required and modifiable → non-const reference
-    Process(Ref(opt_obj));     // Required from optional → reference
+    Process(Ref(obj));        // Required → reference
+    ProcessMutable(Ref(obj)); // Required and modifiable → non-const reference
+    Process(Ref(opt_obj));    // Required from optional → reference
   } catch (const std::exception& e) {
     std::cout << "Exception: " << e.what() << std::endl;
   }
-  ProcessOptional(obj.get());  // Truly optional → raw pointer
+  ProcessOptional(obj.get()); // Truly optional → raw pointer
 
   // Demonstrate optional with nullptr
   ProcessOptional(nullptr);

@@ -57,10 +57,10 @@ void test_value_list() {
   // Test List constructor using MakePtr
   {
     json::List data = {
-      json::MakePtr(42), // Number
+      json::MakePtr(42),      // Number
       json::MakePtr("hello"), // String
-      json::MakePtr(true), // Bool
-      json::MakePtr(nullptr) // Null
+      json::MakePtr(true),    // Bool
+      json::MakePtr(nullptr)  // Null
     };
 
     json::Value value(data);
@@ -71,10 +71,10 @@ void test_value_list() {
   // Test List move constructor
   {
     json::List data = {
-      json::MakePtr(99), // Number
+      json::MakePtr(99),      // Number
       json::MakePtr("world"), // String
-      json::MakePtr(false), // Bool
-      json::MakePtr(nullptr) // Null
+      json::MakePtr(false),   // Bool
+      json::MakePtr(nullptr)  // Null
     };
 
     json::Value value(std::move(data));
@@ -85,9 +85,9 @@ void test_value_list() {
   // Test inline List initialization
   {
     json::Value value(json::List{
-        json::MakePtr(123), // Number
+        json::MakePtr(123),      // Number
         json::MakePtr("inline"), // String
-        json::MakePtr(true) // Bool
+        json::MakePtr(true)      // Bool
     });
     std::cout << "inline value type: " << value.type_name() << std::endl;
   }
@@ -152,8 +152,8 @@ void test_value_dict() {
 
 void test_make_ptr() {
   // Test MakePtr helper function
-  auto ptr1 = json::MakePtr(42); // Number
-  auto ptr2 = json::MakePtr(true); // Bool
+  auto ptr1 = json::MakePtr(42);      // Number
+  auto ptr2 = json::MakePtr(true);    // Bool
   auto ptr3 = json::MakePtr(nullptr); // Null
   auto ptr4 = json::MakePtr("Hello"); // String
 

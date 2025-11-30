@@ -2,8 +2,7 @@
 #include <memory>
 #include <tuple>
 
-std::tuple<std::unique_ptr<int>, std::shared_ptr<double>, bool>
-create_resources() {
+std::tuple<std::unique_ptr<int>, std::shared_ptr<double>, bool> create_resources() {
   auto up = std::make_unique<int>(42);
   auto sp = std::make_shared<double>(3.14);
   bool success = true;
@@ -13,8 +12,7 @@ create_resources() {
 int main() {
   auto [unique_ptr, shared_ptr, ok] = create_resources();
   if (ok) {
-    std::cout << "Unique: " << *unique_ptr << ", Shared: " << *shared_ptr
-              << "\n";
+    std::cout << "Unique: " << *unique_ptr << ", Shared: " << *shared_ptr << "\n";
   }
   return 0;
 }

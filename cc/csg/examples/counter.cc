@@ -2,7 +2,7 @@
 #include <memory>
 
 class Counter {
- public:
+public:
   explicit Counter(int v = 0) : value_(v) {
     // Do Nothing
   }
@@ -21,8 +21,7 @@ class Counter {
     // No Modification to object
     std::cout << "Value: " << value_ << std::endl;
   }
-
- private:
+private:
   int value_;
 };
 
@@ -54,9 +53,9 @@ void TransferUniqueOwnership(std::unique_ptr<Counter> c) {
 int main() {
   auto counter_ptr = std::make_shared<Counter>(10);
 
-  IncrementCounter(counter_ptr.get());  // Non-owning
-  DisplayCounterValue(*counter_ptr);    // Read-only
-  IncrementSharedCounter(counter_ptr);  // Shared ownership
+  IncrementCounter(counter_ptr.get()); // Non-owning
+  DisplayCounterValue(*counter_ptr);   // Read-only
+  IncrementSharedCounter(counter_ptr); // Shared ownership
 
   counter_ptr->Display();
 

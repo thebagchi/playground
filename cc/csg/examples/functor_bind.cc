@@ -31,8 +31,8 @@ int main() {
   // copyable
   auto shared_ptr = std::make_shared<int>(300);
   auto shared_callback = [ptr = shared_ptr](int value) {
-    std::cout << "Smart pointer callback with value: " << value
-              << ", ptr value: " << *ptr << std::endl;
+    std::cout << "Smart pointer callback with value: " << value << ", ptr value: " << *ptr
+              << std::endl;
   };
   process_with_callback(shared_callback, 400);
 
@@ -40,8 +40,8 @@ int main() {
   auto unique_ptr = std::make_unique<int>(500);
   auto unique_callback = [ptr = std::move(unique_ptr)](int value) mutable {
     if (ptr) {
-      std::cout << "Unique pointer callback with value: " << value
-                << ", ptr value: " << *ptr << std::endl;
+      std::cout << "Unique pointer callback with value: " << value << ", ptr value: " << *ptr
+                << std::endl;
     }
   };
   // std::function requires copyable callables, so using unique_ptr with

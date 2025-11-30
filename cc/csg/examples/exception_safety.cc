@@ -3,7 +3,7 @@
 #include <optional>
 
 class Resource {
- public:
+public:
   Resource() {
     // Constructor ...
     std::cout << "Resource acquired" << std::endl;
@@ -28,9 +28,15 @@ void safe_function() {
 void safe_function_with_smart_pointers(std::unique_ptr<Resource> unique_res,
                                        std::shared_ptr<Resource> shared_res,
                                        std::optional<Resource> opt_val) {
-  if (unique_res) unique_res->use();
-  if (shared_res) shared_res->use();
-  if (opt_val) opt_val->use();
+  if (unique_res) {
+    unique_res->use();
+  }
+  if (shared_res) {
+    shared_res->use();
+  }
+  if (opt_val) {
+    opt_val->use();
+  }
   // Simulate exception
   throw std::runtime_error("Simulated exception");
 }

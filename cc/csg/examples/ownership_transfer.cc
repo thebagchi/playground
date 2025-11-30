@@ -2,10 +2,16 @@
 #include <memory>
 
 class Resource {
- public:
-  Resource() { std::cout << "Resource acquired" << std::endl; }
-  ~Resource() { std::cout << "Resource released" << std::endl; }
-  void use() { std::cout << "Using resource" << std::endl; }
+public:
+  Resource() {
+    std::cout << "Resource acquired" << std::endl;
+  }
+  ~Resource() {
+    std::cout << "Resource released" << std::endl;
+  }
+  void use() {
+    std::cout << "Using resource" << std::endl;
+  }
 };
 
 std::unique_ptr<Resource> create_resource() {
@@ -13,14 +19,13 @@ std::unique_ptr<Resource> create_resource() {
 }
 
 void take_ownership(std::unique_ptr<Resource> ptr) {
-  ptr->use();  // Now owns the resource
+  ptr->use(); // Now owns the resource
 }
 
 int main() {
-  auto res = create_resource();  // Ownership transferred efficiently via move
-                                 // (implicit)
-  take_ownership(
-      std::move(res));  // Explicit move to transfer ownership to function
+  auto res = create_resource();   // Ownership transferred efficiently via move
+                                  // (implicit)
+  take_ownership(std::move(res)); // Explicit move to transfer ownership to function
 
   // Example with lambda capturing by move
   auto another_res = create_resource();

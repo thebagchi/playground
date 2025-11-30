@@ -7,8 +7,7 @@
 using Matrix = std::vector<std::vector<double>>;
 using Section = std::tuple<std::uint64_t, std::uint64_t, std::uint64_t>;
 
-void matrix_multiply_section(const Matrix &A, const Matrix &B, Matrix &C,
-                             Section section) {
+void matrix_multiply_section(const Matrix& A, const Matrix& B, Matrix& C, Section section) {
   // Not thinking about optimization ...
   // Purpose here is to load the thread ...
   auto [start, end, size] = section;
@@ -36,25 +35,27 @@ void parallel_matrix_multiply(std::uint64_t size, std::uint64_t num) {
   for (auto i = 0; i < num; ++i) {
     auto srow = i * rows_per_thread;
     auto erow = (i == num - 1) ? size : srow + rows_per_thread;
-    threads.emplace_back(matrix_multiply_section, std::cref(A), std::cref(B),
-                         std::ref(C), std::make_tuple(srow, erow, size));
+    threads.emplace_back(matrix_multiply_section,
+                         std::cref(A),
+                         std::cref(B),
+                         std::ref(C),
+                         std::make_tuple(srow, erow, size));
   }
-  for (auto &thread : threads) {
+  for (auto& thread : threads) {
     thread.join();
   }
 }
 
-int main(int argc, char **argv) {
+int main(int argc, char** argv) {
   std::uint64_t size = 256 * 4 * 2 * 1;
-  std::vector<std::uint64_t> counts = {1, 2, 4, 8, 16, 32, 64, 128, 256};
+  std::vector<std::uint64_t> counts = { 1, 2, 4, 8, 16, 32, 64, 128, 256 };
   for (auto count : counts) {
     auto start_time = std::chrono::high_resolution_clock::now();
     parallel_matrix_multiply(size, count);
     auto end_time = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> time_taken = end_time - start_time;
-    std::cout << "Time taken using: " << std::setw(4) << count
-              << " threads is: " << std::fixed << std::setprecision(4)
-              << time_taken.count() << " seconds ..." << std::endl;
+    std::cout << "Time taken using: " << std::setw(4) << count << " threads is: " << std::fixed
+              << std::setprecision(4) << time_taken.count() << " seconds ..." << std::endl;
   }
   return 0;
 }

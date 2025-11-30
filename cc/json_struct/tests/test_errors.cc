@@ -7,16 +7,16 @@
 #include "json.h"
 
 class Person {
- public:
+public:
   std::string name_;
   std::unique_ptr<std::uint64_t> age_;
   std::shared_ptr<std::string> city_;
   std::optional<std::string> email_;
-
- public:
-  constexpr const static auto properties = std::make_tuple(
-      prop(&Person::name_, "name"), prop(&Person::age_, "age"),
-      prop(&Person::city_, "city"), prop(&Person::email_, "email"));
+public:
+  constexpr const static auto properties = std::make_tuple(prop(&Person::name_, "name"),
+                                                           prop(&Person::age_, "age"),
+                                                           prop(&Person::city_, "city"),
+                                                           prop(&Person::email_, "email"));
 };
 
 BOOST_AUTO_TEST_CASE(TEST_ERROR_TYPE_MISMATCH) {
@@ -63,8 +63,7 @@ BOOST_AUTO_TEST_CASE(TEST_SUCCESS_VALID_JSON) {
   std::cout << "==> TEST_SUCCESS_VALID_JSON" << std::endl;
 
   // Test: Valid JSON should work correctly
-  std::string valid_json =
-      R"({"name":"John","age":30,"city":"NY","email":"john@test.com"})";
+  std::string valid_json = R"({"name":"John","age":30,"city":"NY","email":"john@test.com"})";
   Person p;
 
   BOOST_CHECK_NO_THROW(UnmarshalFromString(valid_json, p));

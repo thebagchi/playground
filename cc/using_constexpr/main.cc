@@ -4,10 +4,8 @@
 
 #include <iostream>
 
-template <typename... T>
-constexpr void count_params(T... args) {
-  static_assert(sizeof...(args) == 10,
-                "please provide exactly 10 arguments to the function");
+template <typename... T> constexpr void count_params(T... args) {
+  static_assert(sizeof...(args) == 10, "please provide exactly 10 arguments to the function");
 }
 
 #if __cplusplus == 201103L

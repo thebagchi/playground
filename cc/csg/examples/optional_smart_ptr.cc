@@ -9,12 +9,11 @@ std::optional<std::unique_ptr<int>> create_optional_unique(bool create) {
   if (create) {
     return std::make_unique<int>(42);
   }
-  return std::nullopt;  // Empty optional
+  return std::nullopt; // Empty optional
 }
 
 // Function that may or may not create a shared_ptr
-std::optional<std::shared_ptr<std::string>> create_optional_shared(
-    bool create) {
+std::optional<std::shared_ptr<std::string>> create_optional_shared(bool create) {
   if (create) {
     return std::make_shared<std::string>("Hello Optional");
   }
@@ -45,8 +44,7 @@ int main() {
     std::lock_guard<std::mutex> lock(mtx);
     if (shared_opt) {
       **shared_opt = 200;
-      std::cout << "Modified shared optional value: " << **shared_opt
-                << std::endl;
+      std::cout << "Modified shared optional value: " << **shared_opt << std::endl;
     }
   }
 

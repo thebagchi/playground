@@ -9,7 +9,12 @@ int main(int argc, char* argv[]) {
   std::cout << "Hello World" << std::endl;
 
   // Example: Run the 'echo' command
-  std::vector<std::string> echo_args = {"echo", "Hello from CMD class!"};
+  // clang-format off
+  std::vector<std::string> echo_args = {
+    "echo",
+    "Hello from CMD class!"
+  };
+  // clang-format on
   CMD cmd(echo_args);
 
   if (cmd.execute()) {
