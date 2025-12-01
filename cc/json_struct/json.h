@@ -232,11 +232,12 @@ template <typename T> struct Write;
  * @brief Specialization for std::string
  */
 template <> struct Write<std::string> {
-  inline boost::json::value operator()(const std::string* object) const noexcept {
+  inline void operator()(const std::string* object, boost::json::value* out) const noexcept {
     if (object) [[likely]] {
-      return boost::json::string_view(*object);
+      *out = boost::json::string_view(*object);
+    } else {
+      *out = nullptr;
     }
-    return nullptr;
   }
 };
 
@@ -244,11 +245,12 @@ template <> struct Write<std::string> {
  * @brief Specialization for const std::string
  */
 template <> struct Write<const std::string> {
-  inline boost::json::value operator()(const std::string* object) const noexcept {
+  inline void operator()(const std::string* object, boost::json::value* out) const noexcept {
     if (object) [[likely]] {
-      return boost::json::string_view(*object);
+      *out = boost::json::string_view(*object);
+    } else {
+      *out = nullptr;
     }
-    return nullptr;
   }
 };
 
@@ -256,11 +258,12 @@ template <> struct Write<const std::string> {
  * @brief Specialization for int64_t
  */
 template <> struct Write<std::int64_t> {
-  inline boost::json::value operator()(const std::int64_t* object) const noexcept {
+  inline void operator()(const std::int64_t* object, boost::json::value* out) const noexcept {
     if (object) [[likely]] {
-      return *object;
+      *out = *object;
+    } else {
+      *out = nullptr;
     }
-    return nullptr;
   }
 };
 
@@ -268,11 +271,12 @@ template <> struct Write<std::int64_t> {
  * @brief Specialization for const int64_t
  */
 template <> struct Write<const std::int64_t> {
-  inline boost::json::value operator()(const std::int64_t* object) const noexcept {
+  inline void operator()(const std::int64_t* object, boost::json::value* out) const noexcept {
     if (object) [[likely]] {
-      return *object;
+      *out = *object;
+    } else {
+      *out = nullptr;
     }
-    return nullptr;
   }
 };
 
@@ -280,11 +284,12 @@ template <> struct Write<const std::int64_t> {
  * @brief Specialization for uint64_t
  */
 template <> struct Write<std::uint64_t> {
-  inline boost::json::value operator()(const std::uint64_t* object) const noexcept {
+  inline void operator()(const std::uint64_t* object, boost::json::value* out) const noexcept {
     if (object) [[likely]] {
-      return *object;
+      *out = *object;
+    } else {
+      *out = nullptr;
     }
-    return nullptr;
   }
 };
 
@@ -292,11 +297,12 @@ template <> struct Write<std::uint64_t> {
  * @brief Specialization for const uint64_t
  */
 template <> struct Write<const std::uint64_t> {
-  inline boost::json::value operator()(const std::uint64_t* object) const noexcept {
+  inline void operator()(const std::uint64_t* object, boost::json::value* out) const noexcept {
     if (object) [[likely]] {
-      return *object;
+      *out = *object;
+    } else {
+      *out = nullptr;
     }
-    return nullptr;
   }
 };
 
@@ -304,11 +310,12 @@ template <> struct Write<const std::uint64_t> {
  * @brief Specialization for double
  */
 template <> struct Write<double> {
-  inline boost::json::value operator()(const double* object) const noexcept {
+  inline void operator()(const double* object, boost::json::value* out) const noexcept {
     if (object) [[likely]] {
-      return *object;
+      *out = *object;
+    } else {
+      *out = nullptr;
     }
-    return nullptr;
   }
 };
 
@@ -316,11 +323,12 @@ template <> struct Write<double> {
  * @brief Specialization for const double
  */
 template <> struct Write<const double> {
-  inline boost::json::value operator()(const double* object) const noexcept {
+  inline void operator()(const double* object, boost::json::value* out) const noexcept {
     if (object) [[likely]] {
-      return *object;
+      *out = *object;
+    } else {
+      *out = nullptr;
     }
-    return nullptr;
   }
 };
 
@@ -328,11 +336,12 @@ template <> struct Write<const double> {
  * @brief Specialization for bool
  */
 template <> struct Write<bool> {
-  inline boost::json::value operator()(const bool* object) const noexcept {
+  inline void operator()(const bool* object, boost::json::value* out) const noexcept {
     if (object) [[likely]] {
-      return *object;
+      *out = *object;
+    } else {
+      *out = nullptr;
     }
-    return nullptr;
   }
 };
 
@@ -340,11 +349,12 @@ template <> struct Write<bool> {
  * @brief Specialization for const bool
  */
 template <> struct Write<const bool> {
-  inline boost::json::value operator()(const bool* object) const noexcept {
+  inline void operator()(const bool* object, boost::json::value* out) const noexcept {
     if (object) [[likely]] {
-      return *object;
+      *out = *object;
+    } else {
+      *out = nullptr;
     }
-    return nullptr;
   }
 };
 
@@ -356,8 +366,8 @@ template <> struct Write<const bool> {
  * @brief Specialization for boost::json::value (pass-through)
  */
 template <> struct Write<boost::json::value> {
-  inline boost::json::value operator()(const boost::json::value* object) const {
-    return *object; // Pass through as-is
+  inline void operator()(const boost::json::value* object, boost::json::value* out) const noexcept {
+    *out = *object; // Pass through as-is
   }
 };
 
@@ -365,8 +375,8 @@ template <> struct Write<boost::json::value> {
  * @brief Specialization for const boost::json::value (pass-through)
  */
 template <> struct Write<const boost::json::value> {
-  inline boost::json::value operator()(const boost::json::value* object) const {
-    return *object; // Pass through as-is
+  inline void operator()(const boost::json::value* object, boost::json::value* out) const noexcept {
+    *out = *object; // Pass through as-is
   }
 };
 
@@ -382,9 +392,9 @@ template <typename T> struct Write {
   /**
    * @brief Serialize object to JSON value
    * @param object Pointer to object to serialize
-   * @return JSON value representation
+   * @param out Pointer to output JSON value
    */
-  inline boost::json::value operator()(const T* object) const {
+  inline void operator()(const T* object, boost::json::value* out) const {
     static_assert(has_properties_v<T>, "T must have a static properties member for serialization");
     boost::json::object obj;
     static constexpr auto props = std::tuple_size_v<decltype(T::properties)>;
@@ -403,18 +413,22 @@ template <typename T> struct Write {
       using P = opt_t<B>;
       if constexpr (is_optional_v<B>) {
         if (ptr) [[likely]] {
-          obj.emplace(property.name_, Write<P>{}(&*ptr));
+          boost::json::value temp;
+          Write<P>{}(&*ptr, &temp);
+          obj.emplace(property.name_, std::move(temp));
         } else if (property.nullable_) [[likely]] {
           obj.emplace(property.name_, nullptr);
         } else {
           throw_field_null_not_nullable(property.name_);
         }
       } else {
-        obj.emplace(property.name_, Write<P>{}(&ptr));
+        boost::json::value temp;
+        Write<P>{}(&ptr, &temp);
+        obj.emplace(property.name_, std::move(temp));
       }
     });
 
-    return obj;
+    *out = std::move(obj);
   }
 };
 
@@ -431,19 +445,22 @@ template <typename T> struct Write<std::vector<T>> {
                 "Raw pointers are not supported in std::vector for serialization. "
                 "Use std::unique_ptr, std::shared_ptr, or std::optional instead.");
 
-  inline boost::json::value operator()(const std::vector<T>* object) const {
+  inline void operator()(const std::vector<T>* object, boost::json::value* out) const {
     if (!object) [[unlikely]] {
-      return nullptr;
+      *out = nullptr;
+      return;
     }
 
     boost::json::array arr;
     arr.reserve(object->size());
 
     for (const auto& item : *object) {
-      arr.emplace_back(Write<T>{}(&item));
+      boost::json::value temp;
+      Write<T>{}(&item, &temp);
+      arr.emplace_back(std::move(temp));
     }
 
-    return arr;
+    *out = std::move(arr);
   }
 };
 
@@ -452,19 +469,22 @@ template <typename T> struct Write<std::vector<T>> {
  * @tparam T Value type (can be basic or complex)
  */
 template <typename T> struct Write<std::map<std::string, T>> {
-  inline boost::json::value operator()(const std::map<std::string, T>* object) const {
+  inline void operator()(const std::map<std::string, T>* object, boost::json::value* out) const {
     if (!object) [[unlikely]] {
-      return nullptr;
+      *out = nullptr;
+      return;
     }
 
     boost::json::object obj;
     obj.reserve(object->size()); // Pre-allocate space for better performance
 
     for (const auto& item : *object) {
-      obj.emplace(item.first, Write<T>{}(&item.second));
+      boost::json::value temp;
+      Write<T>{}(&item.second, &temp);
+      obj.emplace(item.first, std::move(temp));
     }
 
-    return obj;
+    *out = std::move(obj);
   }
 };
 
@@ -477,11 +497,12 @@ template <typename T> struct Write<std::map<std::string, T>> {
  * @tparam T Pointed-to type
  */
 template <typename T> struct Write<std::unique_ptr<T>> {
-  inline boost::json::value operator()(const std::unique_ptr<T>* object) const {
+  inline void operator()(const std::unique_ptr<T>* object, boost::json::value* out) const noexcept {
     if (!object || !*object) [[unlikely]] {
-      return nullptr;
+      *out = nullptr;
+    } else {
+      Write<T>{}(object->get(), out);
     }
-    return Write<T>{}(object->get());
   }
 };
 
@@ -490,11 +511,12 @@ template <typename T> struct Write<std::unique_ptr<T>> {
  * @tparam T Pointed-to type
  */
 template <typename T> struct Write<std::shared_ptr<T>> {
-  inline boost::json::value operator()(const std::shared_ptr<T>* object) const {
+  inline void operator()(const std::shared_ptr<T>* object, boost::json::value* out) const noexcept {
     if (!object || !*object) [[unlikely]] {
-      return nullptr;
+      *out = nullptr;
+    } else {
+      Write<T>{}(object->get(), out);
     }
-    return Write<T>{}(object->get());
   }
 };
 
@@ -503,11 +525,12 @@ template <typename T> struct Write<std::shared_ptr<T>> {
  * @tparam T Contained type
  */
 template <typename T> struct Write<std::optional<T>> {
-  inline boost::json::value operator()(const std::optional<T>* object) const {
+  inline void operator()(const std::optional<T>* object, boost::json::value* out) const noexcept {
     if (!object || !*object) [[unlikely]] {
-      return nullptr;
+      *out = nullptr;
+    } else {
+      Write<T>{}(&**object, out);
     }
-    return Write<T>{}(&**object);
   }
 };
 
@@ -523,13 +546,10 @@ template <typename T> struct Write<std::optional<T>> {
  * @return JSON value representation
  */
 template <typename T>
-boost::json::value Marshal(const T& object, boost::json::storage_ptr sp = {}) {
-  if (sp.get()) {
-    boost::json::value jv(sp);
-    jv = Write<T>{}(&object);
-    return jv;
-  }
-  return Write<T>{}(&object);
+[[nodiscard]] boost::json::value Marshal(const T& object, boost::json::storage_ptr sp = {}) {
+  boost::json::value result(sp.get() ? sp : boost::json::storage_ptr{});
+  Write<T>{}(&object, &result);
+  return result;
 }
 
 /**
@@ -540,7 +560,7 @@ boost::json::value Marshal(const T& object, boost::json::storage_ptr sp = {}) {
  * @return JSON string representation
  */
 template <typename T>
-std::string MarshalToString(const T& object, boost::json::storage_ptr sp = {}) {
+[[nodiscard]] std::string MarshalToString(const T& object, boost::json::storage_ptr sp = {}) {
   return boost::json::serialize(Marshal(object, sp));
 }
 
@@ -829,7 +849,7 @@ template <typename T> struct Read<std::map<std::string, T>> {
       for (const auto& item : obj) {
         T temp;
         Read<T>{}(item.value(), &temp);
-        object->emplace(std::string(item.key()), std::move(temp));
+        object->emplace(boost::json::string_view(item.key()), std::move(temp));
       }
     } else {
       throw_type_mismatch("object", value);
