@@ -462,6 +462,42 @@ BOOST_AUTO_TEST_CASE(benchmark_map_deserialization) {
   BOOST_TEST_MESSAGE("Benchmark completed successfully");
 }
 
+BOOST_AUTO_TEST_CASE(benchmark_unordered_map_serialization) {
+  std::unordered_map<std::string, Person> people_map;
+  for (size_t i = 0; i < 100; ++i) {
+    people_map[random_string(10)] = generate_person(true);
+  }
+
+  auto result = benchmark(
+      "UnorderedMap<string, Person> (100) Serialization",
+      [&]() {
+        std::string json_str = MarshalToString(people_map);
+      },
+      200);
+
+  result.print();
+  BOOST_TEST_MESSAGE("Benchmark completed successfully");
+}
+
+BOOST_AUTO_TEST_CASE(benchmark_unordered_map_deserialization) {
+  std::unordered_map<std::string, Person> people_map;
+  for (size_t i = 0; i < 100; ++i) {
+    people_map[random_string(10)] = generate_person(true);
+  }
+  std::string json_str = MarshalToString(people_map);
+
+  auto result = benchmark(
+      "UnorderedMap<string, Person> (100) Deserialization",
+      [&]() {
+        std::unordered_map<std::string, Person> m;
+        UnmarshalFromString(json_str, m);
+      },
+      200);
+
+  result.print();
+  BOOST_TEST_MESSAGE("Benchmark completed successfully");
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 // =============================================================================

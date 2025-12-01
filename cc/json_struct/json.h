@@ -3,6 +3,7 @@
 
 #include <boost/json.hpp>
 #include <boost/json/static_resource.hpp>
+#include <boost/beast/core/detail/base64.hpp>
 #include <iostream>
 #include <limits>
 #include <map>
@@ -11,6 +12,8 @@
 #include <type_traits>
 #include <utility>
 #include <vector>
+
+namespace base64 = boost::beast::detail::base64;
 
 // =============================================================================
 // Utility Macros for Smart Pointer Creation
@@ -396,7 +399,7 @@ template <typename T> struct Write {
    */
   inline void operator()(const T* object, boost::json::value* out) const {
     static_assert(has_properties_v<T>, "T must have a static properties member for serialization");
-    boost::json::object obj;
+    boost::json::object obj(out->storage());
     static constexpr auto props = std::tuple_size_v<decltype(T::properties)>;
     obj.reserve(props); // Pre-allocate space for better performance
 
@@ -413,7 +416,7 @@ template <typename T> struct Write {
       using P = opt_t<B>;
       if constexpr (is_optional_v<B>) {
         if (ptr) [[likely]] {
-          boost::json::value temp;
+          boost::json::value temp(out->storage());
           Write<P>{}(&*ptr, &temp);
           obj.emplace(property.name_, std::move(temp));
         } else if (property.nullable_) [[likely]] {
@@ -422,13 +425,38 @@ template <typename T> struct Write {
           throw_field_null_not_nullable(property.name_);
         }
       } else {
-        boost::json::value temp;
+        boost::json::value temp(out->storage());
         Write<P>{}(&ptr, &temp);
         obj.emplace(property.name_, std::move(temp));
       }
     });
 
     *out = std::move(obj);
+  }
+};
+
+// =============================================================================
+// Base64 Support for Binary Data
+// =============================================================================
+
+/**
+ * @brief Specialization for std::vector<std::uint8_t> - serialize as Base64 string
+ */
+template <> struct Write<std::vector<std::uint8_t>> {
+  inline void operator()(const std::vector<std::uint8_t>* data,
+                         boost::json::value* out) const noexcept {
+    if (!data || data->empty()) [[unlikely]] {
+      *out = nullptr;
+      return;
+    }
+
+    const std::size_t encoded_len = base64::encoded_size(data->size());
+
+    // Construct json::string directly with correct storage and size
+    auto& str = out->emplace_string();
+    str.reserve(encoded_len); // Critical: pre-allocate exact size
+    str.resize(encoded_len);  // Now safe to write into
+    base64::encode(const_cast<char*>(str.data()), data->data(), data->size());
   }
 };
 
@@ -451,11 +479,11 @@ template <typename T> struct Write<std::vector<T>> {
       return;
     }
 
-    boost::json::array arr;
+    boost::json::array arr(out->storage());
     arr.reserve(object->size());
 
     for (const auto& item : *object) {
-      boost::json::value temp;
+      boost::json::value temp(out->storage());
       Write<T>{}(&item, &temp);
       arr.emplace_back(std::move(temp));
     }
@@ -475,11 +503,36 @@ template <typename T> struct Write<std::map<std::string, T>> {
       return;
     }
 
-    boost::json::object obj;
+    boost::json::object obj(out->storage());
     obj.reserve(object->size()); // Pre-allocate space for better performance
 
     for (const auto& item : *object) {
-      boost::json::value temp;
+      boost::json::value temp(out->storage());
+      Write<T>{}(&item.second, &temp);
+      obj.emplace(item.first, std::move(temp));
+    }
+
+    *out = std::move(obj);
+  }
+};
+
+/**
+ * @brief Specialization for std::unordered_map<std::string, T>
+ * @tparam T Value type (can be basic or complex)
+ */
+template <typename T> struct Write<std::unordered_map<std::string, T>> {
+  inline void operator()(const std::unordered_map<std::string, T>* object,
+                         boost::json::value* out) const {
+    if (!object) [[unlikely]] {
+      *out = nullptr;
+      return;
+    }
+
+    boost::json::object obj(out->storage());
+    obj.reserve(object->size()); // Pre-allocate space for better performance
+
+    for (const auto& item : *object) {
+      boost::json::value temp(out->storage());
       Write<T>{}(&item.second, &temp);
       obj.emplace(item.first, std::move(temp));
     }
@@ -802,6 +855,33 @@ template <> struct Read<boost::json::value> {
 };
 
 // =============================================================================
+// Base64 Support for Binary Data (Read)
+// =============================================================================
+
+/**
+ * @brief Specialization for std::vector<std::uint8_t> - deserialize from Base64 string
+ */
+template <> struct Read<std::vector<std::uint8_t>> {
+  inline void operator()(const boost::json::value& value, std::vector<std::uint8_t>* out) const {
+    if (value.is_null()) {
+      out->clear();
+      return;
+    }
+    if (!value.is_string()) {
+      throw_type_mismatch("base64 string", value);
+    }
+    const auto& str = value.as_string();
+    const std::size_t max_decoded = base64::decoded_size(str.size());
+    out->resize(max_decoded);
+    auto [ptr, len] = base64::decode(out->data(), str.data(), str.size());
+    if (len == 0 && !str.empty()) {
+      throw std::runtime_error("Invalid base64");
+    }
+    out->resize(len);
+  }
+};
+
+// =============================================================================
 // Specializations for Container Types (Read)
 // =============================================================================
 
@@ -845,6 +925,31 @@ template <typename T> struct Read<std::map<std::string, T>> {
       object->clear();
       // Note: std::map doesn't support reserve() as it's tree-based, not
       // contiguous
+
+      for (const auto& item : obj) {
+        T temp;
+        Read<T>{}(item.value(), &temp);
+        object->emplace(boost::json::string_view(item.key()), std::move(temp));
+      }
+    } else {
+      throw_type_mismatch("object", value);
+    }
+  }
+};
+
+/**
+ * @brief Specialization for std::unordered_map<std::string, T>
+ * @tparam T Value type
+ */
+template <typename T> struct Read<std::unordered_map<std::string, T>> {
+  inline void operator()(const boost::json::value& value,
+                         std::unordered_map<std::string, T>* object) const {
+    if (value.is_null()) [[unlikely]] {
+      object->clear();
+    } else if (value.is_object()) [[likely]] {
+      const boost::json::object& obj = value.as_object();
+      object->clear();
+      object->reserve(obj.size()); // Pre-allocate space for better performance
 
       for (const auto& item : obj) {
         T temp;

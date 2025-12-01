@@ -8,7 +8,8 @@ A high-performance, header-only C++ JSON serialization library using Boost.JSON 
 - **Compile-time Reflection**: C++17 metaprogramming with zero runtime overhead
 - **High Performance**: ~5 μs for simple objects, 367k ops/sec deserialization
 - **Smart Pointers**: Full support for `std::unique_ptr`, `std::shared_ptr`, `std::optional`
-- **STL Containers**: Native support for `std::vector`, `std::map`
+- **STL Containers**: Native support for `std::vector`, `std::map`, `std::unordered_map`
+- **Binary Data**: Automatic Base64 encoding/decoding for `std::vector<std::uint8_t>`
 - **Custom Allocators**: Optional `boost::json::static_resource` for stack allocation
 - **Type Safety**: Strong compile-time type checking and validation
 
@@ -76,6 +77,38 @@ int main() {
 }
 ```
 
+### Binary Data (Base64)
+
+```cpp
+#include "json.h"
+
+struct FileData {
+  std::string filename;
+  std::vector<std::uint8_t> content;  // Automatically encoded/decoded as Base64
+  
+  constexpr static auto properties = std::make_tuple(
+    prop(&FileData::filename, "filename"),
+    prop(&FileData::content, "content")
+  );
+};
+
+int main() {
+  // Binary data automatically encoded to Base64
+  std::vector<std::uint8_t> binary_data = {0x00, 0x01, 0x02, 0xFF, 0xFE, 0xFD};
+  FileData file{"test.bin", binary_data};
+  
+  std::string json = MarshalToString(file);
+  // {"filename":"test.bin","content":"AAEC/+79"}
+  
+  // Binary data automatically decoded from Base64
+  FileData file2;
+  UnmarshalFromString(json, file2);
+  // file2.content == {0x00, 0x01, 0x02, 0xFF, 0xFE, 0xFD}
+  
+  return 0;
+}
+```
+
 ### With Custom Allocator
 
 ```cpp
@@ -99,19 +132,21 @@ int main() {
 
 ### Supported Types
 
-| Type                        | Nullable |
-|-----------------------------|----------|
-| std::string                 | No       |
-| std::int64_t                | No       |
-| std::uint64_t               | No       |
-| double                      | No       |
-| bool                        | No       |
-| boost::json::value          | No       |
-| std::unique_ptr<T>          | Yes      |
-| std::shared_ptr<T>          | Yes      |
-| std::optional<T>            | Yes      |
-| std::vector<T>              | No       |
-| std::map<std::string, T>    | No       |
+| Type                               | Nullable |
+|------------------------------------|----------|
+| std::string                        | No       |
+| std::int64_t                       | No       |
+| std::uint64_t                      | No       |
+| double                             | No       |
+| bool                               | No       |
+| boost::json::value                 | No       |
+| std::unique_ptr<T>                 | Yes      |
+| std::shared_ptr<T>                 | Yes      |
+| std::optional<T>                   | Yes      |
+| std::vector<T>                     | No       |
+| std::map<std::string, T>           | No       |
+| std::unordered_map<std::string, T> | No       |
+| std::vector<std::uint8_t>          | No       |
 
 ## API Reference
 
@@ -141,6 +176,7 @@ prop(&Class::member, "json_key")  // Define struct member mapping
 5. **String Views**: `boost::json::string_view` avoids temporary strings
 6. **Emplace Operations**: Direct construction in containers (no copies)
 7. **Custom Allocators**: Optional stack-based allocation for critical paths
+8. **Base64 Zero-Copy**: Direct encoding into `boost::json::string` (no temp strings)
 
 ### Architecture
 
