@@ -130,12 +130,12 @@ template <typename C, typename T, bool Nullable = false, bool Required = false> 
    * @param member Pointer to member variable
    * @param name JSON field name
    */
-  constexpr Props(T C::* member, const char* name) : member_{ member }, name_{ name } {
+  constexpr Props(T C::*member, const char* name) : member_{ member }, name_{ name } {
     // Do Nothing ...
   }
 
   using Type = T;                             ///< The smart pointer type
-  T C::* member_;                             ///< Pointer to member variable
+  T C::*member_;                              ///< Pointer to member variable
   const char* name_;                          ///< JSON field name
   static constexpr bool nullable_ = Nullable; ///< Whether field can be null
   static constexpr bool required_ = Required; ///< Whether field is required
@@ -152,7 +152,7 @@ template <typename C, typename T, bool Nullable = false, bool Required = false> 
  * @return Props descriptor
  */
 template <bool Nullable = false, bool Required = false, typename C, typename T>
-constexpr Props<C, T, Nullable, Required> prop(T C::* member, const char* name) {
+constexpr Props<C, T, Nullable, Required> prop(T C::*member, const char* name) {
   return Props<C, T, Nullable, Required>{ member, name };
 }
 
