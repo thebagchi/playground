@@ -2,6 +2,7 @@
 #define JSON_H_INCLUDED
 
 #include <boost/json.hpp>
+#include <boost/json/static_resource.hpp>
 #include <iostream>
 #include <limits>
 #include <map>
@@ -129,12 +130,12 @@ template <typename C, typename T, bool Nullable = false, bool Required = false> 
    * @param member Pointer to member variable
    * @param name JSON field name
    */
-  constexpr Props(T C::*member, const char* name) : member_{ member }, name_{ name } {
+  constexpr Props(T C::* member, const char* name) : member_{ member }, name_{ name } {
     // Do Nothing ...
   }
 
   using Type = T;                             ///< The smart pointer type
-  T C::*member_;                              ///< Pointer to member variable
+  T C::* member_;                             ///< Pointer to member variable
   const char* name_;                          ///< JSON field name
   static constexpr bool nullable_ = Nullable; ///< Whether field can be null
   static constexpr bool required_ = Required; ///< Whether field is required
@@ -151,7 +152,7 @@ template <typename C, typename T, bool Nullable = false, bool Required = false> 
  * @return Props descriptor
  */
 template <bool Nullable = false, bool Required = false, typename C, typename T>
-constexpr Props<C, T, Nullable, Required> prop(T C::*member, const char* name) {
+constexpr Props<C, T, Nullable, Required> prop(T C::* member, const char* name) {
   return Props<C, T, Nullable, Required>{ member, name };
 }
 
@@ -177,27 +178,30 @@ constexpr void for_each(std::integer_sequence<T, S...>, F&& f) {
  */
 [[noreturn]] inline void throw_field_null_not_nullable(const char* field_name) {
   std::string msg;
-  msg.reserve(50 + std::strlen(field_name)); // Pre-allocate space
-  msg.append("Field '").append(field_name).append("' is null but not nullable");
-  throw std::runtime_error(msg);
+  const size_t name_len = std::strlen(field_name);
+  msg.reserve(30 + name_len); // Pre-allocate exact space needed
+  msg.append("Field '").append(field_name, name_len).append("' is null but not nullable");
+  throw std::runtime_error(std::move(msg));
 }
 
 [[noreturn]] inline void throw_field_missing(const char* field_name) {
   std::string msg;
-  msg.reserve(25 + std::strlen(field_name)); // Pre-allocate space
-  msg.append("Field '").append(field_name).append("' is missing");
-  throw std::runtime_error(msg);
+  const size_t name_len = std::strlen(field_name);
+  msg.reserve(17 + name_len); // Pre-allocate exact space needed
+  msg.append("Field '").append(field_name, name_len).append("' is missing");
+  throw std::runtime_error(std::move(msg));
 }
 
 [[noreturn]] inline void throw_type_mismatch(const char* expected_type,
                                              const boost::json::value& value) {
   std::string msg;
-  msg.reserve(100); // Pre-allocate space
+  const size_t expected_len = std::strlen(expected_type);
+  msg.reserve(40 + expected_len); // Pre-allocate exact space needed
   msg.append("Type mismatch: expected ")
-      .append(expected_type)
+      .append(expected_type, expected_len)
       .append(", got ")
       .append(boost::json::to_string(value.kind()));
-  throw std::runtime_error(msg);
+  throw std::runtime_error(std::move(msg));
 }
 
 [[noreturn]] inline void throw_invalid_json_object() {
@@ -206,9 +210,9 @@ constexpr void for_each(std::integer_sequence<T, S...>, F&& f) {
 
 [[noreturn]] inline void throw_json_parse_error(const std::string& error_msg) {
   std::string msg;
-  msg.reserve(20 + error_msg.size());
+  msg.reserve(18 + error_msg.size());
   msg.append("JSON parse error: ").append(error_msg);
-  throw std::runtime_error(msg);
+  throw std::runtime_error(std::move(msg));
 }
 
 // =============================================================================
@@ -229,11 +233,10 @@ template <typename T> struct Write;
  */
 template <> struct Write<std::string> {
   inline boost::json::value operator()(const std::string* object) const noexcept {
-    if (object) {
+    if (object) [[likely]] {
       return boost::json::string_view(*object);
-    } else {
-      return nullptr;
     }
+    return nullptr;
   }
 };
 
@@ -242,11 +245,10 @@ template <> struct Write<std::string> {
  */
 template <> struct Write<const std::string> {
   inline boost::json::value operator()(const std::string* object) const noexcept {
-    if (object) {
+    if (object) [[likely]] {
       return boost::json::string_view(*object);
-    } else {
-      return nullptr;
     }
+    return nullptr;
   }
 };
 
@@ -255,11 +257,10 @@ template <> struct Write<const std::string> {
  */
 template <> struct Write<std::int64_t> {
   inline boost::json::value operator()(const std::int64_t* object) const noexcept {
-    if (object) {
+    if (object) [[likely]] {
       return *object;
-    } else {
-      return nullptr;
     }
+    return nullptr;
   }
 };
 
@@ -268,11 +269,10 @@ template <> struct Write<std::int64_t> {
  */
 template <> struct Write<const std::int64_t> {
   inline boost::json::value operator()(const std::int64_t* object) const noexcept {
-    if (object) {
+    if (object) [[likely]] {
       return *object;
-    } else {
-      return nullptr;
     }
+    return nullptr;
   }
 };
 
@@ -281,11 +281,10 @@ template <> struct Write<const std::int64_t> {
  */
 template <> struct Write<std::uint64_t> {
   inline boost::json::value operator()(const std::uint64_t* object) const noexcept {
-    if (object) {
+    if (object) [[likely]] {
       return *object;
-    } else {
-      return nullptr;
     }
+    return nullptr;
   }
 };
 
@@ -294,11 +293,10 @@ template <> struct Write<std::uint64_t> {
  */
 template <> struct Write<const std::uint64_t> {
   inline boost::json::value operator()(const std::uint64_t* object) const noexcept {
-    if (object) {
+    if (object) [[likely]] {
       return *object;
-    } else {
-      return nullptr;
     }
+    return nullptr;
   }
 };
 
@@ -307,11 +305,10 @@ template <> struct Write<const std::uint64_t> {
  */
 template <> struct Write<double> {
   inline boost::json::value operator()(const double* object) const noexcept {
-    if (object) {
+    if (object) [[likely]] {
       return *object;
-    } else {
-      return nullptr;
     }
+    return nullptr;
   }
 };
 
@@ -320,11 +317,10 @@ template <> struct Write<double> {
  */
 template <> struct Write<const double> {
   inline boost::json::value operator()(const double* object) const noexcept {
-    if (object) {
+    if (object) [[likely]] {
       return *object;
-    } else {
-      return nullptr;
     }
+    return nullptr;
   }
 };
 
@@ -333,11 +329,10 @@ template <> struct Write<const double> {
  */
 template <> struct Write<bool> {
   inline boost::json::value operator()(const bool* object) const noexcept {
-    if (object) {
+    if (object) [[likely]] {
       return *object;
-    } else {
-      return nullptr;
     }
+    return nullptr;
   }
 };
 
@@ -346,11 +341,10 @@ template <> struct Write<bool> {
  */
 template <> struct Write<const bool> {
   inline boost::json::value operator()(const bool* object) const noexcept {
-    if (object) {
+    if (object) [[likely]] {
       return *object;
-    } else {
-      return nullptr;
     }
+    return nullptr;
   }
 };
 
@@ -393,7 +387,7 @@ template <typename T> struct Write {
   inline boost::json::value operator()(const T* object) const {
     static_assert(has_properties_v<T>, "T must have a static properties member for serialization");
     boost::json::object obj;
-    constexpr auto props = std::tuple_size<decltype(T::properties)>::value;
+    static constexpr auto props = std::tuple_size_v<decltype(T::properties)>;
     obj.reserve(props); // Pre-allocate space for better performance
 
     for_each(std::make_index_sequence<props>{}, [&](auto i) {
@@ -408,15 +402,15 @@ template <typename T> struct Write {
       using B = std::remove_const_t<M>;
       using P = opt_t<B>;
       if constexpr (is_optional_v<B>) {
-        if (ptr) {
-          obj[property.name_] = Write<P>{}(&*ptr);
-        } else if (property.nullable_) {
-          obj[property.name_] = nullptr;
+        if (ptr) [[likely]] {
+          obj.emplace(property.name_, Write<P>{}(&*ptr));
+        } else if (property.nullable_) [[likely]] {
+          obj.emplace(property.name_, nullptr);
         } else {
           throw_field_null_not_nullable(property.name_);
         }
       } else {
-        obj[property.name_] = Write<P>{}(&ptr);
+        obj.emplace(property.name_, Write<P>{}(&ptr));
       }
     });
 
@@ -446,7 +440,7 @@ template <typename T> struct Write<std::vector<T>> {
     arr.reserve(object->size());
 
     for (const auto& item : *object) {
-      arr.push_back(Write<T>{}(&item));
+      arr.emplace_back(Write<T>{}(&item));
     }
 
     return arr;
@@ -467,7 +461,7 @@ template <typename T> struct Write<std::map<std::string, T>> {
     obj.reserve(object->size()); // Pre-allocate space for better performance
 
     for (const auto& item : *object) {
-      obj[boost::json::string_view(item.first)] = Write<T>{}(&item.second);
+      obj.emplace(item.first, Write<T>{}(&item.second));
     }
 
     return obj;
@@ -522,12 +516,19 @@ template <typename T> struct Write<std::optional<T>> {
 // =============================================================================
 
 /**
- * @brief Convenience function to marshal (serialize) an object to JSON
+ * @brief Convenience function to marshal (serialize) an object to JSON with optional custom allocator
  * @tparam T Type to serialize
  * @param object Reference to the object to serialize
+ * @param sp Storage pointer for custom memory allocation (optional)
  * @return JSON value representation
  */
-template <typename T> boost::json::value Marshal(const T& object) {
+template <typename T>
+boost::json::value Marshal(const T& object, boost::json::storage_ptr sp = {}) {
+  if (sp.get()) {
+    boost::json::value jv(sp);
+    jv = Write<T>{}(&object);
+    return jv;
+  }
   return Write<T>{}(&object);
 }
 
@@ -535,10 +536,12 @@ template <typename T> boost::json::value Marshal(const T& object) {
  * @brief Convenience function to marshal (serialize) an object to JSON string
  * @tparam T Type to serialize
  * @param object Reference to the object to serialize
+ * @param sp Storage pointer for custom memory allocation (optional)
  * @return JSON string representation
  */
-template <typename T> std::string MarshalToString(const T& object) {
-  return boost::json::serialize(Marshal(object));
+template <typename T>
+std::string MarshalToString(const T& object, boost::json::storage_ptr sp = {}) {
+  return boost::json::serialize(Marshal(object, sp));
 }
 
 // =============================================================================
@@ -556,12 +559,12 @@ template <typename T> struct Read {
    * @param object Pointer to object to populate
    */
   inline void operator()(const boost::json::value& value, T* object) const {
-    if (!value.is_object()) {
+    if (!value.is_object()) [[unlikely]] {
       throw_invalid_json_object();
     }
 
     const boost::json::object& obj = value.as_object();
-    constexpr auto props = std::tuple_size<decltype(T::properties)>::value;
+    static constexpr auto props = std::tuple_size_v<decltype(T::properties)>;
 
     for_each(std::make_index_sequence<props>{}, [&](auto i) {
       constexpr auto property = std::get<i>(T::properties);
@@ -569,7 +572,7 @@ template <typename T> struct Read {
 
       // Check if JSON object contains this field
       auto it = obj.find(property.name_);
-      if (it != obj.end()) {
+      if (it != obj.end()) [[likely]] {
         const auto& val = it->value();
         auto& ptr = object->*(property.member_);
         using M = std::remove_reference_t<decltype(ptr)>;
@@ -577,17 +580,17 @@ template <typename T> struct Read {
         using P = opt_t<B>;
 
         if constexpr (is_optional_v<B>) {
-          if (val.is_null()) {
-            if (property.nullable_) {
+          if (val.is_null()) [[unlikely]] {
+            if (property.nullable_) [[likely]] {
               if constexpr (std::is_same_v<std::decay_t<decltype(ptr)>, std::optional<P>>) {
                 ptr = std::nullopt;
               } else {
                 ptr = nullptr;
               }
-            } else {
+            } else [[unlikely]] {
               throw_field_null_not_nullable(property.name_);
             }
-          } else {
+          } else [[likely]] {
             if constexpr (std::is_same_v<std::decay_t<decltype(ptr)>, std::optional<P>>) {
               P temp;
               Read<P>{}(val, &temp);
@@ -598,15 +601,15 @@ template <typename T> struct Read {
             }
           }
         } else {
-          if (val.is_null()) {
+          if (val.is_null()) [[unlikely]] {
             throw_field_null_not_nullable(property.name_);
-          } else {
+          } else [[likely]] {
             Read<P>{}(val, &ptr);
           }
         }
-      } else {
+      } else [[unlikely]] {
         // Field missing
-        if (property.nullable_) {
+        if (property.nullable_) [[likely]] {
           auto& ptr = object->*(property.member_);
           using M = std::remove_reference_t<decltype(ptr)>;
           using B = std::remove_const_t<M>;
@@ -686,10 +689,12 @@ template <typename T> struct Read<std::optional<T>> {
  */
 template <> struct Read<std::string> {
   inline void operator()(const boost::json::value& value, std::string* object) const {
-    if (!value.is_string()) {
+    if (!value.is_string()) [[unlikely]] {
       throw_type_mismatch("string", value);
     }
-    *object = value.as_string(); // Direct assignment, no c_str() conversion
+    const auto& str = value.as_string();
+    object->reserve(str.size());
+    *object = str;
   }
 };
 
@@ -698,9 +703,9 @@ template <> struct Read<std::string> {
  */
 template <> struct Read<std::int64_t> {
   inline void operator()(const boost::json::value& value, std::int64_t* object) const {
-    if (value.is_int64()) {
+    if (value.is_int64()) [[likely]] {
       *object = value.as_int64();
-    } else if (value.is_uint64()) {
+    } else if (value.is_uint64()) [[unlikely]] {
       auto val = value.as_uint64();
       if (val <= static_cast<std::uint64_t>(std::numeric_limits<std::int64_t>::max())) {
         *object = static_cast<std::int64_t>(val);
@@ -718,9 +723,9 @@ template <> struct Read<std::int64_t> {
  */
 template <> struct Read<std::uint64_t> {
   inline void operator()(const boost::json::value& value, std::uint64_t* object) const {
-    if (value.is_uint64()) {
+    if (value.is_uint64()) [[likely]] {
       *object = value.as_uint64();
-    } else if (value.is_int64()) {
+    } else if (value.is_int64()) [[unlikely]] {
       auto val = value.as_int64();
       if (val >= 0) {
         *object = static_cast<std::uint64_t>(val);
@@ -738,11 +743,11 @@ template <> struct Read<std::uint64_t> {
  */
 template <> struct Read<double> {
   inline void operator()(const boost::json::value& value, double* object) const {
-    if (value.is_double()) {
+    if (value.is_double()) [[likely]] {
       *object = value.as_double();
-    } else if (value.is_int64()) {
+    } else if (value.is_int64()) [[unlikely]] {
       *object = static_cast<double>(value.as_int64());
-    } else if (value.is_uint64()) {
+    } else if (value.is_uint64()) [[unlikely]] {
       *object = static_cast<double>(value.as_uint64());
     } else {
       throw_type_mismatch("number", value);
@@ -755,9 +760,9 @@ template <> struct Read<double> {
  */
 template <> struct Read<bool> {
   inline void operator()(const boost::json::value& value, bool* object) const {
-    if (value.is_bool()) {
+    if (value.is_bool()) [[likely]] {
       *object = value.as_bool();
-    } else {
+    } else [[unlikely]] {
       throw_type_mismatch("boolean", value);
     }
   }
@@ -790,7 +795,7 @@ template <typename T> struct Read<std::vector<T>> {
                 "Use std::unique_ptr, std::shared_ptr, or std::optional instead.");
 
   inline void operator()(const boost::json::value& value, std::vector<T>* object) const {
-    if (value.is_null()) {
+    if (value.is_null()) [[unlikely]] {
       object->clear();
     } else if (value.is_array()) [[likely]] {
       const boost::json::array& arr = value.as_array();
@@ -813,7 +818,7 @@ template <typename T> struct Read<std::vector<T>> {
  */
 template <typename T> struct Read<std::map<std::string, T>> {
   inline void operator()(const boost::json::value& value, std::map<std::string, T>* object) const {
-    if (value.is_null()) {
+    if (value.is_null()) [[unlikely]] {
       object->clear();
     } else if (value.is_object()) [[likely]] {
       const boost::json::object& obj = value.as_object();
@@ -824,7 +829,7 @@ template <typename T> struct Read<std::map<std::string, T>> {
       for (const auto& item : obj) {
         T temp;
         Read<T>{}(item.value(), &temp);
-        (*object)[std::string(item.key())] = std::move(temp);
+        object->emplace(std::string(item.key()), std::move(temp));
       }
     } else {
       throw_type_mismatch("object", value);
@@ -847,16 +852,20 @@ template <typename T> void Unmarshal(const boost::json::value& value, T& object)
 }
 
 /**
- * @brief Convenience function to unmarshal (deserialize) JSON string to an
- * object
+ * @brief Convenience function to unmarshal (deserialize) JSON string to an object
  * @tparam T Type to deserialize
  * @param json_string JSON string to deserialize from
  * @param object Reference to the object to populate
+ * @param sp Storage pointer for custom memory allocation during parsing (optional)
  * @throws std::runtime_error if JSON parsing fails or type mismatches occur
  */
-template <typename T> void UnmarshalFromString(const std::string& json_string, T& object) {
+template <typename T>
+void UnmarshalFromString(const std::string& json_string,
+                         T& object,
+                         boost::json::storage_ptr sp = {}) {
   boost::system::error_code ec;
-  boost::json::value value = boost::json::parse(json_string, ec);
+  boost::json::value value =
+      sp.get() ? boost::json::parse(json_string, ec, sp) : boost::json::parse(json_string, ec);
   if (ec) {
     throw_json_parse_error(ec.message());
   }

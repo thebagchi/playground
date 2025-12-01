@@ -15,3 +15,7 @@ target_link_libraries(test_describe Boost::json Boost::unit_test_framework)
 add_executable(test_rfc6902 test_rfc6902.cc)
 
 target_link_libraries(test_rfc6902 Boost::json Boost::unit_test_framework)
+
+add_executable(test_benchmark test_benchmark.cc)
+
+target_link_libraries(test_benchmark Boost::json Boost::unit_test_framework)
