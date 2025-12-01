@@ -669,7 +669,7 @@ template <typename T> struct Read {
               Read<P>{}(val, &temp);
               ptr = std::move(temp);
             } else {
-              ptr = std::make_unique<P>();
+              ptr = MAKE_UNIQUE(P);
               Read<P>{}(val, ptr.get());
             }
           }
@@ -716,7 +716,7 @@ template <typename T> struct Read<std::unique_ptr<T>> {
     if (value.is_null()) [[unlikely]] {
       *object = nullptr;
     } else [[likely]] {
-      *object = std::make_unique<T>();
+      *object = MAKE_UNIQUE(T);
       Read<T>{}(value, object->get());
     }
   }
@@ -731,7 +731,7 @@ template <typename T> struct Read<std::shared_ptr<T>> {
     if (value.is_null()) [[unlikely]] {
       *object = nullptr;
     } else [[likely]] {
-      *object = std::make_shared<T>();
+      *object = MAKE_SHARED(T);
       Read<T>{}(value, object->get());
     }
   }
