@@ -96,23 +96,22 @@ int main() {
   return 0;
 }
 ```
-```
 
 ### Supported Types
 
-```cpp
-// Primitives
-std::string, int64_t, uint64_t, double, bool
-
-// Containers
-std::vector<T>, std::map<std::string, T>
-
-// Nullable wrappers
-std::unique_ptr<T>, std::shared_ptr<T>, std::optional<T>
-
-// Pass-through
-boost::json::value
-```
+| Type                        | Nullable |
+|-----------------------------|----------|
+| std::string                 | No       |
+| std::int64_t                | No       |
+| std::uint64_t               | No       |
+| double                      | No       |
+| bool                        | No       |
+| boost::json::value          | No       |
+| std::unique_ptr<T>          | Yes      |
+| std::shared_ptr<T>          | Yes      |
+| std::optional<T>            | Yes      |
+| std::vector<T>              | No       |
+| std::map<std::string, T>    | No       |
 
 ## API Reference
 
