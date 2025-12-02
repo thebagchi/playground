@@ -15,13 +15,13 @@ A high-performance, header-only C++ JSON serialization library using Boost.JSON 
 
 ## Performance Benchmarks
 
-| Operation                         | Throughput   | Latency |
-|-----------------------------------|--------------|---------|
-| Simple object serialization       | 206k ops/sec | 4.8 μs  |
-| Simple object deserialization     | 367k ops/sec | 2.7 μs  |
-| Complex object serialization      | 117k ops/sec | 8.6 μs  |
-| Vector (100 items) serialization  | 2.7k ops/sec | 371 μs  |
-| Large struct (1000 items)         | 162 ops/sec  | 6.2 ms  |
+| Operation                          | Throughput    | Latency |
+|------------------------------------|---------------|---------|
+| Simple object serialization        | 206k ops/sec  | 4.8 μs  |
+| Simple object deserialization      | 367k ops/sec  | 2.7 μs  |
+| Complex object serialization       | 117k ops/sec  | 8.6 μs  |
+| Vector (100 items) serialization   | 2.7k ops/sec  | 371 μs  |
+| Large struct (1000 items)          | 162 ops/sec   | 6.2 ms  |
 
 *Benchmarks run on standard hardware. Custom allocators provide additional 10-20% performance improvement.*
 
@@ -132,21 +132,62 @@ int main() {
 
 ### Supported Types
 
-| Type                               | Nullable |
-|------------------------------------|----------|
-| std::string                        | No       |
-| std::int64_t                       | No       |
-| std::uint64_t                      | No       |
-| double                             | No       |
-| bool                               | No       |
-| boost::json::value                 | No       |
-| std::unique_ptr<T>                 | Yes      |
-| std::shared_ptr<T>                 | Yes      |
-| std::optional<T>                   | Yes      |
-| std::vector<T>                     | No       |
-| std::map<std::string, T>           | No       |
-| std::unordered_map<std::string, T> | No       |
-| std::vector<std::uint8_t>          | No       |
+| Type                                | Nullable |
+|-------------------------------------|----------|
+| std::string                         | No       |
+| std::int64_t                        | No       |
+| std::uint64_t                       | No       |
+| double                              | No       |
+| bool                                | No       |
+| boost::json::value                  | No       |
+| std::unique_ptr<T>                  | Yes      |
+| std::shared_ptr<T>                  | Yes      |
+| std::optional<T>                    | Yes      |
+| std::vector<T>                      | No       |
+| std::map<std::string, T>            | No       |
+| std::unordered_map<std::string, T>  | No       |
+| std::vector<std::uint8_t>           | No       |
+
+## Type Aliases
+
+For reduced verbosity, the library provides convenient type aliases in `utils.h`:
+
+| Alias            | Maps to                              | Description                  |
+|----------------  |--------------------------------------|------------------------------|
+| `ByteArray`      | `std::vector<std::uint8_t>`          | Binary data (Base64 encoded) |
+| `String`         | `std::string`                        | Text strings                 |
+| `Int64`          | `std::int64_t`                       | 64-bit signed integer        |
+| `UInt64`         | `std::uint64_t`                      | 64-bit unsigned integer      |
+| `Double`         | `double`                             | Double precision float       |
+| `Bool`           | `bool`                               | Boolean value                |
+| `Vector<T>`      | `std::vector<T>`                     | Generic vectors              |
+| `Map<T>`         | `std::map<std::string, T>`           | Ordered string-keyed maps    |
+| `Dict<T>`        | `std::unordered_map<std::string, T>` | Unordered string-keyed maps  |
+| `UniquePtr<T>`   | `std::unique_ptr<T>`                 | Unique pointers              |
+| `SharedPtr<T>`   | `std::shared_ptr<T>`                 | Shared pointers              |
+| `Optional<T>`    | `std::optional<T>`                   | Optional values              |
+| `Value`          | `boost::json::value`                 | JSON values                  |
+| `StoragePtr`     | `boost::json::storage_ptr`           | JSON storage pointers        |
+
+### Example with Type Aliases
+
+```cpp
+#include "json.h"  // Includes utils.h automatically
+
+struct Person {
+  String name;                    // Instead of std::string
+  UniquePtr<uint64_t> age;        // Instead of std::unique_ptr<uint64_t>
+  Optional<String> email;         // Instead of std::optional<std::string>
+  Dict<String> metadata;          // Instead of std::unordered_map<std::string, std::string>
+
+  constexpr static auto properties = std::make_tuple(
+    prop(&Person::name, "name"),
+    prop(&Person::age, "age"),
+    prop(&Person::email, "email"),
+    prop(&Person::metadata, "metadata")
+  );
+};
+```
 
 ## API Reference
 

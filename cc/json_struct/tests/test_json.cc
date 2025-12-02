@@ -10,93 +10,99 @@
 #include "json.h"
 #include "test_data.h"
 
+// using namespace json;
+
 class Person {
 public:
-  std::unique_ptr<std::string> name_;
+  UniquePtr<String> name_;
   std::unique_ptr<std::uint64_t> age_;
-  std::unique_ptr<std::string> city_;
-  std::unique_ptr<std::string> email_;
+  UniquePtr<String> city_;
+  UniquePtr<String> email_;
 public:
-  constexpr const static auto properties = std::make_tuple(prop(&Person::name_, "name"),
-                                                           prop(&Person::age_, "age"),
-                                                           prop(&Person::city_, "city"),
-                                                           prop<true>(&Person::email_, "email"));
+  constexpr const static auto properties =
+      std::make_tuple(json::prop(&Person::name_, "name"),
+                      json::prop(&Person::age_, "age"),
+                      json::prop(&Person::city_, "city"),
+                      json::prop<true>(&Person::email_, "email"));
 };
 
-using PersonVector = std::vector<Person>;
-using PersonVectorUniquePtr = std::vector<std::unique_ptr<Person>>;
-using PersonVectorSharedPtr = std::vector<std::shared_ptr<Person>>;
-using PersonVectorOptional = std::vector<std::optional<Person>>;
+using PersonVector = Vector<Person>;
+using PersonVectorUniquePtr = Vector<UniquePtr<Person>>;
+using PersonVectorSharedPtr = Vector<SharedPtr<Person>>;
+using PersonVectorOptional = Vector<Optional<Person>>;
 
-using PersonMap = std::map<std::string, Person>;
-using PersonMapUniquePtr = std::map<std::string, std::unique_ptr<Person>>;
-using PersonMapSharedPtr = std::map<std::string, std::shared_ptr<Person>>;
-using PersonMapOptional = std::map<std::string, std::optional<Person>>;
+using PersonMap = Map<Person>;
+using PersonMapUniquePtr = Map<UniquePtr<Person>>;
+using PersonMapSharedPtr = Map<SharedPtr<Person>>;
+using PersonMapOptional = Map<Optional<Person>>;
 
-using ArbitraryList = std::vector<boost::json::value>;
-using ArbitraryListUniquePtr = std::vector<std::unique_ptr<boost::json::value>>;
-using ArbitraryListSharedPtr = std::vector<std::shared_ptr<boost::json::value>>;
-using ArbitraryListOptional = std::vector<std::optional<boost::json::value>>;
+using ArbitraryList = Vector<Value>;
+using ArbitraryListUniquePtr = Vector<UniquePtr<Value>>;
+using ArbitraryListSharedPtr = Vector<SharedPtr<Value>>;
+using ArbitraryListOptional = Vector<Optional<Value>>;
 
-using ArbitraryMap = std::map<std::string, boost::json::value>;
-using ArbitraryMapUniquePtr = std::map<std::string, std::unique_ptr<boost::json::value>>;
-using ArbitraryMapSharedPtr = std::map<std::string, std::shared_ptr<boost::json::value>>;
-using ArbitraryMapOptional = std::map<std::string, std::optional<boost::json::value>>;
+using ArbitraryMap = Map<Value>;
+using ArbitraryMapUniquePtr = Map<UniquePtr<Value>>;
+using ArbitraryMapSharedPtr = Map<SharedPtr<Value>>;
+using ArbitraryMapOptional = Map<Optional<Value>>;
 
 class Arbitrary {
 public:
   boost::json::value value_;
 public:
-  constexpr const static auto properties = std::make_tuple(prop(&Arbitrary::value_, "value"));
+  constexpr const static auto properties = std::make_tuple(json::prop(&Arbitrary::value_, "value"));
 };
 
-using ArbitraryUniquePtrStruct = std::unique_ptr<Arbitrary>;
-using ArbitrarySharedPtrStruct = std::shared_ptr<Arbitrary>;
-using ArbitraryOptionalStruct = std::optional<Arbitrary>;
+using ArbitraryUniquePtrStruct = UniquePtr<Arbitrary>;
+using ArbitrarySharedPtrStruct = SharedPtr<Arbitrary>;
+using ArbitraryOptionalStruct = Optional<Arbitrary>;
 
 class ArbitraryUniquePtr {
 public:
   std::unique_ptr<boost::json::value> value_;
 public:
   constexpr const static auto properties =
-      std::make_tuple(prop(&ArbitraryUniquePtr::value_, "value"));
+      std::make_tuple(json::prop(&ArbitraryUniquePtr::value_, "value"));
 };
 
 class ArbitrarySharedPtr {
 public:
-  std::shared_ptr<boost::json::value> value_;
+  SharedPtr<Value> value_;
 public:
   constexpr const static auto properties =
-      std::make_tuple(prop(&ArbitrarySharedPtr::value_, "value"));
+      std::make_tuple(json::prop(&ArbitrarySharedPtr::value_, "value"));
 };
 
 class ArbitraryOptional {
 public:
-  std::optional<boost::json::value> value_;
+  Optional<Value> value_;
 public:
   constexpr const static auto properties =
-      std::make_tuple(prop(&ArbitraryOptional::value_, "value"));
+      std::make_tuple(json::prop(&ArbitraryOptional::value_, "value"));
 };
 
 class ArbitraryVector {
 public:
   ArbitraryList value_;
 public:
-  constexpr const static auto properties = std::make_tuple(prop(&ArbitraryVector::value_, "value"));
+  constexpr const static auto properties =
+      std::make_tuple(json::prop(&ArbitraryVector::value_, "value"));
 };
 
 class ArbitraryDict {
 public:
   ArbitraryMap value_;
 public:
-  constexpr const static auto properties = std::make_tuple(prop(&ArbitraryDict::value_, "value"));
+  constexpr const static auto properties =
+      std::make_tuple(json::prop(&ArbitraryDict::value_, "value"));
 };
 
 class PersonList {
 public:
   std::unique_ptr<PersonVector> persons_;
 public:
-  constexpr const static auto properties = std::make_tuple(prop(&PersonList::persons_, "persons"));
+  constexpr const static auto properties =
+      std::make_tuple(json::prop(&PersonList::persons_, "persons"));
 };
 
 class PersonListUniquePtr {
@@ -104,71 +110,73 @@ public:
   std::unique_ptr<PersonVectorUniquePtr> persons_;
 public:
   constexpr const static auto properties =
-      std::make_tuple(prop(&PersonListUniquePtr::persons_, "persons"));
+      std::make_tuple(json::prop(&PersonListUniquePtr::persons_, "persons"));
 };
 
 class PersonListSharedPtr {
 public:
-  std::shared_ptr<PersonVectorSharedPtr> persons_;
+  SharedPtr<PersonVectorSharedPtr> persons_;
 public:
   constexpr const static auto properties =
-      std::make_tuple(prop(&PersonListSharedPtr::persons_, "persons"));
+      std::make_tuple(json::prop(&PersonListSharedPtr::persons_, "persons"));
 };
 
 class PersonListOptional {
 public:
-  std::optional<std::vector<std::optional<Person>>> persons_;
+  Optional<Vector<Optional<Person>>> persons_;
 public:
   constexpr const static auto properties =
-      std::make_tuple(prop(&PersonListOptional::persons_, "persons"));
+      std::make_tuple(json::prop(&PersonListOptional::persons_, "persons"));
 };
 
 class PersonShared {
 public:
-  std::shared_ptr<std::string> name_;
-  std::shared_ptr<std::uint64_t> age_;
-  std::shared_ptr<std::string> city_;
-  std::shared_ptr<std::string> email_;
+  SharedPtr<String> name_;
+  SharedPtr<UInt64> age_;
+  SharedPtr<String> city_;
+  SharedPtr<String> email_;
 public:
   constexpr const static auto properties =
-      std::make_tuple(prop(&PersonShared::name_, "name"),
-                      prop(&PersonShared::age_, "age"),
-                      prop(&PersonShared::city_, "city"),
-                      prop<true>(&PersonShared::email_, "email"));
+      std::make_tuple(json::prop(&PersonShared::name_, "name"),
+                      json::prop(&PersonShared::age_, "age"),
+                      json::prop(&PersonShared::city_, "city"),
+                      json::prop<true>(&PersonShared::email_, "email"));
 };
 
 class PersonOptional {
 public:
-  std::optional<std::string> name_;
-  std::optional<std::uint64_t> age_;
-  std::optional<std::string> city_;
-  std::optional<std::string> email_;
+  Optional<String> name_;
+  Optional<UInt64> age_;
+  Optional<String> city_;
+  Optional<String> email_;
 public:
   constexpr const static auto properties =
-      std::make_tuple(prop(&PersonOptional::name_, "name"),
-                      prop(&PersonOptional::age_, "age"),
-                      prop(&PersonOptional::city_, "city"),
-                      prop<true>(&PersonOptional::email_, "email"));
+      std::make_tuple(json::prop(&PersonOptional::name_, "name"),
+                      json::prop(&PersonOptional::age_, "age"),
+                      json::prop(&PersonOptional::city_, "city"),
+                      json::prop<true>(&PersonOptional::email_, "email"));
 };
 
 class PersonScalars {
 public:
-  std::string name_;
+  String name_;
   std::uint64_t age_;
-  std::string city_;
-  std::string email_;
+  String city_;
+  String email_;
 public:
-  constexpr const static auto properties = std::make_tuple(prop(&PersonScalars::name_, "name"),
-                                                           prop(&PersonScalars::age_, "age"),
-                                                           prop(&PersonScalars::city_, "city"),
-                                                           prop(&PersonScalars::email_, "email"));
+  constexpr const static auto properties =
+      std::make_tuple(json::prop(&PersonScalars::name_, "name"),
+                      json::prop(&PersonScalars::age_, "age"),
+                      json::prop(&PersonScalars::city_, "city"),
+                      json::prop(&PersonScalars::email_, "email"));
 };
 
 class PersonDict {
 public:
   std::unique_ptr<PersonMap> persons_;
 public:
-  constexpr const static auto properties = std::make_tuple(prop(&PersonDict::persons_, "persons"));
+  constexpr const static auto properties =
+      std::make_tuple(json::prop(&PersonDict::persons_, "persons"));
 };
 
 class PersonDictUniquePtr {
@@ -176,23 +184,23 @@ public:
   std::unique_ptr<PersonMapUniquePtr> persons_;
 public:
   constexpr const static auto properties =
-      std::make_tuple(prop(&PersonDictUniquePtr::persons_, "persons"));
+      std::make_tuple(json::prop(&PersonDictUniquePtr::persons_, "persons"));
 };
 
 class PersonDictSharedPtr {
 public:
-  std::shared_ptr<PersonMapSharedPtr> persons_;
+  SharedPtr<PersonMapSharedPtr> persons_;
 public:
   constexpr const static auto properties =
-      std::make_tuple(prop(&PersonDictSharedPtr::persons_, "persons"));
+      std::make_tuple(json::prop(&PersonDictSharedPtr::persons_, "persons"));
 };
 
 class PersonDictOptional {
 public:
-  std::optional<PersonMapOptional> persons_;
+  Optional<PersonMapOptional> persons_;
 public:
   constexpr const static auto properties =
-      std::make_tuple(prop(&PersonDictOptional::persons_, "persons"));
+      std::make_tuple(json::prop(&PersonDictOptional::persons_, "persons"));
 };
 
 BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_PERSON) {
@@ -201,12 +209,12 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_PERSON) {
   try {
     {
       Person p;
-      p.name_ = MAKE_UNIQUE(std::string, "John Doe");
+      p.name_ = MAKE_UNIQUE(String, "John Doe");
       p.age_ = MAKE_UNIQUE(std::uint64_t, 30);
-      p.city_ = MAKE_UNIQUE(std::string, "New York");
+      p.city_ = MAKE_UNIQUE(String, "New York");
       p.email_ = nullptr;
 
-      json_value = Marshal(p);
+      json_value = json::Marshal(p);
       std::cout << "==> TEST_PARSE_JSON_PERSON" << std::endl;
       std::cout << json_value << std::endl;
       std::cout << std::endl;
@@ -214,7 +222,7 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_PERSON) {
 
     {
       Person p;
-      Unmarshal(json_value, p);
+      json::Unmarshal(json_value, p);
 
       BOOST_CHECK(p.name_ != nullptr);
       BOOST_CHECK(p.age_ != nullptr);
@@ -239,14 +247,14 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_PERSON_SHARED) {
       p1.city_ = MAKE_SHARED(std::string, "San Francisco");
       p1.email_ = nullptr;
 
-      json_value = Marshal(p1);
+      json_value = json::Marshal(p1);
       std::cout << "==> TEST_PARSE_JSON_PERSON_SHARED" << std::endl;
       std::cout << json_value << std::endl;
       std::cout << std::endl;
     }
 
     {
-      Unmarshal(json_value, p2);
+      json::Unmarshal(json_value, p2);
 
       BOOST_CHECK(p2.name_ != nullptr);
       BOOST_CHECK(*p2.name_ == "Charlie Brown");
@@ -273,13 +281,13 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_PERSON_OPTIONAL) {
     p1.city_ = "Washington DC";
     p1.email_ = std::nullopt;
 
-    boost::json::value json_value = Marshal(p1);
+    boost::json::value json_value = json::Marshal(p1);
     std::cout << "==> TEST_PARSE_JSON_PERSON_OPTIONAL" << std::endl;
     std::cout << json_value << std::endl;
     std::cout << std::endl;
 
     PersonOptional p2;
-    Unmarshal(json_value, p2);
+    json::Unmarshal(json_value, p2);
 
     BOOST_CHECK(p2.name_ == "Diana Prince");
     BOOST_CHECK(p2.age_ == 28);
@@ -300,13 +308,13 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_PERSON_SCALARS) {
     p1.city_ = "New York";
     p1.email_ = "john@example.com";
 
-    boost::json::value json_value = Marshal(p1);
+    boost::json::value json_value = json::Marshal(p1);
     std::cout << "==> TEST_PARSE_JSON_PERSON_SCALARS" << std::endl;
     std::cout << json_value << std::endl;
     std::cout << std::endl;
 
     PersonScalars p2;
-    Unmarshal(json_value, p2);
+    json::Unmarshal(json_value, p2);
 
     BOOST_CHECK(p2.name_ == "John Doe");
     BOOST_CHECK(p2.age_ == 30);
@@ -326,7 +334,7 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_PERSON_LIST) {
     boost::json::value json_value = boost::json::parse(json_str);
 
     PersonList person_list;
-    Unmarshal(json_value, person_list);
+    json::Unmarshal(json_value, person_list);
 
     BOOST_CHECK(person_list.persons_ != nullptr);
     BOOST_CHECK(person_list.persons_->size() == 3);
@@ -361,7 +369,7 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_PERSON_LIST_UNIQUE_PTR) {
     boost::json::value json_value = boost::json::parse(json_str);
 
     PersonListUniquePtr person_list;
-    Unmarshal(json_value, person_list);
+    json::Unmarshal(json_value, person_list);
 
     BOOST_CHECK(person_list.persons_ != nullptr);
     BOOST_CHECK(person_list.persons_->size() == 3);
@@ -399,7 +407,7 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_PERSON_LIST_SHARED_PTR) {
     boost::json::value json_value = boost::json::parse(json_str);
 
     PersonListSharedPtr person_list;
-    Unmarshal(json_value, person_list);
+    json::Unmarshal(json_value, person_list);
 
     BOOST_CHECK(person_list.persons_ != nullptr);
     BOOST_CHECK(person_list.persons_->size() == 3);
@@ -437,7 +445,7 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_PERSON_LIST_OPTIONAL) {
     boost::json::value json_value = boost::json::parse(json_str);
 
     PersonListOptional person_list;
-    Unmarshal(json_value, person_list);
+    json::Unmarshal(json_value, person_list);
 
     BOOST_CHECK(person_list.persons_.has_value());
     BOOST_CHECK(person_list.persons_->size() == 4);
@@ -489,13 +497,13 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_PERSON_VECTOR) {
     p2.email_ = nullptr;
     people1.push_back(std::move(p2));
 
-    boost::json::value json_value = Marshal(people1);
+    boost::json::value json_value = json::Marshal(people1);
     std::cout << "==> TEST_PARSE_JSON_PERSON_VECTOR" << std::endl;
     std::cout << json_value << std::endl;
     std::cout << std::endl;
 
     PersonVector people2;
-    Unmarshal(json_value, people2);
+    json::Unmarshal(json_value, people2);
 
     BOOST_CHECK(people2.size() == 2);
 
@@ -534,13 +542,13 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_PERSON_VECTOR_SHARED_PTR) {
     p2->email_ = nullptr;
     people1.push_back(p2);
 
-    boost::json::value json_value = Marshal(people1);
+    boost::json::value json_value = json::Marshal(people1);
     std::cout << "==> TEST_PARSE_JSON_PERSON_VECTOR_SHARED_PTR" << std::endl;
     std::cout << json_value << std::endl;
     std::cout << std::endl;
 
     PersonVectorSharedPtr people2;
-    Unmarshal(json_value, people2);
+    json::Unmarshal(json_value, people2);
 
     BOOST_CHECK(people2.size() == 2);
 
@@ -581,13 +589,13 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_PERSON_VECTOR_UNIQUE_PTR) {
     p2->email_ = nullptr;
     people1.push_back(std::move(p2));
 
-    boost::json::value json_value = Marshal(people1);
+    boost::json::value json_value = json::Marshal(people1);
     std::cout << "==> TEST_PARSE_JSON_PERSON_VECTOR_UNIQUE_PTR" << std::endl;
     std::cout << json_value << std::endl;
     std::cout << std::endl;
 
     PersonVectorUniquePtr people2;
-    Unmarshal(json_value, people2);
+    json::Unmarshal(json_value, people2);
 
     BOOST_CHECK(people2.size() == 2);
 
@@ -630,13 +638,13 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_PERSON_VECTOR_OPTIONAL) {
     p3.email_ = nullptr;
     people1.push_back(std::move(p3));
 
-    boost::json::value json_value = Marshal(people1);
+    boost::json::value json_value = json::Marshal(people1);
     std::cout << "==> TEST_PARSE_JSON_PERSON_VECTOR_OPTIONAL" << std::endl;
     std::cout << json_value << std::endl;
     std::cout << std::endl;
 
     PersonVectorOptional people2;
-    Unmarshal(json_value, people2);
+    json::Unmarshal(json_value, people2);
 
     BOOST_CHECK(people2.size() == 3);
 
@@ -689,13 +697,13 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_PERSON_MAP) {
     p3.email_ = nullptr;
     persons_map["bob"] = std::move(p3);
 
-    boost::json::value json_value = Marshal(persons_map);
+    boost::json::value json_value = json::Marshal(persons_map);
     std::cout << "==> TEST_PARSE_JSON_PERSON_MAP" << std::endl;
     std::cout << json_value << std::endl;
     std::cout << std::endl;
 
     PersonMap persons_map2;
-    Unmarshal(json_value, persons_map2);
+    json::Unmarshal(json_value, persons_map2);
 
     BOOST_CHECK(persons_map2.size() == 3);
 
@@ -753,13 +761,13 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_PERSON_MAP_UNIQUE_PTR) {
     p3->email_ = nullptr;
     persons_map["bob"] = std::move(p3);
 
-    boost::json::value json_value = Marshal(persons_map);
+    boost::json::value json_value = json::Marshal(persons_map);
     std::cout << "==> TEST_PARSE_JSON_PERSON_MAP_UNIQUE_PTR" << std::endl;
     std::cout << json_value << std::endl;
     std::cout << std::endl;
 
     PersonMapUniquePtr persons_map2;
-    Unmarshal(json_value, persons_map2);
+    json::Unmarshal(json_value, persons_map2);
 
     BOOST_CHECK(persons_map2.size() == 3);
 
@@ -820,13 +828,13 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_PERSON_MAP_SHARED_PTR) {
     p3->email_ = nullptr;
     persons_map["bob"] = p3;
 
-    boost::json::value json_value = Marshal(persons_map);
+    boost::json::value json_value = json::Marshal(persons_map);
     std::cout << "==> TEST_PARSE_JSON_PERSON_MAP_SHARED_PTR" << std::endl;
     std::cout << json_value << std::endl;
     std::cout << std::endl;
 
     PersonMapSharedPtr persons_map2;
-    Unmarshal(json_value, persons_map2);
+    json::Unmarshal(json_value, persons_map2);
 
     BOOST_CHECK(persons_map2.size() == 3);
 
@@ -889,13 +897,13 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_PERSON_MAP_OPTIONAL) {
     p4.email_ = nullptr;
     persons_map["alice"] = std::move(p4);
 
-    boost::json::value json_value = Marshal(persons_map);
+    boost::json::value json_value = json::Marshal(persons_map);
     std::cout << "==> TEST_PARSE_JSON_PERSON_MAP_OPTIONAL" << std::endl;
     std::cout << json_value << std::endl;
     std::cout << std::endl;
 
     PersonMapOptional persons_map2;
-    Unmarshal(json_value, persons_map2);
+    json::Unmarshal(json_value, persons_map2);
 
     BOOST_CHECK(persons_map2.size() == 4);
 
@@ -966,13 +974,13 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_PERSON_DICT) {
     PersonDict person_dict;
     person_dict.persons_ = std::move(persons_map);
 
-    boost::json::value json_value = Marshal(person_dict);
+    boost::json::value json_value = json::Marshal(person_dict);
     std::cout << "==> TEST_PARSE_JSON_PERSON_DICT" << std::endl;
     std::cout << json_value << std::endl;
     std::cout << std::endl;
 
     PersonDict person_dict2;
-    Unmarshal(json_value, person_dict2);
+    json::Unmarshal(json_value, person_dict2);
 
     BOOST_CHECK(person_dict2.persons_ != nullptr);
     BOOST_CHECK(person_dict2.persons_->size() == 3);
@@ -1034,13 +1042,13 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_PERSON_DICT_UNIQUE_PTR) {
     PersonDictUniquePtr person_dict;
     person_dict.persons_ = std::move(persons_map);
 
-    boost::json::value json_value = Marshal(person_dict);
+    boost::json::value json_value = json::Marshal(person_dict);
     std::cout << "==> TEST_PARSE_JSON_PERSON_DICT_UNIQUE_PTR" << std::endl;
     std::cout << json_value << std::endl;
     std::cout << std::endl;
 
     PersonDictUniquePtr person_dict2;
-    Unmarshal(json_value, person_dict2);
+    json::Unmarshal(json_value, person_dict2);
 
     BOOST_CHECK(person_dict2.persons_ != nullptr);
     BOOST_CHECK(person_dict2.persons_->size() == 3);
@@ -1105,13 +1113,13 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_PERSON_DICT_SHARED_PTR) {
     PersonDictSharedPtr person_dict;
     person_dict.persons_ = persons_map;
 
-    boost::json::value json_value = Marshal(person_dict);
+    boost::json::value json_value = json::Marshal(person_dict);
     std::cout << "==> TEST_PARSE_JSON_PERSON_DICT_SHARED_PTR" << std::endl;
     std::cout << json_value << std::endl;
     std::cout << std::endl;
 
     PersonDictSharedPtr person_dict2;
-    Unmarshal(json_value, person_dict2);
+    json::Unmarshal(json_value, person_dict2);
 
     BOOST_CHECK(person_dict2.persons_ != nullptr);
     BOOST_CHECK(person_dict2.persons_->size() == 3);
@@ -1178,13 +1186,13 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_PERSON_DICT_OPTIONAL) {
     PersonDictOptional person_dict;
     person_dict.persons_ = std::move(persons_map);
 
-    boost::json::value json_value = Marshal(person_dict);
+    boost::json::value json_value = json::Marshal(person_dict);
     std::cout << "==> TEST_PARSE_JSON_PERSON_DICT_OPTIONAL" << std::endl;
     std::cout << json_value << std::endl;
     std::cout << std::endl;
 
     PersonDictOptional person_dict2;
-    Unmarshal(json_value, person_dict2);
+    json::Unmarshal(json_value, person_dict2);
 
     BOOST_CHECK(person_dict2.persons_.has_value());
     BOOST_CHECK(person_dict2.persons_->size() == 4);
@@ -1235,13 +1243,13 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_ARBITRARY_LIST) {
     values.push_back(boost::json::value({ { "key", "value" }, { "number", 123 } }));
     values.push_back(boost::json::value({ 1, 2, 3, 4, 5 }));
 
-    boost::json::value json_value = Marshal(values);
+    boost::json::value json_value = json::Marshal(values);
     std::cout << "==> TEST_PARSE_JSON_ARBITRARY_LIST" << std::endl;
     std::cout << json_value << std::endl;
     std::cout << std::endl;
 
     ArbitraryList values2;
-    Unmarshal(json_value, values2);
+    json::Unmarshal(json_value, values2);
 
     BOOST_CHECK(values2.size() == 5);
 
@@ -1268,13 +1276,13 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_ARBITRARY_LIST_UNIQUE_PTR) {
     values.push_back(MAKE_UNIQUE(boost::json::value, boost::json::object{ { "key", "value" } }));
     values.push_back(MAKE_UNIQUE(boost::json::value, boost::json::array{ 1, 2, 3 }));
 
-    boost::json::value json_value = Marshal(values);
+    boost::json::value json_value = json::Marshal(values);
     std::cout << "==> TEST_PARSE_JSON_ARBITRARY_LIST_UNIQUE_PTR" << std::endl;
     std::cout << json_value << std::endl;
     std::cout << std::endl;
 
     ArbitraryListUniquePtr values2;
-    Unmarshal(json_value, values2);
+    json::Unmarshal(json_value, values2);
 
     BOOST_CHECK(values2.size() == 6);
 
@@ -1304,13 +1312,13 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_ARBITRARY_LIST_SHARED_PTR) {
     values.push_back(MAKE_SHARED(boost::json::value, boost::json::object{ { "key", "value" } }));
     values.push_back(MAKE_SHARED(boost::json::value, boost::json::array{ 1, 2, 3 }));
 
-    boost::json::value json_value = Marshal(values);
+    boost::json::value json_value = json::Marshal(values);
     std::cout << "==> TEST_PARSE_JSON_ARBITRARY_LIST_SHARED_PTR" << std::endl;
     std::cout << json_value << std::endl;
     std::cout << std::endl;
 
     ArbitraryListSharedPtr values2;
-    Unmarshal(json_value, values2);
+    json::Unmarshal(json_value, values2);
 
     BOOST_CHECK(values2.size() == 6);
 
@@ -1340,13 +1348,13 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_ARBITRARY_LIST_OPTIONAL) {
     values.push_back(boost::json::value(boost::json::object{ { "key", "value" } }));
     values.push_back(boost::json::value(boost::json::array{ 1, 2, 3 }));
 
-    boost::json::value json_value = Marshal(values);
+    boost::json::value json_value = json::Marshal(values);
     std::cout << "==> TEST_PARSE_JSON_ARBITRARY_LIST_OPTIONAL" << std::endl;
     std::cout << json_value << std::endl;
     std::cout << std::endl;
 
     ArbitraryListOptional values2;
-    Unmarshal(json_value, values2);
+    json::Unmarshal(json_value, values2);
 
     BOOST_CHECK(values2.size() == 6);
 
@@ -1375,13 +1383,13 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_ARBITRARY_MAP) {
     values["object"] = boost::json::value({ { "key", "value" }, { "number", 123 } });
     values["array"] = boost::json::value({ 1, 2, 3, 4, 5 });
 
-    boost::json::value json_value = Marshal(values);
+    boost::json::value json_value = json::Marshal(values);
     std::cout << "==> TEST_PARSE_JSON_ARBITRARY_MAP" << std::endl;
     std::cout << json_value << std::endl;
     std::cout << std::endl;
 
     ArbitraryMap values2;
-    Unmarshal(json_value, values2);
+    json::Unmarshal(json_value, values2);
 
     BOOST_CHECK(values2.size() == 5);
 
@@ -1408,13 +1416,13 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_ARBITRARY_MAP_UNIQUE_PTR) {
     values["object"] = MAKE_UNIQUE(boost::json::value, boost::json::object{ { "key", "value" } });
     values["array"] = MAKE_UNIQUE(boost::json::value, boost::json::array{ 1, 2, 3 });
 
-    boost::json::value json_value = Marshal(values);
+    boost::json::value json_value = json::Marshal(values);
     std::cout << "==> TEST_PARSE_JSON_ARBITRARY_MAP_UNIQUE_PTR" << std::endl;
     std::cout << json_value << std::endl;
     std::cout << std::endl;
 
     ArbitraryMapUniquePtr values2;
-    Unmarshal(json_value, values2);
+    json::Unmarshal(json_value, values2);
 
     BOOST_CHECK(values2.size() == 6);
 
@@ -1446,13 +1454,13 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_ARBITRARY_MAP_SHARED_PTR) {
     values["object"] = MAKE_SHARED(boost::json::value, boost::json::object{ { "key", "value" } });
     values["array"] = MAKE_SHARED(boost::json::value, boost::json::array{ 1, 2, 3 });
 
-    boost::json::value json_value = Marshal(values);
+    boost::json::value json_value = json::Marshal(values);
     std::cout << "==> TEST_PARSE_JSON_ARBITRARY_MAP_SHARED_PTR" << std::endl;
     std::cout << json_value << std::endl;
     std::cout << std::endl;
 
     ArbitraryMapSharedPtr values2;
-    Unmarshal(json_value, values2);
+    json::Unmarshal(json_value, values2);
 
     BOOST_CHECK(values2.size() == 6);
 
@@ -1484,13 +1492,13 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_ARBITRARY_MAP_OPTIONAL) {
     values["object"] = boost::json::value(boost::json::object{ { "key", "value" } });
     values["array"] = boost::json::value(boost::json::array{ 1, 2, 3 });
 
-    boost::json::value json_value = Marshal(values);
+    boost::json::value json_value = json::Marshal(values);
     std::cout << "==> TEST_PARSE_JSON_ARBITRARY_MAP_OPTIONAL" << std::endl;
     std::cout << json_value << std::endl;
     std::cout << std::endl;
 
     ArbitraryMapOptional values2;
-    Unmarshal(json_value, values2);
+    json::Unmarshal(json_value, values2);
 
     BOOST_CHECK(values2.size() == 6);
 
@@ -1516,13 +1524,13 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_ARBITRARY) {
     Arbitrary value;
     value.value_ = boost::json::value("hello world");
 
-    boost::json::value json_value = Marshal(value);
+    boost::json::value json_value = json::Marshal(value);
     std::cout << "==> TEST_PARSE_JSON_ARBITRARY" << std::endl;
     std::cout << json_value << std::endl;
     std::cout << std::endl;
 
     Arbitrary value2;
-    Unmarshal(json_value, value2);
+    json::Unmarshal(json_value, value2);
 
     BOOST_CHECK(value2.value_.is_string() && value2.value_.as_string() == "hello world");
 
@@ -1537,13 +1545,13 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_ARBITRARY_UNIQUE_PTR) {
     ArbitraryUniquePtrStruct value = MAKE_UNIQUE(Arbitrary);
     value->value_ = boost::json::value(42);
 
-    boost::json::value json_value = Marshal(value);
+    boost::json::value json_value = json::Marshal(value);
     std::cout << "==> TEST_PARSE_JSON_ARBITRARY_UNIQUE_PTR" << std::endl;
     std::cout << json_value << std::endl;
     std::cout << std::endl;
 
     ArbitraryUniquePtrStruct value2;
-    Unmarshal(json_value, value2);
+    json::Unmarshal(json_value, value2);
 
     BOOST_CHECK(value2 != nullptr && value2->value_.is_int64() && value2->value_.as_int64() == 42);
 
@@ -1558,13 +1566,13 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_ARBITRARY_SHARED_PTR) {
     ArbitrarySharedPtrStruct value = MAKE_SHARED(Arbitrary);
     value->value_ = boost::json::value(true);
 
-    boost::json::value json_value = Marshal(value);
+    boost::json::value json_value = json::Marshal(value);
     std::cout << "==> TEST_PARSE_JSON_ARBITRARY_SHARED_PTR" << std::endl;
     std::cout << json_value << std::endl;
     std::cout << std::endl;
 
     ArbitrarySharedPtrStruct value2;
-    Unmarshal(json_value, value2);
+    json::Unmarshal(json_value, value2);
 
     BOOST_CHECK(value2 != nullptr && value2->value_.is_bool() && value2->value_.as_bool() == true);
 
@@ -1580,13 +1588,13 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_ARBITRARY_OPTIONAL) {
     value.emplace();
     value->value_ = boost::json::value({ { "key", "value" } });
 
-    boost::json::value json_value = Marshal(value);
+    boost::json::value json_value = json::Marshal(value);
     std::cout << "==> TEST_PARSE_JSON_ARBITRARY_OPTIONAL" << std::endl;
     std::cout << json_value << std::endl;
     std::cout << std::endl;
 
     ArbitraryOptionalStruct value2;
-    Unmarshal(json_value, value2);
+    json::Unmarshal(json_value, value2);
 
     BOOST_CHECK(value2.has_value() && value2->value_.is_object());
 
@@ -1601,13 +1609,13 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_ARBITRARY_UNIQUE_PTR_MEMBER) {
     ArbitraryUniquePtr value;
     value.value_ = MAKE_UNIQUE(boost::json::value, "hello world");
 
-    boost::json::value json_value = Marshal(value);
+    boost::json::value json_value = json::Marshal(value);
     std::cout << "==> TEST_PARSE_JSON_ARBITRARY_UNIQUE_PTR_MEMBER" << std::endl;
     std::cout << json_value << std::endl;
     std::cout << std::endl;
 
     ArbitraryUniquePtr value2;
-    Unmarshal(json_value, value2);
+    json::Unmarshal(json_value, value2);
 
     BOOST_CHECK(value2.value_ != nullptr && value2.value_->is_string() &&
                 value2.value_->as_string() == "hello world");
@@ -1624,13 +1632,13 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_ARBITRARY_SHARED_PTR_MEMBER) {
     ArbitrarySharedPtr value;
     value.value_ = MAKE_SHARED(boost::json::value, 42);
 
-    boost::json::value json_value = Marshal(value);
+    boost::json::value json_value = json::Marshal(value);
     std::cout << "==> TEST_PARSE_JSON_ARBITRARY_SHARED_PTR_MEMBER" << std::endl;
     std::cout << json_value << std::endl;
     std::cout << std::endl;
 
     ArbitrarySharedPtr value2;
-    Unmarshal(json_value, value2);
+    json::Unmarshal(json_value, value2);
 
     BOOST_CHECK(value2.value_ != nullptr && value2.value_->is_int64() &&
                 value2.value_->as_int64() == 42);
@@ -1647,13 +1655,13 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_ARBITRARY_OPTIONAL_MEMBER) {
     ArbitraryOptional value;
     value.value_ = boost::json::value(true);
 
-    boost::json::value json_value = Marshal(value);
+    boost::json::value json_value = json::Marshal(value);
     std::cout << "==> TEST_PARSE_JSON_ARBITRARY_OPTIONAL_MEMBER" << std::endl;
     std::cout << json_value << std::endl;
     std::cout << std::endl;
 
     ArbitraryOptional value2;
-    Unmarshal(json_value, value2);
+    json::Unmarshal(json_value, value2);
 
     BOOST_CHECK(value2.value_.has_value() && value2.value_->is_bool() &&
                 value2.value_->as_bool() == true);
@@ -1671,13 +1679,13 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_ARBITRARY_VECTOR) {
     value.value_.push_back(boost::json::value(42));
     value.value_.push_back(boost::json::value(true));
 
-    boost::json::value json_value = Marshal(value);
+    boost::json::value json_value = json::Marshal(value);
     std::cout << "==> TEST_PARSE_JSON_ARBITRARY_VECTOR" << std::endl;
     std::cout << json_value << std::endl;
     std::cout << std::endl;
 
     ArbitraryVector value2;
-    Unmarshal(json_value, value2);
+    json::Unmarshal(json_value, value2);
 
     BOOST_CHECK(value2.value_.size() == 3);
     BOOST_CHECK(value2.value_[0].is_string() && value2.value_[0].as_string() == "hello");
@@ -1697,13 +1705,13 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_ARBITRARY_DICT) {
     value.value_["number"] = boost::json::value(42);
     value.value_["boolean"] = boost::json::value(true);
 
-    boost::json::value json_value = Marshal(value);
+    boost::json::value json_value = json::Marshal(value);
     std::cout << "==> TEST_PARSE_JSON_ARBITRARY_DICT" << std::endl;
     std::cout << json_value << std::endl;
     std::cout << std::endl;
 
     ArbitraryDict value2;
-    Unmarshal(json_value, value2);
+    json::Unmarshal(json_value, value2);
 
     BOOST_CHECK(value2.value_.size() == 3);
     BOOST_CHECK(value2.value_["string"].is_string() &&

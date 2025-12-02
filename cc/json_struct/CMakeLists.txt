@@ -33,9 +33,7 @@ set(CMAKE_EXE_LINKER_FLAGS "-static")
 
 find_package(Boost REQUIRED COMPONENTS json unit_test_framework)
 
-add_executable(main.bin main.cc)
-
-target_link_libraries(main.bin Boost::json)
+add_subdirectory(example)
 
 add_subdirectory(tests)
 

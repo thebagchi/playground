@@ -1,5 +1,6 @@
 #include <boost/json.hpp>
 #include <cstdint>
+#include <iomanip>
 #include <iostream>
 #include <memory>
 #include <optional>
@@ -7,39 +8,41 @@
 
 #include "json.h"
 
+// using namespace json;
+
 class Person {
 public:
-  std::string name_;
-  std::unique_ptr<std::uint64_t> age_;
-  std::shared_ptr<std::string> city_;
-  std::optional<std::string> email_;
+  String name_;
+  UniquePtr<UInt64> age_;
+  SharedPtr<String> city_;
+  Optional<String> email_;
 public:
-  constexpr const static auto properties = std::make_tuple(prop(&Person::name_, "name"),
-                                                           prop(&Person::age_, "age"),
-                                                           prop(&Person::city_, "city"),
-                                                           prop(&Person::email_, "email"));
+  constexpr const static auto properties = std::make_tuple(json::prop(&Person::name_, "name"),
+                                                           json::prop(&Person::age_, "age"),
+                                                           json::prop(&Person::city_, "city"),
+                                                           json::prop(&Person::email_, "email"));
 };
 
 void encode_decode_struct() {
   try {
     // Create a Person with mixed types
     Person p1;
-    p1.name_ = "John Doe";                           // direct string
-    p1.age_ = MAKE_UNIQUE(std::uint64_t, 30);        // unique_ptr
-    p1.city_ = MAKE_SHARED(std::string, "New York"); // shared_ptr
-    p1.email_ = "john@example.com";                  // optional
+    p1.name_ = "John Doe";                      // direct string
+    p1.age_ = MAKE_UNIQUE(UInt64, 30);          // unique_ptr
+    p1.city_ = MAKE_SHARED(String, "New York"); // shared_ptr
+    p1.email_ = "john@example.com";             // optional
 
     // Marshal to JSON
-    boost::json::value json_value = Marshal(p1);
+    boost::json::value json_value = json::Marshal(p1);
     std::cout << "Encoded JSON: " << json_value << std::endl;
 
     // Marshal to JSON string
-    std::string json_string = MarshalToString(p1);
+    String json_string = json::MarshalToString(p1);
     std::cout << "Encoded JSON string: " << json_string << std::endl;
 
     // Unmarshal back to Person from string
     Person p2;
-    UnmarshalFromString(json_string, p2);
+    json::UnmarshalFromString(json_string, p2);
 
     // Display decoded results
     std::cout << "Decoded Person:" << std::endl;
@@ -62,19 +65,19 @@ void encode_decode_struct() {
 void encode_decode_uint64() {
   try {
     // Create uint64_t values
-    std::uint64_t original_value = 1234567890123456789ULL;
-    std::uint64_t decoded_value = 0;
+    UInt64 original_value = 1234567890123456789ULL;
+    UInt64 decoded_value = 0;
 
     // Marshal to JSON
-    boost::json::value json_value = Marshal(original_value);
+    boost::json::value json_value = json::Marshal(original_value);
     std::cout << "Encoded uint64 JSON: " << json_value << std::endl;
 
     // Marshal to JSON string
-    std::string json_string = MarshalToString(original_value);
+    String json_string = json::MarshalToString(original_value);
     std::cout << "Encoded uint64 JSON string: " << json_string << std::endl;
 
     // Unmarshal back to uint64_t from string
-    UnmarshalFromString(json_string, decoded_value);
+    json::UnmarshalFromString(json_string, decoded_value);
 
     // Display decoded results
     std::cout << "Decoded uint64_t:" << std::endl;
@@ -90,19 +93,19 @@ void encode_decode_uint64() {
 void encode_decode_string() {
   try {
     // Create string values
-    std::string original_value = "Hello, JSON World!";
-    std::string decoded_value;
+    String original_value = "Hello, JSON World!";
+    String decoded_value;
 
     // Marshal to JSON
-    boost::json::value json_value = Marshal(original_value);
+    boost::json::value json_value = json::Marshal(original_value);
     std::cout << "Encoded string JSON: " << json_value << std::endl;
 
     // Marshal to JSON string
-    std::string json_string = MarshalToString(original_value);
+    String json_string = json::MarshalToString(original_value);
     std::cout << "Encoded string JSON string: " << json_string << std::endl;
 
     // Unmarshal back to string from string
-    UnmarshalFromString(json_string, decoded_value);
+    json::UnmarshalFromString(json_string, decoded_value);
 
     // Display decoded results
     std::cout << "Decoded string:" << std::endl;
@@ -118,19 +121,19 @@ void encode_decode_string() {
 void encode_decode_double() {
   try {
     // Create double values
-    double original_value = 3.14159265358979323846;
-    double decoded_value = 0.0;
+    Double original_value = 3.14159265358979323846;
+    Double decoded_value = 0.0;
 
     // Marshal to JSON
-    boost::json::value json_value = Marshal(original_value);
+    boost::json::value json_value = json::Marshal(original_value);
     std::cout << "Encoded double JSON: " << json_value << std::endl;
 
     // Marshal to JSON string
-    std::string json_string = MarshalToString(original_value);
+    String json_string = json::MarshalToString(original_value);
     std::cout << "Encoded double JSON string: " << json_string << std::endl;
 
     // Unmarshal back to double from string
-    UnmarshalFromString(json_string, decoded_value);
+    json::UnmarshalFromString(json_string, decoded_value);
 
     // Display decoded results
     std::cout << "Decoded double:" << std::endl;
@@ -146,19 +149,19 @@ void encode_decode_double() {
 void encode_decode_bool() {
   try {
     // Create bool values
-    bool original_value = true;
-    bool decoded_value = false;
+    Bool original_value = true;
+    Bool decoded_value = false;
 
     // Marshal to JSON
-    boost::json::value json_value = Marshal(original_value);
+    boost::json::value json_value = json::Marshal(original_value);
     std::cout << "Encoded bool JSON: " << json_value << std::endl;
 
     // Marshal to JSON string
-    std::string json_string = MarshalToString(original_value);
+    String json_string = json::MarshalToString(original_value);
     std::cout << "Encoded bool JSON string: " << json_string << std::endl;
 
     // Unmarshal back to bool from string
-    UnmarshalFromString(json_string, decoded_value);
+    json::UnmarshalFromString(json_string, decoded_value);
 
     // Display decoded results
     std::cout << "Decoded bool:" << std::endl;
@@ -174,19 +177,19 @@ void encode_decode_bool() {
 void encode_decode_int64() {
   try {
     // Create int64_t values (negative number)
-    std::int64_t original_value = -9223372036854775807LL; // Large negative number
-    std::int64_t decoded_value = 0;
+    Int64 original_value = -9223372036854775807LL; // Large negative number
+    Int64 decoded_value = 0;
 
     // Marshal to JSON
-    boost::json::value json_value = Marshal(original_value);
+    boost::json::value json_value = json::Marshal(original_value);
     std::cout << "Encoded int64 JSON: " << json_value << std::endl;
 
     // Marshal to JSON string
-    std::string json_string = MarshalToString(original_value);
+    String json_string = json::MarshalToString(original_value);
     std::cout << "Encoded int64 JSON string: " << json_string << std::endl;
 
     // Unmarshal back to int64_t from string
-    UnmarshalFromString(json_string, decoded_value);
+    json::UnmarshalFromString(json_string, decoded_value);
 
     // Display decoded results
     std::cout << "Decoded int64_t:" << std::endl;
@@ -202,19 +205,19 @@ void encode_decode_int64() {
 void encode_decode_vector() {
   try {
     // Create vector of strings
-    std::vector<std::string> original_vector = { "apple", "banana", "cherry", "date" };
-    std::vector<std::string> decoded_vector;
+    Vector<String> original_vector = { "apple", "banana", "cherry", "date" };
+    Vector<String> decoded_vector;
 
     // Marshal to JSON
-    boost::json::value json_value = Marshal(original_vector);
+    boost::json::value json_value = json::Marshal(original_vector);
     std::cout << "Encoded vector JSON: " << json_value << std::endl;
 
     // Marshal to JSON string
-    std::string json_string = MarshalToString(original_vector);
+    String json_string = json::MarshalToString(original_vector);
     std::cout << "Encoded vector JSON string: " << json_string << std::endl;
 
     // Unmarshal back to vector from string
-    UnmarshalFromString(json_string, decoded_vector);
+    json::UnmarshalFromString(json_string, decoded_vector);
 
     // Display decoded results
     std::cout << "Decoded vector:" << std::endl;
@@ -246,21 +249,19 @@ void encode_decode_vector() {
 void encode_decode_map() {
   try {
     // Create map of string to string
-    std::map<std::string, std::string> original_map = { { "name", "Alice" },
-                                                        { "city", "Boston" },
-                                                        { "country", "USA" } };
-    std::map<std::string, std::string> decoded_map;
+    Map<String> original_map = { { "name", "Alice" }, { "city", "Boston" }, { "country", "USA" } };
+    Map<String> decoded_map;
 
     // Marshal to JSON
-    boost::json::value json_value = Marshal(original_map);
+    boost::json::value json_value = json::Marshal(original_map);
     std::cout << "Encoded map JSON: " << json_value << std::endl;
 
     // Marshal to JSON string
-    std::string json_string = MarshalToString(original_map);
+    String json_string = json::MarshalToString(original_map);
     std::cout << "Encoded map JSON string: " << json_string << std::endl;
 
     // Unmarshal back to map from string
-    UnmarshalFromString(json_string, decoded_map);
+    json::UnmarshalFromString(json_string, decoded_map);
 
     // Display decoded results
     std::cout << "Decoded map:" << std::endl;
@@ -292,19 +293,19 @@ void encode_decode_map() {
 void encode_decode_optional() {
   try {
     // Create optional string (with value)
-    std::optional<std::string> original_optional = "Hello Optional World!";
-    std::optional<std::string> decoded_optional;
+    Optional<String> original_optional = "Hello Optional World!";
+    Optional<String> decoded_optional;
 
     // Marshal to JSON
-    boost::json::value json_value = Marshal(original_optional);
+    boost::json::value json_value = json::Marshal(original_optional);
     std::cout << "Encoded optional JSON: " << json_value << std::endl;
 
     // Marshal to JSON string
-    std::string json_string = MarshalToString(original_optional);
+    String json_string = json::MarshalToString(original_optional);
     std::cout << "Encoded optional JSON string: " << json_string << std::endl;
 
     // Unmarshal back to optional from string
-    UnmarshalFromString(json_string, decoded_optional);
+    json::UnmarshalFromString(json_string, decoded_optional);
 
     // Display decoded results
     std::cout << "Decoded optional:" << std::endl;
@@ -316,6 +317,55 @@ void encode_decode_optional() {
 
   } catch (const std::exception& e) {
     std::cout << "Error in encode_decode_optional: " << e.what() << std::endl;
+  }
+}
+
+void encode_decode_byte_array() {
+  try {
+    // Create byte array with some sample data
+    ByteArray original_bytes = { std::byte{ 0x48 }, std::byte{ 0x65 }, std::byte{ 0x6C },
+                                 std::byte{ 0x6C }, std::byte{ 0x6F }, std::byte{ 0x20 },
+                                 std::byte{ 0x57 }, std::byte{ 0x6F }, std::byte{ 0x72 },
+                                 std::byte{ 0x6C }, std::byte{ 0x64 }, std::byte{ 0x21 } };
+    ByteArray decoded_bytes;
+
+    // Marshal to JSON
+    boost::json::value json_value = json::Marshal(original_bytes);
+    std::cout << "Encoded byte array JSON: " << json_value << std::endl;
+
+    // Marshal to JSON string
+    String json_string = json::MarshalToString(original_bytes);
+    std::cout << "Encoded byte array JSON string: " << json_string << std::endl;
+
+    // Unmarshal back to byte array from string
+    json::UnmarshalFromString(json_string, decoded_bytes);
+
+    // Display decoded results
+    std::cout << "Decoded byte array:" << std::endl;
+    std::cout << "  Original: [";
+    for (size_t i = 0; i < original_bytes.size(); ++i) {
+      std::cout << "0x" << std::hex << std::setw(2) << std::setfill('0')
+                << static_cast<int>(original_bytes[i]);
+      if (i < original_bytes.size() - 1) {
+        std::cout << ", ";
+      }
+    }
+    std::cout << "]" << std::endl;
+
+    std::cout << "  Decoded:  [";
+    for (size_t i = 0; i < decoded_bytes.size(); ++i) {
+      std::cout << "0x" << std::hex << std::setw(2) << std::setfill('0')
+                << static_cast<int>(decoded_bytes[i]);
+      if (i < decoded_bytes.size() - 1) {
+        std::cout << ", ";
+      }
+    }
+    std::cout << "]" << std::endl;
+
+    std::cout << "  Match: " << (original_bytes == decoded_bytes ? "Yes" : "No") << std::endl;
+
+  } catch (const std::exception& e) {
+    std::cout << "Error in encode_decode_byte_array: " << e.what() << std::endl;
   }
 }
 
@@ -331,15 +381,15 @@ void encode_decode_arbitrary() {
     boost::json::value decoded_arbitrary;
 
     // Marshal to JSON
-    boost::json::value json_value = Marshal(original_arbitrary);
+    boost::json::value json_value = json::Marshal(original_arbitrary);
     std::cout << "Encoded arbitrary JSON: " << json_value << std::endl;
 
     // Marshal to JSON string
-    std::string json_string = MarshalToString(original_arbitrary);
+    String json_string = json::MarshalToString(original_arbitrary);
     std::cout << "Encoded arbitrary JSON string: " << json_string << std::endl;
 
     // Unmarshal back to arbitrary JSON from string
-    UnmarshalFromString(json_string, decoded_arbitrary);
+    json::UnmarshalFromString(json_string, decoded_arbitrary);
 
     // Display decoded results
     std::cout << "Decoded arbitrary JSON:" << std::endl;
@@ -366,6 +416,7 @@ int main(int argc, char* argv[]) {
     encode_decode_vector();
     encode_decode_map();
     encode_decode_optional();
+    encode_decode_byte_array();
     encode_decode_arbitrary();
   } catch (const std::exception& e) {
     std::cerr << "Error in main: " << e.what() << std::endl;

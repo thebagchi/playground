@@ -3,6 +3,10 @@
 #include <boost/json.hpp>
 #include <boost/test/unit_test.hpp>
 
+#include "json.h"
+
+// using namespace json;
+
 struct MyStruct {
   int field_name;
 };
@@ -32,10 +36,10 @@ BOOST_AUTO_TEST_CASE(test_encode_decode) {
 
   // Encode to JSON
   boost::json::value jv = boost::json::value_from(original);
-  std::string json_str = boost::json::serialize(jv);
+  String json_str = boost::json::serialize(jv);
 
   // Expected JSON string
-  std::string expected_json = R"({"field-name":42})";
+  String expected_json = R"({"field-name":42})";
   BOOST_CHECK_EQUAL(json_str, expected_json);
 
   // Decode back to MyStruct

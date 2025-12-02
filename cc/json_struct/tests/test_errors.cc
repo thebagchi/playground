@@ -6,37 +6,39 @@
 
 #include "json.h"
 
+// using namespace json;
+
 class Person {
 public:
-  std::string name_;
-  std::unique_ptr<std::uint64_t> age_;
-  std::shared_ptr<std::string> city_;
-  std::optional<std::string> email_;
+  String name_;
+  UniquePtr<UInt64> age_;
+  SharedPtr<String> city_;
+  Optional<String> email_;
 public:
-  constexpr const static auto properties = std::make_tuple(prop(&Person::name_, "name"),
-                                                           prop(&Person::age_, "age"),
-                                                           prop(&Person::city_, "city"),
-                                                           prop(&Person::email_, "email"));
+  constexpr const static auto properties = std::make_tuple(json::prop(&Person::name_, "name"),
+                                                           json::prop(&Person::age_, "age"),
+                                                           json::prop(&Person::city_, "city"),
+                                                           json::prop(&Person::email_, "email"));
 };
 
 BOOST_AUTO_TEST_CASE(TEST_ERROR_TYPE_MISMATCH) {
   std::cout << "==> TEST_ERROR_TYPE_MISMATCH" << std::endl;
 
   // Test: Type mismatch - string instead of number for age field
-  std::string invalid_json = R"({"name":"John","age":"thirty","city":"NY"})";
+  String invalid_json = R"({"name":"John","age":"thirty","city":"NY"})";
   Person p;
 
-  BOOST_CHECK_THROW(UnmarshalFromString(invalid_json, p), std::runtime_error);
+  BOOST_CHECK_THROW(json::UnmarshalFromString(invalid_json, p), std::runtime_error);
 }
 
 BOOST_AUTO_TEST_CASE(TEST_ERROR_INVALID_JSON_STRUCTURE) {
   std::cout << "==> TEST_ERROR_INVALID_JSON_STRUCTURE" << std::endl;
 
   // Test: Invalid JSON structure - string instead of object
-  std::string invalid_json = R"("just a string")";
+  String invalid_json = R"("just a string")";
   Person p;
 
-  BOOST_CHECK_THROW(UnmarshalFromString(invalid_json, p), std::runtime_error);
+  BOOST_CHECK_THROW(json::UnmarshalFromString(invalid_json, p), std::runtime_error);
 }
 
 BOOST_AUTO_TEST_CASE(TEST_ERROR_MALFORMED_JSON) {
@@ -46,7 +48,7 @@ BOOST_AUTO_TEST_CASE(TEST_ERROR_MALFORMED_JSON) {
   std::string invalid_json = R"({"name":"John","age":)";
   Person p;
 
-  BOOST_CHECK_THROW(UnmarshalFromString(invalid_json, p), std::runtime_error);
+  BOOST_CHECK_THROW(json::UnmarshalFromString(invalid_json, p), std::runtime_error);
 }
 
 BOOST_AUTO_TEST_CASE(TEST_ERROR_ARRAY_INSTEAD_OF_OBJECT) {
@@ -56,7 +58,7 @@ BOOST_AUTO_TEST_CASE(TEST_ERROR_ARRAY_INSTEAD_OF_OBJECT) {
   std::string invalid_json = R"(["name","age","city"])";
   Person p;
 
-  BOOST_CHECK_THROW(UnmarshalFromString(invalid_json, p), std::runtime_error);
+  BOOST_CHECK_THROW(json::UnmarshalFromString(invalid_json, p), std::runtime_error);
 }
 
 BOOST_AUTO_TEST_CASE(TEST_SUCCESS_VALID_JSON) {
@@ -66,7 +68,7 @@ BOOST_AUTO_TEST_CASE(TEST_SUCCESS_VALID_JSON) {
   std::string valid_json = R"({"name":"John","age":30,"city":"NY","email":"john@test.com"})";
   Person p;
 
-  BOOST_CHECK_NO_THROW(UnmarshalFromString(valid_json, p));
+  BOOST_CHECK_NO_THROW(json::UnmarshalFromString(valid_json, p));
 
   // Verify the parsed data
   BOOST_CHECK_EQUAL(p.name_, "John");
