@@ -21,6 +21,23 @@ install_boost(${BOOST_SOURCE_DIR} ${BOOST_INSTALL_DIR})
 # Set the path to the installed Boost
 set(CMAKE_PREFIX_PATH "${BOOST_INSTALL_DIR}")
 
+# Generate json_all.h by combining all header files
+set(GENERATED_HEADER "${CMAKE_CURRENT_BINARY_DIR}/json_all.h")
+file(GLOB HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
+
+add_custom_command(
+    OUTPUT ${GENERATED_HEADER}
+    COMMAND ${CMAKE_COMMAND} 
+        -DSOURCE_DIR=${CMAKE_CURRENT_SOURCE_DIR}
+        -DOUTPUT_FILE=${GENERATED_HEADER}
+        -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake/combine_headers.cmake
+    DEPENDS ${HEADER_FILES} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/combine_headers.cmake
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    COMMENT "Generating json_all.h in build directory"
+)
+
+add_custom_target(combine_headers ALL DEPENDS ${GENERATED_HEADER})
+
 # Prefer static linking for Boost
 set(Boost_USE_STATIC_LIBS ON)
 set(Boost_USE_DEBUG_LIBS OFF)

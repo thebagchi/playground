@@ -23,11 +23,6 @@ using ByteVector = std::vector<std::byte>;
 template <std::size_t N> using ByteArray = std::array<std::byte, N>;
 
 /**
- * @brief Byte list type alias (doubly-linked list)
- */
-using ByteList = std::list<std::byte>;
-
-/**
  * @brief String type alias
  */
 using String = std::string;
@@ -61,9 +56,24 @@ template <typename T> using List = std::list<T>;
 template <typename T> using Map = std::map<std::string, T>;
 
 /**
+ * @brief MultiMap type alias (ordered multimap with string keys - allows duplicate keys)
+ */
+template <typename T> using MultiMap = std::multimap<std::string, T>;
+
+/**
  * @brief Dictionary type alias (unordered map with string keys)
  */
 template <typename T> using Dict = std::unordered_map<std::string, T>;
+
+/**
+ * @brief MultiDict type alias (unordered multimap with string keys - allows duplicate keys)
+ */
+template <typename T> using MultiDict = std::unordered_multimap<std::string, T>;
+
+/**
+ * @brief Pair type alias (string key-value pair)
+ */
+template <typename T> using Pair = std::pair<std::string, T>;
 
 /**
  * @brief Unique pointer type alias

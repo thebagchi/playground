@@ -157,6 +157,50 @@ namespace json {
     throw std::runtime_error(std::move(msg));
   }
 
+  [[noreturn]] inline void throw_invalid_base64() {
+    throw std::runtime_error("Invalid base64");
+  }
+
+  [[noreturn]] inline void throw_byte_array_null() {
+    throw std::runtime_error("Cannot deserialize null value into ByteArray - array size is fixed");
+  }
+
+  [[noreturn]] inline void throw_byte_array_size_mismatch(std::size_t decoded_size,
+                                                          std::size_t expected_size) {
+    String msg;
+    msg.reserve(60); // Pre-allocate enough space
+    msg.append("ByteArray size mismatch: decoded ")
+        .append(std::to_string(decoded_size))
+        .append(" bytes, but ByteArray expects ")
+        .append(std::to_string(expected_size))
+        .append(" bytes");
+    throw std::runtime_error(std::move(msg));
+  }
+
+  [[noreturn]] inline void throw_value_too_large_for_int64() {
+    throw std::runtime_error("Value too large for int64_t");
+  }
+
+  [[noreturn]] inline void throw_negative_value_for_uint64() {
+    throw std::runtime_error("Negative value cannot be converted to uint64_t");
+  }
+
+  [[noreturn]] inline void throw_array_null() {
+    throw std::runtime_error("Cannot deserialize null value into Array - array size is fixed");
+  }
+
+  [[noreturn]] inline void throw_array_size_mismatch(std::size_t json_size,
+                                                     std::size_t expected_size) {
+    String msg;
+    msg.reserve(80); // Pre-allocate enough space
+    msg.append("Array size mismatch: JSON array has ")
+        .append(std::to_string(json_size))
+        .append(" elements, but Array expects ")
+        .append(std::to_string(expected_size))
+        .append(" elements");
+    throw std::runtime_error(std::move(msg));
+  }
+
   // =============================================================================
   // JSON Serialization Templates
   // =============================================================================
@@ -399,6 +443,27 @@ namespace json {
     }
   };
 
+  /**
+ * @brief Specialization for ByteArray<N> - serialize as Base64 string
+ * @tparam N Array size (known at compile time)
+ */
+  template <std::size_t N> struct Write<ByteArray<N>> {
+    inline void operator()(const ByteArray<N>* data, Value* out) const noexcept {
+      if (!data) [[unlikely]] {
+        *out = nullptr;
+        return;
+      }
+
+      const std::size_t encoded_len = base64::encoded_size(N);
+
+      // Construct json::string directly with correct storage and size
+      auto& str = out->emplace_string();
+      str.reserve(encoded_len); // Critical: pre-allocate exact size
+      str.resize(encoded_len);  // Now safe to write into
+      base64::encode(const_cast<char*>(str.data()), data->data(), N);
+    }
+  };
+
   // =============================================================================
   // Specializations for Container Types
   // =============================================================================
@@ -478,6 +543,130 @@ namespace json {
         Write<T>{}(&item.second, &temp);
         obj.emplace(item.first, std::move(temp));
       }
+
+      *out = std::move(obj);
+    }
+  };
+
+  /**
+ * @brief Specialization for MultiMap<T>
+ * @tparam T Value type (can be basic or complex)
+ * @note For duplicate keys, values are stored as an array in JSON
+ */
+  template <typename T> struct Write<MultiMap<T>> {
+    inline void operator()(const MultiMap<T>* object, Value* out) const {
+      if (!object) [[unlikely]] {
+        *out = nullptr;
+        return;
+      }
+
+      boost::json::object obj(out->storage());
+
+      // Group values by key
+      String current_key;
+      boost::json::array current_array(out->storage());
+
+      for (const auto& item : *object) {
+        if (current_key.empty()) {
+          // First item
+          current_key = item.first;
+        } else if (current_key != item.first) {
+          // Key changed - emit previous key's values
+          if (current_array.size() == 1) {
+            // Single value - store directly
+            obj.emplace(current_key, std::move(current_array[0]));
+          } else {
+            // Multiple values - store as array
+            obj.emplace(current_key, std::move(current_array));
+          }
+          current_array = boost::json::array(out->storage());
+          current_key = item.first;
+        }
+
+        // Add current value to array
+        Value temp(out->storage());
+        Write<T>{}(&item.second, &temp);
+        current_array.emplace_back(std::move(temp));
+      }
+
+      // Emit last key's values
+      if (!current_key.empty()) {
+        if (current_array.size() == 1) {
+          obj.emplace(current_key, std::move(current_array[0]));
+        } else {
+          obj.emplace(current_key, std::move(current_array));
+        }
+      }
+
+      *out = std::move(obj);
+    }
+  };
+
+  /**
+ * @brief Specialization for MultiDict<T>
+ * @tparam T Value type (can be basic or complex)
+ * @note For duplicate keys, values are stored as an array in JSON
+ */
+  template <typename T> struct Write<MultiDict<T>> {
+    inline void operator()(const MultiDict<T>* object, Value* out) const {
+      if (!object) [[unlikely]] {
+        *out = nullptr;
+        return;
+      }
+
+      boost::json::object obj(out->storage());
+
+      // Build a map of keys to their values
+      std::unordered_map<String, boost::json::array> key_values;
+
+      for (const auto& item : *object) {
+        auto it = key_values.find(item.first);
+        if (it == key_values.end()) {
+          it = key_values.emplace(item.first, boost::json::array(out->storage())).first;
+        }
+
+        Value temp(out->storage());
+        Write<T>{}(&item.second, &temp);
+        it->second.emplace_back(std::move(temp));
+      }
+
+      // Emit all keys
+      for (auto& kv : key_values) {
+        if (kv.second.size() == 1) {
+          // Single value - store directly
+          obj.emplace(kv.first, std::move(kv.second[0]));
+        } else {
+          // Multiple values - store as array
+          obj.emplace(kv.first, std::move(kv.second));
+        }
+      }
+
+      *out = std::move(obj);
+    }
+  };
+
+  /**
+ * @brief Specialization for Pair<T>
+ * @tparam T Value type (can be basic or complex)
+ * @note Serializes as JSON object with "key" and "value" fields
+ */
+  template <typename T> struct Write<Pair<T>> {
+    inline void operator()(const Pair<T>* object, Value* out) const {
+      if (!object) [[unlikely]] {
+        *out = nullptr;
+        return;
+      }
+
+      boost::json::object obj(out->storage());
+      obj.reserve(2);
+
+      // Serialize key
+      obj.emplace("key", object->first);
+
+      // Serialize value
+      Value temp(out->storage());
+      Write<T>{}(&object->second, &temp);
+      obj.emplace("value", std::move(temp));
 
       *out = std::move(obj);
     }
@@ -778,7 +967,7 @@ namespace json {
         if (val <= static_cast<std::uint64_t>(std::numeric_limits<Int64>::max())) {
           *object = static_cast<Int64>(val);
         } else {
-          throw std::runtime_error("Value too large for int64_t");
+          throw_value_too_large_for_int64();
         }
       } else {
         throw_type_mismatch("integer", value);
@@ -798,7 +987,7 @@ namespace json {
         if (val >= 0) {
           *object = static_cast<UInt64>(val);
         } else {
-          throw std::runtime_error("Negative value cannot be converted to uint64_t");
+          throw_negative_value_for_uint64();
         }
       } else {
         throw_type_mismatch("unsigned integer", value);
@@ -868,11 +1057,38 @@ namespace json {
       const auto& str = value.as_string();
       const std::size_t max_decoded = base64::decoded_size(str.size());
       out->resize(max_decoded);
-      auto [ptr, len] = base64::decode(out->data(), str.data(), str.size());
-      if (len == 0 && !str.empty()) {
-        throw std::runtime_error("Invalid base64");
+      auto [decoded_size, input_size] = base64::decode(out->data(), str.data(), str.size());
+      if (decoded_size == 0 && !str.empty()) {
+        throw_invalid_base64();
       }
-      out->resize(len);
+      out->resize(decoded_size);
+    }
+  };
+
+  /**
+ * @brief Specialization for ByteArray<N> - deserialize from Base64 string
+ * @tparam N Array size (known at compile time)
+ */
+  template <std::size_t N> struct Read<ByteArray<N>> {
+    inline void operator()(const Value& value, ByteArray<N>* out) const {
+      if (value.is_null()) [[unlikely]] {
+        throw_byte_array_null();
+      }
+      if (!value.is_string()) {
+        throw_type_mismatch("base64 string", value);
+      }
+      const auto& str = value.as_string();
+
+      // Decode the base64 string directly into the array
+      auto [decoded_size, input_size] = base64::decode(out->data(), str.data(), str.size());
+      if (decoded_size == 0 && !str.empty()) {
+        throw_invalid_base64();
+      }
+
+      // Verify that the decoded size matches the expected array size
+      if (decoded_size != N) {
+        throw_byte_array_size_mismatch(decoded_size, N);
+      }
     }
   };
 
@@ -959,6 +1175,115 @@ namespace json {
   };
 
   /**
+ * @brief Specialization for MultiMap<T>
+ * @tparam T Value type
+ * @note Handles both single values and arrays for each key
+ */
+  template <typename T> struct Read<MultiMap<T>> {
+    inline void operator()(const Value& value, MultiMap<T>* object) const {
+      if (value.is_null()) [[unlikely]] {
+        object->clear();
+      } else if (value.is_object()) [[likely]] {
+        const boost::json::object& obj = value.as_object();
+        object->clear();
+
+        for (const auto& item : obj) {
+          const String key = String(item.key());
+
+          if (item.value().is_array()) {
+            // Multiple values for this key
+            const boost::json::array& arr = item.value().as_array();
+            for (const auto& arr_item : arr) {
+              T temp;
+              Read<T>{}(arr_item, &temp);
+              object->emplace(key, std::move(temp));
+            }
+          } else {
+            // Single value for this key
+            T temp;
+            Read<T>{}(item.value(), &temp);
+            object->emplace(key, std::move(temp));
+          }
+        }
+      } else {
+        throw_type_mismatch("object", value);
+      }
+    }
+  };
+
+  /**
+ * @brief Specialization for MultiDict<T>
+ * @tparam T Value type
+ * @note Handles both single values and arrays for each key
+ */
+  template <typename T> struct Read<MultiDict<T>> {
+    inline void operator()(const Value& value, MultiDict<T>* object) const {
+      if (value.is_null()) [[unlikely]] {
+        object->clear();
+      } else if (value.is_object()) [[likely]] {
+        const boost::json::object& obj = value.as_object();
+        object->clear();
+
+        for (const auto& item : obj) {
+          const String key = String(item.key());
+
+          if (item.value().is_array()) {
+            // Multiple values for this key
+            const boost::json::array& arr = item.value().as_array();
+            for (const auto& arr_item : arr) {
+              T temp;
+              Read<T>{}(arr_item, &temp);
+              object->emplace(key, std::move(temp));
+            }
+          } else {
+            // Single value for this key
+            T temp;
+            Read<T>{}(item.value(), &temp);
+            object->emplace(key, std::move(temp));
+          }
+        }
+      } else {
+        throw_type_mismatch("object", value);
+      }
+    }
+  };
+
+  /**
+ * @brief Specialization for Pair<T>
+ * @tparam T Value type
+ * @note Expects JSON object with "key" and "value" fields
+ */
+  template <typename T> struct Read<Pair<T>> {
+    inline void operator()(const Value& value, Pair<T>* object) const {
+      if (value.is_null()) [[unlikely]] {
+        object->first.clear();
+        object->second = T{};
+      } else if (value.is_object()) [[likely]] {
+        const boost::json::object& obj = value.as_object();
+
+        // Read key field
+        auto key_it = obj.find("key");
+        if (key_it == obj.end()) {
+          throw_field_missing("key");
+        }
+        if (!key_it->value().is_string()) {
+          throw_type_mismatch("string for key field", key_it->value());
+        }
+        object->first = String(key_it->value().as_string());
+
+        // Read value field
+        auto value_it = obj.find("value");
+        if (value_it == obj.end()) {
+          throw_field_missing("value");
+        }
+        Read<T>{}(value_it->value(), &object->second);
+      } else {
+        throw_type_mismatch("object", value);
+      }
+    }
+  };
+
+  /**
  * @brief Specialization for Dict<T>
  * @tparam T Value type
  */
@@ -995,15 +1320,13 @@ namespace json {
     inline void operator()(const Value& value, Array<T, N>* object) const {
       if (value.is_null()) [[unlikely]] {
         // For null values, we can't clear a fixed-size array, so we throw an error
-        throw std::runtime_error("Cannot deserialize null value into Array - array size is fixed");
+        throw_array_null();
       } else if (value.is_array()) [[likely]] {
         const boost::json::array& arr = value.as_array();
 
         // Check that the JSON array size matches the Array size
         if (arr.size() != N) {
-          throw std::runtime_error("Array size mismatch: JSON array has " +
-                                   std::to_string(arr.size()) + " elements, but Array expects " +
-                                   std::to_string(N) + " elements");
+          throw_array_size_mismatch(arr.size(), N);
         }
 
         // Deserialize each element

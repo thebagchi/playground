@@ -1,14 +1,8 @@
-#include <array>
-#include <boost/json.hpp>
-#include <cstdint>
 #include <iomanip>
 #include <iostream>
-#include <memory>
-#include <optional>
 #include <tuple>
 
-#include "json.h"
-#include "typing.h"
+#include "json_all.h"
 
 // using namespace json;
 
@@ -382,6 +376,98 @@ void encode_decode_map() {
   }
 }
 
+void encode_decode_multimap() {
+  try {
+    // Create multimap with duplicate keys
+    MultiMap<String> original_multimap;
+    original_multimap.insert({ "fruits", "apple" });
+    original_multimap.insert({ "fruits", "banana" });
+    original_multimap.insert({ "fruits", "cherry" });
+    original_multimap.insert({ "colors", "red" });
+    original_multimap.insert({ "colors", "blue" });
+    original_multimap.insert({ "numbers", "42" });
+
+    MultiMap<String> decoded_multimap;
+
+    // Marshal to JSON
+    boost::json::value json_value = json::Marshal(original_multimap);
+    std::cout << "Encoded multimap JSON: " << json_value << std::endl;
+
+    // Marshal to JSON string
+    String json_string = json::MarshalToString(original_multimap);
+    std::cout << "Encoded multimap JSON string: " << json_string << std::endl;
+
+    // Unmarshal back to multimap from string
+    json::UnmarshalFromString(json_string, decoded_multimap);
+
+    // Display decoded results
+    std::cout << "Decoded multimap:" << std::endl;
+    std::cout << "  Original: {";
+    for (auto it = original_multimap.begin(); it != original_multimap.end(); ++it) {
+      std::cout << "\"" << it->first << "\": \"" << it->second << "\"";
+      if (std::next(it) != original_multimap.end()) {
+        std::cout << ", ";
+      }
+    }
+    std::cout << "}" << std::endl;
+
+    std::cout << "  Decoded:  {";
+    for (auto it = decoded_multimap.begin(); it != decoded_multimap.end(); ++it) {
+      std::cout << "\"" << it->first << "\": \"" << it->second << "\"";
+      if (std::next(it) != decoded_multimap.end()) {
+        std::cout << ", ";
+      }
+    }
+    std::cout << "}" << std::endl;
+
+    std::cout << "  Match: " << (original_multimap == decoded_multimap ? "Yes" : "No") << std::endl;
+
+  } catch (const std::exception& e) {
+    std::cout << "Error in encode_decode_multimap: " << e.what() << std::endl;
+  }
+}
+
+void encode_decode_pair() {
+  try {
+    // Create pair with string key and integer value
+    Pair<Int64> original_pair = { "age", 30 };
+
+    Pair<Int64> decoded_pair;
+
+    // Marshal to JSON
+    boost::json::value json_value = json::Marshal(original_pair);
+    std::cout << "Encoded pair JSON: " << json_value << std::endl;
+
+    // Marshal to JSON string
+    String json_string = json::MarshalToString(original_pair);
+    std::cout << "Encoded pair JSON string: " << json_string << std::endl;
+
+    // Unmarshal back to pair from string
+    json::UnmarshalFromString(json_string, decoded_pair);
+
+    // Display decoded results
+    std::cout << "Decoded pair:" << std::endl;
+    std::cout << "  Original: {\"" << original_pair.first << "\": " << original_pair.second << "}"
+              << std::endl;
+    std::cout << "  Decoded:  {\"" << decoded_pair.first << "\": " << decoded_pair.second << "}"
+              << std::endl;
+    std::cout << "  Match: " << (original_pair == decoded_pair ? "Yes" : "No") << std::endl;
+
+    // Test with complex type
+    Pair<Vector<String>> complex_pair = { "tags", { "c++", "json", "boost" } };
+    boost::json::value complex_json = json::Marshal(complex_pair);
+    std::cout << "Encoded complex pair JSON: " << complex_json << std::endl;
+
+    Pair<Vector<String>> decoded_complex_pair;
+    json::UnmarshalFromString(json::MarshalToString(complex_pair), decoded_complex_pair);
+    std::cout << "  Complex pair match: " << (complex_pair == decoded_complex_pair ? "Yes" : "No")
+              << std::endl;
+
+  } catch (const std::exception& e) {
+    std::cout << "Error in encode_decode_pair: " << e.what() << std::endl;
+  }
+}
+
 void encode_decode_optional() {
   try {
     // Create optional string (with value)
@@ -461,6 +547,55 @@ void encode_decode_byte_array() {
   }
 }
 
+void encode_decode_byte_array_fixed() {
+  try {
+    // Create fixed-size byte array with some sample data (12 bytes)
+    ByteArray<12> original_bytes = { std::byte{ 0x48 }, std::byte{ 0x65 }, std::byte{ 0x6C },
+                                     std::byte{ 0x6C }, std::byte{ 0x6F }, std::byte{ 0x20 },
+                                     std::byte{ 0x57 }, std::byte{ 0x6F }, std::byte{ 0x72 },
+                                     std::byte{ 0x6C }, std::byte{ 0x64 }, std::byte{ 0x21 } };
+    ByteArray<12> decoded_bytes{};
+
+    // Marshal to JSON
+    boost::json::value json_value = json::Marshal(original_bytes);
+    std::cout << "Encoded fixed-size byte array JSON: " << json_value << std::endl;
+
+    // Marshal to JSON string
+    String json_string = json::MarshalToString(original_bytes);
+    std::cout << "Encoded fixed-size byte array JSON string: " << json_string << std::endl;
+
+    // Unmarshal back to byte array from string
+    json::UnmarshalFromString(json_string, decoded_bytes);
+
+    // Display decoded results
+    std::cout << "Decoded fixed-size byte array:" << std::endl;
+    std::cout << "  Original: [";
+    for (size_t i = 0; i < original_bytes.size(); ++i) {
+      std::cout << "0x" << std::hex << std::setw(2) << std::setfill('0')
+                << static_cast<int>(original_bytes[i]);
+      if (i < original_bytes.size() - 1) {
+        std::cout << ", ";
+      }
+    }
+    std::cout << "]" << std::endl;
+
+    std::cout << "  Decoded:  [";
+    for (size_t i = 0; i < decoded_bytes.size(); ++i) {
+      std::cout << "0x" << std::hex << std::setw(2) << std::setfill('0')
+                << static_cast<int>(decoded_bytes[i]);
+      if (i < decoded_bytes.size() - 1) {
+        std::cout << ", ";
+      }
+    }
+    std::cout << "]" << std::endl;
+
+    std::cout << "  Match: " << (original_bytes == decoded_bytes ? "Yes" : "No") << std::endl;
+
+  } catch (const std::exception& e) {
+    std::cout << "Error in encode_decode_byte_array_fixed: " << e.what() << std::endl;
+  }
+}
+
 void encode_decode_arbitrary() {
   try {
     // Create arbitrary JSON value (complex object)
@@ -517,8 +652,11 @@ int main(int argc, char* argv[]) {
     encode_decode_array();
     encode_decode_list();
     encode_decode_map();
+    encode_decode_multimap();
+    encode_decode_pair();
     encode_decode_optional();
     encode_decode_byte_array();
+    encode_decode_byte_array_fixed();
     encode_decode_arbitrary();
   } catch (const std::exception& e) {
     std::cerr << "Error in main: " << e.what() << std::endl;
