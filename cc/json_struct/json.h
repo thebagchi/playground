@@ -782,12 +782,15 @@ namespace json {
       }
 
       boost::json::array arr(out->storage());
-      arr.reserve(object->size());
 
-      for (const auto& item : *object) {
-        Value temp(out->storage());
-        Write<T>{}(&item, &temp);
-        arr.emplace_back(std::move(temp));
+      if (!object->empty()) [[likely]] {
+        arr.reserve(object->size());
+
+        for (const auto& item : *object) {
+          Value temp(out->storage());
+          Write<T>{}(&item, &temp);
+          arr.emplace_back(std::move(temp));
+        }
       }
 
       *out = std::move(arr);
@@ -810,12 +813,15 @@ namespace json {
       }
 
       boost::json::array arr(out->storage());
-      arr.reserve(object->size());
 
-      for (const auto& item : *object) {
-        Value temp(out->storage());
-        Write<T>{}(&item, &temp);
-        arr.emplace_back(std::move(temp));
+      if (!object->empty()) [[likely]] {
+        arr.reserve(object->size());
+
+        for (const auto& item : *object) {
+          Value temp(out->storage());
+          Write<T>{}(&item, &temp);
+          arr.emplace_back(std::move(temp));
+        }
       }
 
       *out = std::move(arr);
@@ -834,12 +840,15 @@ namespace json {
       }
 
       boost::json::object obj(out->storage());
-      obj.reserve(object->size()); // Pre-allocate space for better performance
 
-      for (const auto& item : *object) {
-        Value temp(out->storage());
-        Write<T>{}(&item.second, &temp);
-        obj.emplace(item.first, std::move(temp));
+      if (!object->empty()) [[likely]] {
+        obj.reserve(object->size()); // Pre-allocate space for better performance
+
+        for (const auto& item : *object) {
+          Value temp(out->storage());
+          Write<T>{}(&item.second, &temp);
+          obj.emplace(item.first, std::move(temp));
+        }
       }
 
       *out = std::move(obj);
@@ -858,17 +867,24 @@ namespace json {
         return;
       }
 
+      if (object->empty()) [[unlikely]] {
+        *out = boost::json::object(out->storage());
+        return;
+      }
+
       boost::json::object obj(out->storage());
 
-      // Group values by key
-      boost::json::string current_key(out->storage());
+      // Group values by key - use string_view for comparison to avoid copies
+      std::string_view current_key;
       boost::json::array current_array(out->storage());
 
       for (const auto& item : *object) {
-        if (current_key.empty()) {
+        std::string_view item_key = item.first;
+
+        if (current_key.empty()) [[unlikely]] {
           // First item
-          current_key = boost::json::string(item.first, out->storage());
-        } else if (current_key != item.first) {
+          current_key = item_key;
+        } else if (current_key != item_key) [[unlikely]] {
           // Key changed - emit previous key's values
           if (current_array.size() == 1) {
             // Single value - store directly
@@ -877,8 +893,8 @@ namespace json {
             // Multiple values - store as array
             obj.emplace(current_key, std::move(current_array));
           }
-          current_array = boost::json::array(out->storage());
-          current_key = boost::json::string(item.first, out->storage());
+          current_array.clear();
+          current_key = item_key;
         }
 
         // Add current value to array
@@ -888,12 +904,10 @@ namespace json {
       }
 
       // Emit last key's values
-      if (!current_key.empty()) {
-        if (current_array.size() == 1) {
-          obj.emplace(current_key, std::move(current_array[0]));
-        } else {
-          obj.emplace(current_key, std::move(current_array));
-        }
+      if (current_array.size() == 1) {
+        obj.emplace(current_key, std::move(current_array[0]));
+      } else {
+        obj.emplace(current_key, std::move(current_array));
       }
 
       *out = std::move(obj);
@@ -912,18 +926,21 @@ namespace json {
         return;
       }
 
+      if (object->empty()) [[unlikely]] {
+        *out = boost::json::object(out->storage());
+        return;
+      }
+
       boost::json::object obj(out->storage());
 
-      // Build a map of keys to their values
-      std::unordered_map<boost::json::string, boost::json::array> key_values;
+      // Build a map of keys to their values using string_view for efficient lookups
+      std::unordered_map<std::string_view, boost::json::array> key_values;
 
       for (const auto& item : *object) {
-        auto it = key_values.find(boost::json::string(item.first, out->storage()));
-        if (it == key_values.end()) {
-          it = key_values
-                   .emplace(boost::json::string(item.first, out->storage()),
-                            boost::json::array(out->storage()))
-                   .first;
+        std::string_view key_view = item.first;
+        auto it = key_values.find(key_view);
+        if (it == key_values.end()) [[unlikely]] {
+          it = key_values.emplace(key_view, boost::json::array(out->storage())).first;
         }
 
         Value temp(out->storage());
@@ -932,6 +949,7 @@ namespace json {
       }
 
       // Emit all keys
+      obj.reserve(key_values.size());
       for (auto& kv : key_values) {
         if (kv.second.size() == 1) {
           // Single value - store directly
@@ -985,12 +1003,15 @@ namespace json {
       }
 
       boost::json::object obj(out->storage());
-      obj.reserve(object->size()); // Pre-allocate space for better performance
 
-      for (const auto& item : *object) {
-        Value temp(out->storage());
-        Write<T>{}(&item.second, &temp);
-        obj.emplace(item.first, std::move(temp));
+      if (!object->empty()) [[likely]] {
+        obj.reserve(object->size()); // Pre-allocate space for better performance
+
+        for (const auto& item : *object) {
+          Value temp(out->storage());
+          Write<T>{}(&item.second, &temp);
+          obj.emplace(item.first, std::move(temp));
+        }
       }
 
       *out = std::move(obj);
@@ -1363,9 +1384,7 @@ namespace json {
       if (!value.is_string()) [[unlikely]] {
         throw_type_mismatch("string", value);
       }
-      const auto& str = value.as_string();
-      object->reserve(str.size());
-      *object = str;
+      *object = value.as_string();
     }
   };
 
@@ -1580,7 +1599,7 @@ namespace json {
         for (const auto& item : obj) {
           T temp;
           Read<T>{}(item.value(), &temp);
-          object->emplace(boost::json::string(item.key(), value.storage()), std::move(temp));
+          object->emplace(String(item.key()), std::move(temp));
         }
       } else {
         throw_type_mismatch("object", value);
@@ -1602,19 +1621,22 @@ namespace json {
         object->clear();
 
         for (const auto& item : obj) {
+          // Convert key once and reuse for all values
+          String key_str(item.key());
+
           if (item.value().is_array()) {
             // Multiple values for this key
             const boost::json::array& arr = item.value().as_array();
             for (const auto& arr_item : arr) {
               T temp;
               Read<T>{}(arr_item, &temp);
-              object->emplace(boost::json::string(item.key(), value.storage()), std::move(temp));
+              object->emplace(key_str, std::move(temp));
             }
           } else {
             // Single value for this key
             T temp;
             Read<T>{}(item.value(), &temp);
-            object->emplace(boost::json::string(item.key(), value.storage()), std::move(temp));
+            object->emplace(key_str, std::move(temp));
           }
         }
       } else {
@@ -1637,19 +1659,22 @@ namespace json {
         object->clear();
 
         for (const auto& item : obj) {
+          // Convert key once and reuse for all values
+          String key_str(item.key());
+
           if (item.value().is_array()) {
             // Multiple values for this key
             const boost::json::array& arr = item.value().as_array();
             for (const auto& arr_item : arr) {
               T temp;
               Read<T>{}(arr_item, &temp);
-              object->emplace(boost::json::string(item.key(), value.storage()), std::move(temp));
+              object->emplace(key_str, std::move(temp));
             }
           } else {
             // Single value for this key
             T temp;
             Read<T>{}(item.value(), &temp);
-            object->emplace(boost::json::string(item.key(), value.storage()), std::move(temp));
+            object->emplace(key_str, std::move(temp));
           }
         }
       } else {
@@ -1679,7 +1704,7 @@ namespace json {
         if (!key_it->value().is_string()) {
           throw_type_mismatch("string for key field", key_it->value());
         }
-        object->first = String(key_it->value().as_string());
+        object->first = key_it->value().as_string();
 
         // Read value field
         auto value_it = obj.find("value");
@@ -1709,7 +1734,7 @@ namespace json {
         for (const auto& item : obj) {
           T temp;
           Read<T>{}(item.value(), &temp);
-          object->emplace(boost::json::string(item.key(), value.storage()), std::move(temp));
+          object->emplace(String(item.key()), std::move(temp));
         }
       } else {
         throw_type_mismatch("object", value);
