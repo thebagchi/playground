@@ -121,7 +121,7 @@ struct Address {
       std::make_tuple(json::prop(&Address::street_, "street"),
                       json::prop(&Address::city_, "city"),
                       json::prop(&Address::country_, "country"),
-                      json::prop<true>(&Address::postal_code_, "postal_code"));
+                      json::prop(&Address::postal_code_, "postal_code", json::NULLABLE));
 };
 
 struct Person {
@@ -134,8 +134,8 @@ struct Person {
   constexpr const static auto properties =
       std::make_tuple(json::prop(&Person::name_, "name"),
                       json::prop(&Person::age_, "age"),
-                      json::prop<true>(&Person::email_, "email"),
-                      json::prop<true>(&Person::address_, "address"),
+                      json::prop(&Person::email_, "email", json::NULLABLE),
+                      json::prop(&Person::address_, "address", json::NULLABLE),
                       json::prop(&Person::tags_, "tags"));
 };
 
@@ -166,13 +166,13 @@ struct WithShared {
 struct WithOptional {
   Optional<String> value_;
   constexpr const static auto properties =
-      std::make_tuple(json::prop<true>(&WithOptional::value_, "value"));
+      std::make_tuple(json::prop(&WithOptional::value_, "value", json::NULLABLE));
 };
 
 struct WithPointer {
   UniquePtr<String> value_;
   constexpr const static auto properties =
-      std::make_tuple(json::prop<true>(&WithPointer::value_, "value"));
+      std::make_tuple(json::prop(&WithPointer::value_, "value", json::NULLABLE));
 };
 
 // =============================================================================

@@ -50,8 +50,13 @@ namespace json {
   // Usage:
   //   struct MyStruct {
   //     UniquePtr<String> name;
-  //     constexpr static auto properties = std::make_tuple(
-  //       prop(&MyStruct::name, "name")
+  //     UniquePtr<String> email;
+  //   };
+  //
+  //   template<> struct STRUCT(MyStruct) {
+  //     static constexpr auto properties = std::make_tuple(
+  //       prop(&MyStruct::name, "name", REQUIRED),
+  //       prop(&MyStruct::email, "email", NULLABLE)
   //     );
   //   };
   //
@@ -80,30 +85,124 @@ namespace json {
    * @param member Pointer to member variable
    * @param name JSON field name
    */
-    constexpr Props(T C::*member, const char* name) : member_{ member }, name_{ name } {
+    constexpr Props(T C::* member, const char* name) : member_{ member }, name_{ name } {
       // Do Nothing ...
     }
 
     using Type = T;                             ///< The smart pointer type
-    T C::*member_;                              ///< Pointer to member variable
+    T C::* member_;                             ///< Pointer to member variable
     const char* name_;                          ///< JSON field name
     static constexpr bool nullable_ = Nullable; ///< Whether field can be null
     static constexpr bool required_ = Required; ///< Whether field is required
   };
 
+  // Convenience tag types for property options
+  struct nullable_tag {};
+  struct required_tag {};
+
+  static constexpr nullable_tag NULLABLE{};
+  static constexpr required_tag REQUIRED{};
+
   /**
  * @brief Helper function to create property descriptors
- * @tparam Nullable Whether this field can be null (default: false)
- * @tparam Required Whether this field is required (default: false)
  * @tparam C Class type (deduced)
  * @tparam T Member type (deduced)
  * @param member Pointer to member variable
  * @param name JSON field name
- * @return Props descriptor
+ * @return Props descriptor (optional field)
  */
-  template <bool Nullable = false, bool Required = false, typename C, typename T>
-  constexpr Props<C, T, Nullable, Required> prop(T C::*member, const char* name) {
-    return Props<C, T, Nullable, Required>{ member, name };
+  template <typename C, typename T>
+  constexpr Props<C, T, false, false> prop(T C::* member, const char* name) {
+    return Props<C, T, false, false>{ member, name };
+  }
+
+  /**
+ * @brief Helper function to create nullable property descriptors
+ * @tparam C Class type (deduced)
+ * @tparam T Member type (deduced)
+ * @param member Pointer to member variable
+ * @param name JSON field name
+ * @param tag Nullable tag
+ * @return Props descriptor (nullable field)
+ */
+  template <typename C, typename T>
+  constexpr Props<C, T, true, false> prop(T C::* member, const char* name, nullable_tag) {
+    return Props<C, T, true, false>{ member, name };
+  }
+
+  /**
+ * @brief Helper function to create required property descriptors
+ * @tparam C Class type (deduced)
+ * @tparam T Member type (deduced)
+ * @param member Pointer to member variable
+ * @param name JSON field name
+ * @param tag Required tag
+ * @return Props descriptor (required field)
+ */
+  template <typename C, typename T>
+  constexpr Props<C, T, false, true> prop(T C::* member, const char* name, required_tag) {
+    return Props<C, T, false, true>{ member, name };
+  }
+
+  /**
+ * @brief Helper function to create nullable and required property descriptors
+ * @tparam C Class type (deduced)
+ * @tparam T Member type (deduced)
+ * @param member Pointer to member variable
+ * @param name JSON field name
+ * @param nullable_tag Nullable tag
+ * @param required_tag Required tag
+ * @return Props descriptor (nullable and required field)
+ */
+  template <typename C, typename T>
+  constexpr Props<C, T, true, true>
+  prop(T C::* member, const char* name, nullable_tag, required_tag) {
+    return Props<C, T, true, true>{ member, name };
+  }
+
+  /**
+ * @brief STRUCT helper for defining JSON properties for structs/classes
+ * Provides a cleaner syntax for defining struct properties using a builder pattern
+ *
+ * Example usage:
+ *   struct MyStruct {
+ *     UniquePtr<String> name;
+ *     UniquePtr<int> age;
+ *   };
+ *
+ *   template<> struct STRUCT(MyStruct) {
+ *     static constexpr auto properties = std::make_tuple(
+ *       prop(&MyStruct::name, "name", REQUIRED),
+ *       prop(&MyStruct::email, "email", NULLABLE)
+ *     );
+ *   };
+ */
+
+  /**
+ * @brief Base template for STRUCT property definitions
+ * @tparam T The struct/class type
+ */
+  template <typename T> struct STRUCT {
+    // Default empty properties tuple - should be specialized
+    static constexpr auto properties = std::make_tuple();
+  };
+
+  /**
+ * @brief Trait to check if STRUCT<T> has properties
+ */
+  template <typename T, typename = void> struct has_struct_properties : std::false_type {};
+
+  template <typename T>
+  struct has_struct_properties<T, std::void_t<decltype(STRUCT<T>::properties)>> : std::true_type {};
+
+  template <typename T>
+  inline constexpr bool has_struct_properties_v = has_struct_properties<T>::value;
+
+  /**
+ * @brief Get properties tuple from STRUCT<T>::properties
+ */
+  template <typename T> constexpr auto get_properties_tuple() {
+    return STRUCT<T>::properties;
   }
 
   // =============================================================================
@@ -120,9 +219,22 @@ namespace json {
  * @tparam T The enum type
  */
   template <typename T> struct ENUM {
-    static constexpr bool case_insensitive = false;
     static constexpr EnumEncoding encoding = EnumEncoding::NUMBER;
-    static constexpr std::array names = std::array<std::string_view, 0>{};
+    static constexpr bool case_insensitive = false;
+    static constexpr std::array<std::string_view, 0> names{};
+  };
+
+  // -----------------------------------------------------------------------------
+  // Validation — fires at compile time if mismatch
+  // -----------------------------------------------------------------------------
+  template <typename Enum> struct enum_validator {
+    static constexpr std::size_t name_count = std::size(ENUM<Enum>::names);
+    static constexpr bool value = true;
+
+    static_assert((ENUM<Enum>::encoding == EnumEncoding::STRING && name_count > 0) ||
+                      (ENUM<Enum>::encoding == EnumEncoding::NUMBER && name_count == 0),
+                  "ENUM<T> validation failed: for STRING encoding, names array must not be empty; "
+                  "for NUMBER encoding, names array must be empty");
   };
 
   // =============================================================================
@@ -280,6 +392,49 @@ namespace json {
       }
       return true;
     }
+
+    // -----------------------------------------------------------------------------
+    // Build sorted array from array
+    // -----------------------------------------------------------------------------
+    template <typename Enum> constexpr auto make_sorted_names() {
+      if constexpr (ENUM<Enum>::encoding == EnumEncoding::NUMBER) {
+        return std::array<std::string_view, 0>{};
+      } else {
+        constexpr auto& arr = ENUM<Enum>::names;
+        constexpr std::size_t N = std::size(arr);
+        std::array<std::string_view, N> sorted_arr{};
+        for (std::size_t i = 0; i < N; ++i) {
+          sorted_arr[i] = arr[i];
+        }
+        // Bubble sort — N is tiny, compile-time only (manual swap to avoid std::swap)
+        for (std::size_t i = 0; i < N; ++i) {
+          for (std::size_t j = i + 1; j < N; ++j) {
+            if (sorted_arr[i] > sorted_arr[j]) {
+              auto temp = sorted_arr[i];
+              sorted_arr[i] = sorted_arr[j];
+              sorted_arr[j] = temp;
+            }
+          }
+        }
+        return sorted_arr;
+      }
+    }
+
+    template <typename Enum> constexpr auto sorted_names_v = make_sorted_names<Enum>();
+
+    // Case-insensitive comparison
+    constexpr bool iequal(std::string_view a, std::string_view b) {
+      if (a.size() != b.size()) {
+        return false;
+      }
+      for (std::size_t i = 0; i < a.size(); ++i) {
+        if (to_lower(a[i]) != to_lower(b[i])) {
+          return false;
+        }
+      }
+      return true;
+    }
+
   } // namespace detail
 
   // =============================================================================
@@ -457,6 +612,8 @@ namespace json {
 
     // Specialization for enums
     template <typename T> struct WriteEnum<T, true> {
+      static_assert(enum_validator<T>::value, "Invalid ENUM configuration");
+
       inline void operator()(const T* value, boost::json::value* out) const noexcept {
         if (!value) {
           *out = nullptr;
@@ -468,17 +625,8 @@ namespace json {
           *out = static_cast<std::underlying_type_t<T>>(*value);
         } else {
           // Serialize as string name
-          constexpr std::size_t N = ENUM<T>::names.size();
-          if constexpr (N > 0) {
-            const auto idx = static_cast<std::size_t>(*value);
-            if (idx < N) {
-              *out = std::string(ENUM<T>::names[idx]);
-            } else {
-              *out = nullptr;
-            }
-          } else {
-            *out = nullptr;
-          }
+          constexpr auto& names = ENUM<T>::names;
+          *out = std::string(names[static_cast<std::size_t>(*value)]);
         }
       }
     };
@@ -487,6 +635,56 @@ namespace json {
     template <typename T> struct WriteEnum<T, false> {
       inline void operator()(const T*, boost::json::value*) const {
         static_assert(false, "WriteEnum should only be used for enum types");
+      }
+    };
+
+    template <typename T, bool IsStruct = has_struct_properties_v<T>> struct WriteStruct;
+
+    // Specialization for structs
+    template <typename T> struct WriteStruct<T, true> {
+      inline void operator()(const T* object, boost::json::value* out) const {
+        boost::json::object obj(out->storage());
+        constexpr auto props_tuple = get_properties_tuple<T>();
+        static constexpr auto props = std::tuple_size_v<decltype(props_tuple)>;
+        obj.reserve(props); // Pre-allocate space for better performance
+
+        for_each(std::make_index_sequence<props>{}, [&](auto i) {
+          constexpr auto property = std::get<i>(props_tuple);
+          using Type = typename decltype(property)::Type;
+          const auto& ptr = object->*(property.member_);
+
+          // Extract the underlying value type from optional containers (unique_ptr,
+          // shared_ptr, optional) by removing const/reference qualifiers and
+          // getting the contained type
+          using M = std::remove_reference_t<decltype(ptr)>;
+          using B = std::remove_const_t<M>;
+          using P = opt_t<B>;
+          if constexpr (is_optional_v<B>) {
+            if (ptr) [[likely]] {
+              boost::json::value temp(out->storage());
+              ::json::Write<P>{}(&*ptr, &temp);
+              obj.emplace(property.name_, std::move(temp));
+            } else if (property.nullable_) [[likely]] {
+              obj.emplace(property.name_, nullptr);
+            } else {
+              throw_field_null_not_nullable(property.name_);
+            }
+          } else {
+            boost::json::value temp(out->storage());
+            ::json::Write<P>{}(&ptr, &temp);
+            obj.emplace(property.name_, std::move(temp));
+          }
+        });
+
+        *out = std::move(obj);
+      }
+    };
+
+    // Non-specialization for non-structs
+    template <typename T> struct WriteStruct<T, false> {
+      inline void operator()(const T*, boost::json::value*) const {
+        static_assert(has_struct_properties_v<T>,
+                      "T must have STRUCT<T> specialization for serialization");
       }
     };
   } // namespace detail
@@ -510,45 +708,16 @@ namespace json {
         // Delegate to enum handler
         detail::WriteEnum<T>{}(object, out);
       } else {
-        // Struct serialization
-        static_assert(has_properties_v<T>,
-                      "T must have a static properties member for serialization");
-        boost::json::object obj(out->storage());
-        static constexpr auto props = std::tuple_size_v<decltype(T::properties)>;
-        obj.reserve(props); // Pre-allocate space for better performance
-
-        for_each(std::make_index_sequence<props>{}, [&](auto i) {
-          constexpr auto property = std::get<i>(T::properties);
-          using Type = typename decltype(property)::Type;
-          const auto& ptr = object->*(property.member_);
-
-          // Extract the underlying value type from optional containers (unique_ptr,
-          // shared_ptr, optional) by removing const/reference qualifiers and
-          // getting the contained type
-          using M = std::remove_reference_t<decltype(ptr)>;
-          using B = std::remove_const_t<M>;
-          using P = opt_t<B>;
-          if constexpr (is_optional_v<B>) {
-            if (ptr) [[likely]] {
-              boost::json::value temp(out->storage());
-              Write<P>{}(&*ptr, &temp);
-              obj.emplace(property.name_, std::move(temp));
-            } else if (property.nullable_) [[likely]] {
-              obj.emplace(property.name_, nullptr);
-            } else {
-              throw_field_null_not_nullable(property.name_);
-            }
-          } else {
-            boost::json::value temp(out->storage());
-            Write<P>{}(&ptr, &temp);
-            obj.emplace(property.name_, std::move(temp));
-          }
-        });
-
-        *out = std::move(obj);
+        // Delegate to struct handler
+        detail::WriteStruct<T>{}(object, out);
       }
     }
   };
+
+  // =============================================================================
+  // Generic Enum Handler (for any enum type)
+  // =============================================================================
+  // This specialization automatically handles any enum type using the ENUM<T> metadata
 
   // =============================================================================
   // Base64 Support for Binary Data
@@ -936,69 +1105,8 @@ namespace json {
   // JSON Deserialization Templates
   // =============================================================================
 
-  // =============================================================================
-  // Generic Enum Handler for Read (for any enum type)
-  // =============================================================================
-
-  namespace detail {
-    template <typename T, bool IsEnum = std::is_enum_v<T>> struct ReadEnum;
-
-    // Specialization for enums
-    template <typename T> struct ReadEnum<T, true> {
-      inline void operator()(const boost::json::value& value, T* object) const {
-        if (value.is_null()) {
-          *object = T{};
-          return;
-        }
-
-        if constexpr (ENUM<T>::encoding == EnumEncoding::NUMBER) {
-          // Deserialize from integer value
-          if (value.is_int64()) {
-            *object = static_cast<T>(value.as_int64());
-          } else if (value.is_uint64()) {
-            *object = static_cast<T>(value.as_uint64());
-          } else {
-            throw_type_mismatch("integer for enum", value);
-          }
-        } else {
-          // Deserialize from string name
-          if (!value.is_string()) {
-            throw_type_mismatch("string for enum name", value);
-          }
-
-          std::string_view input = value.as_string();
-          constexpr auto& names = ENUM<T>::names;
-          constexpr std::size_t N = names.size();
-
-          if constexpr (N > 0) {
-            for (std::size_t i = 0; i < N; ++i) {
-              bool matches = false;
-              if constexpr (ENUM<T>::case_insensitive) {
-                matches = detail::case_insensitive_equal(names[i], input);
-              } else {
-                matches = (names[i] == input);
-              }
-
-              if (matches) {
-                *object = static_cast<T>(i);
-                return;
-              }
-            }
-            throw std::runtime_error("Invalid enum string value");
-          } else {
-            throw std::runtime_error("Enum has no string names defined");
-          }
-        }
-      }
-    };
-
-    // Non-specialization for non-enums (should not be called)
-    template <typename T> struct ReadEnum<T, false> {
-      inline void operator()(const boost::json::value&, T*) const {
-        static_assert(false, "ReadEnum should only be used for enum types");
-      }
-    };
-  } // namespace detail
+  template <typename T, bool IsEnum = std::is_enum_v<T>> struct ReadEnum;
+  template <typename T, bool IsStruct = has_struct_properties_v<T>> struct ReadStruct;
 
   /**
  * @brief Primary template for JSON deserialization
@@ -1013,78 +1121,182 @@ namespace json {
     inline void operator()(const boost::json::value& value, T* object) const {
       if constexpr (std::is_enum_v<T>) {
         // Delegate to enum handler
-        detail::ReadEnum<T>{}(value, object);
+        ReadEnum<T>{}(value, object);
       } else {
-        // Struct deserialization
-        if (!value.is_object()) [[unlikely]] {
-          throw_invalid_json_object();
+        // Delegate to struct handler
+        ReadStruct<T>{}(value, object);
+      }
+    }
+  };
+
+  // =============================================================================
+  // Generic Enum Handler for Read (for any enum type)
+  // =============================================================================
+
+  // Specialization for enums
+  template <typename T> struct ReadEnum<T, true> {
+    static_assert(enum_validator<T>::value, "Invalid ENUM configuration");
+
+    inline void operator()(const boost::json::value& value, T* object) const {
+      if (value.is_null()) {
+        *object = T{};
+        return;
+      }
+
+      if constexpr (ENUM<T>::encoding == EnumEncoding::NUMBER) {
+        // Deserialize from integer value
+        if (value.is_int64()) {
+          *object = static_cast<T>(value.as_int64());
+        } else if (value.is_uint64()) {
+          *object = static_cast<T>(value.as_uint64());
+        } else {
+          throw_type_mismatch("integer for enum", value);
+        }
+      } else {
+        // Deserialize from string name
+        if (!value.is_string()) {
+          throw_type_mismatch("string for enum name", value);
         }
 
-        const boost::json::object& obj = value.as_object();
-        static constexpr auto props = std::tuple_size_v<decltype(T::properties)>;
+        std::string_view input = value.as_string();
+        const auto& sorted_names = detail::sorted_names_v<T>;
+        const auto& original_names = ENUM<T>::names;
 
-        for_each(std::make_index_sequence<props>{}, [&](auto i) {
-          constexpr auto property = std::get<i>(T::properties);
-          using Type = typename decltype(property)::Type;
+        // Binary search in sorted names
+        auto it = std::lower_bound(sorted_names.begin(),
+                                   sorted_names.end(),
+                                   input,
+                                   [](std::string_view a, std::string_view b) {
+                                     if (ENUM<T>::case_insensitive) {
+                                       std::size_t n = std::min(a.size(), b.size());
+                                       for (std::size_t i = 0; i < n; ++i) {
+                                         char ca = detail::to_lower(a[i]);
+                                         char cb = detail::to_lower(b[i]);
+                                         if (ca != cb) {
+                                           return ca < cb;
+                                         }
+                                       }
+                                       return a.size() < b.size();
+                                     }
+                                     return a < b;
+                                   });
 
-          // Check if JSON object contains this field
-          auto it = obj.find(property.name_);
-          if (it != obj.end()) [[likely]] {
-            const auto& val = it->value();
-            auto& ptr = object->*(property.member_);
-            using M = std::remove_reference_t<decltype(ptr)>;
-            using B = std::remove_const_t<M>;
-            using P = opt_t<B>;
+        if (it == sorted_names.end() ||
+            (ENUM<T>::case_insensitive ? !detail::iequal(*it, input) : *it != input)) {
+          throw std::runtime_error(std::string("Invalid enum value: ") + std::string(input));
+        }
 
-            if constexpr (is_optional_v<B>) {
-              if (val.is_null()) [[unlikely]] {
-                if (property.nullable_) [[likely]] {
-                  if constexpr (std::is_same_v<std::decay_t<decltype(ptr)>, std::optional<P>>) {
-                    ptr = std::nullopt;
-                  } else {
-                    ptr = nullptr;
-                  }
-                } else [[unlikely]] {
-                  throw_field_null_not_nullable(property.name_);
-                }
-              } else [[likely]] {
-                if constexpr (std::is_same_v<std::decay_t<decltype(ptr)>, std::optional<P>>) {
-                  P temp;
-                  Read<P>{}(val, &temp);
-                  ptr = std::move(temp);
-                } else {
-                  ptr = MAKE_UNIQUE(P);
-                  Read<P>{}(val, ptr.get());
-                }
-              }
-            } else {
-              if (val.is_null()) [[unlikely]] {
-                throw_field_null_not_nullable(property.name_);
-              } else [[likely]] {
-                Read<P>{}(val, &ptr);
-              }
-            }
-          } else [[unlikely]] {
-            // Field missing
-            if (property.nullable_) [[likely]] {
-              auto& ptr = object->*(property.member_);
-              using M = std::remove_reference_t<decltype(ptr)>;
-              using B = std::remove_const_t<M>;
-              if constexpr (is_optional_v<B>) {
-                using P = opt_t<B>;
+        // Find the original index in the unsorted names array
+        std::size_t sorted_index = std::distance(sorted_names.begin(), it);
+        std::string_view found_name = sorted_names[sorted_index];
+
+        // Find the position in original names array
+        for (std::size_t i = 0; i < original_names.size(); ++i) {
+          if (ENUM<T>::case_insensitive ? detail::iequal(original_names[i], found_name) :
+                                          original_names[i] == found_name) {
+            *object = static_cast<T>(i);
+            return;
+          }
+        }
+
+        // This should never happen if arrays are consistent
+        throw std::runtime_error(std::string("Internal error: could not map enum name: ") +
+                                 std::string(input));
+      }
+    }
+  };
+
+  // Non-specialization for non-enums (should not be called)
+  template <typename T> struct ReadEnum<T, false> {
+    inline void operator()(const boost::json::value&, T*) const {
+      static_assert(false, "ReadEnum should only be used for enum types");
+    }
+  };
+
+  // Specialization for structs
+  template <typename T> struct ReadStruct<T, true> {
+    inline void operator()(const boost::json::value& value, T* object) const {
+      if (!value.is_object()) [[unlikely]] {
+        throw_invalid_json_object();
+      }
+
+      const boost::json::object& obj = value.as_object();
+      constexpr auto props_tuple = get_properties_tuple<T>();
+      static constexpr auto props = std::tuple_size_v<decltype(props_tuple)>;
+
+      for_each(std::make_index_sequence<props>{}, [&](auto i) {
+        constexpr auto property = std::get<i>(props_tuple);
+        using Type = typename decltype(property)::Type;
+
+        // Check if JSON object contains this field
+        auto it = obj.find(property.name_);
+        if (it != obj.end()) [[likely]] {
+          const auto& val = it->value();
+          auto& ptr = object->*(property.member_);
+          using M = std::remove_reference_t<decltype(ptr)>;
+          using B = std::remove_const_t<M>;
+          using P = opt_t<B>;
+
+          if constexpr (is_optional_v<B>) {
+            if (val.is_null()) [[unlikely]] {
+              if (property.nullable_) [[likely]] {
                 if constexpr (std::is_same_v<std::decay_t<decltype(ptr)>, std::optional<P>>) {
                   ptr = std::nullopt;
                 } else {
                   ptr = nullptr;
                 }
+              } else [[unlikely]] {
+                throw_field_null_not_nullable(property.name_);
               }
-              // No else: static_assert ensures nullable implies optional
-            } else {
-              throw_field_missing(property.name_);
+            } else [[likely]] {
+              if constexpr (std::is_same_v<std::decay_t<decltype(ptr)>, std::optional<P>>) {
+                P temp;
+                ::json::Read<P>{}(val, &temp);
+                ptr = std::move(temp);
+              } else {
+                if constexpr (std::is_same_v<B, UniquePtr<P>>) {
+                  ptr = MAKE_UNIQUE(P);
+                } else if constexpr (std::is_same_v<B, SharedPtr<P>>) {
+                  ptr = MAKE_SHARED(P);
+                }
+                ::json::Read<P>{}(val, ptr.get());
+              }
+            }
+          } else {
+            if (val.is_null()) [[unlikely]] {
+              throw_field_null_not_nullable(property.name_);
+            } else [[likely]] {
+              ::json::Read<P>{}(val, &ptr);
             }
           }
-        });
-      }
+        } else [[unlikely]] {
+          // Field missing
+          if (property.nullable_) [[likely]] {
+            auto& ptr = object->*(property.member_);
+            using M = std::remove_reference_t<decltype(ptr)>;
+            using B = std::remove_const_t<M>;
+            if constexpr (is_optional_v<B>) {
+              using P = opt_t<B>;
+              if constexpr (std::is_same_v<std::decay_t<decltype(ptr)>, std::optional<P>>) {
+                ptr = std::nullopt;
+              } else {
+                ptr = nullptr;
+              }
+            }
+            // No else: static_assert ensures nullable implies optional
+          } else {
+            throw_field_missing(property.name_);
+          }
+        }
+      });
+    }
+  };
+
+  // Non-specialization for non-structs
+  template <typename T> struct ReadStruct<T, false> {
+    inline void operator()(const boost::json::value&, T*) const {
+      static_assert(has_struct_properties_v<T>,
+                    "T must have STRUCT<T> specialization for deserialization");
     }
   };
 

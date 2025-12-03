@@ -21,6 +21,10 @@ public:
                                                            json::prop(&Person::email_, "email"));
 };
 
+template <> struct json::STRUCT<Person> {
+  static constexpr auto properties = Person::properties;
+};
+
 BOOST_AUTO_TEST_CASE(TEST_ERROR_TYPE_MISMATCH) {
   std::cout << "==> TEST_ERROR_TYPE_MISMATCH" << std::endl;
 

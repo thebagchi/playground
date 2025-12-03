@@ -23,7 +23,11 @@ public:
       std::make_tuple(json::prop(&Person::name_, "name"),
                       json::prop(&Person::age_, "age"),
                       json::prop(&Person::city_, "city"),
-                      json::prop<true>(&Person::email_, "email"));
+                      json::prop(&Person::email_, "email", json::NULLABLE));
+};
+
+template <> struct json::STRUCT<Person> {
+  static constexpr auto properties = Person::properties;
 };
 
 using PersonVector = Vector<Person>;
@@ -53,6 +57,10 @@ public:
   constexpr const static auto properties = std::make_tuple(json::prop(&Arbitrary::value_, "value"));
 };
 
+template <> struct json::STRUCT<Arbitrary> {
+  static constexpr auto properties = Arbitrary::properties;
+};
+
 using ArbitraryUniquePtrStruct = UniquePtr<Arbitrary>;
 using ArbitrarySharedPtrStruct = SharedPtr<Arbitrary>;
 using ArbitraryOptionalStruct = Optional<Arbitrary>;
@@ -65,12 +73,20 @@ public:
       std::make_tuple(json::prop(&ArbitraryUniquePtr::value_, "value"));
 };
 
+template <> struct json::STRUCT<ArbitraryUniquePtr> {
+  static constexpr auto properties = ArbitraryUniquePtr::properties;
+};
+
 class ArbitrarySharedPtr {
 public:
   SharedPtr<Value> value_;
 public:
   constexpr const static auto properties =
       std::make_tuple(json::prop(&ArbitrarySharedPtr::value_, "value"));
+};
+
+template <> struct json::STRUCT<ArbitrarySharedPtr> {
+  static constexpr auto properties = ArbitrarySharedPtr::properties;
 };
 
 class ArbitraryOptional {
@@ -81,12 +97,20 @@ public:
       std::make_tuple(json::prop(&ArbitraryOptional::value_, "value"));
 };
 
+template <> struct json::STRUCT<ArbitraryOptional> {
+  static constexpr auto properties = ArbitraryOptional::properties;
+};
+
 class ArbitraryVector {
 public:
   ArbitraryList value_;
 public:
   constexpr const static auto properties =
       std::make_tuple(json::prop(&ArbitraryVector::value_, "value"));
+};
+
+template <> struct json::STRUCT<ArbitraryVector> {
+  static constexpr auto properties = ArbitraryVector::properties;
 };
 
 class ArbitraryDict {
@@ -97,12 +121,20 @@ public:
       std::make_tuple(json::prop(&ArbitraryDict::value_, "value"));
 };
 
+template <> struct json::STRUCT<ArbitraryDict> {
+  static constexpr auto properties = ArbitraryDict::properties;
+};
+
 class PersonList {
 public:
   std::unique_ptr<PersonVector> persons_;
 public:
   constexpr const static auto properties =
       std::make_tuple(json::prop(&PersonList::persons_, "persons"));
+};
+
+template <> struct json::STRUCT<PersonList> {
+  static constexpr auto properties = PersonList::properties;
 };
 
 class PersonListUniquePtr {
@@ -113,6 +145,10 @@ public:
       std::make_tuple(json::prop(&PersonListUniquePtr::persons_, "persons"));
 };
 
+template <> struct json::STRUCT<PersonListUniquePtr> {
+  static constexpr auto properties = PersonListUniquePtr::properties;
+};
+
 class PersonListSharedPtr {
 public:
   SharedPtr<PersonVectorSharedPtr> persons_;
@@ -121,12 +157,20 @@ public:
       std::make_tuple(json::prop(&PersonListSharedPtr::persons_, "persons"));
 };
 
+template <> struct json::STRUCT<PersonListSharedPtr> {
+  static constexpr auto properties = PersonListSharedPtr::properties;
+};
+
 class PersonListOptional {
 public:
   Optional<Vector<Optional<Person>>> persons_;
 public:
   constexpr const static auto properties =
       std::make_tuple(json::prop(&PersonListOptional::persons_, "persons"));
+};
+
+template <> struct json::STRUCT<PersonListOptional> {
+  static constexpr auto properties = PersonListOptional::properties;
 };
 
 class PersonShared {
@@ -140,7 +184,7 @@ public:
       std::make_tuple(json::prop(&PersonShared::name_, "name"),
                       json::prop(&PersonShared::age_, "age"),
                       json::prop(&PersonShared::city_, "city"),
-                      json::prop<true>(&PersonShared::email_, "email"));
+                      json::prop(&PersonShared::email_, "email", json::NULLABLE));
 };
 
 class PersonOptional {
@@ -154,7 +198,7 @@ public:
       std::make_tuple(json::prop(&PersonOptional::name_, "name"),
                       json::prop(&PersonOptional::age_, "age"),
                       json::prop(&PersonOptional::city_, "city"),
-                      json::prop<true>(&PersonOptional::email_, "email"));
+                      json::prop(&PersonOptional::email_, "email", json::NULLABLE));
 };
 
 class PersonScalars {
@@ -201,6 +245,34 @@ public:
 public:
   constexpr const static auto properties =
       std::make_tuple(json::prop(&PersonDictOptional::persons_, "persons"));
+};
+
+template <> struct json::STRUCT<PersonShared> {
+  static constexpr auto properties = PersonShared::properties;
+};
+
+template <> struct json::STRUCT<PersonOptional> {
+  static constexpr auto properties = PersonOptional::properties;
+};
+
+template <> struct json::STRUCT<PersonScalars> {
+  static constexpr auto properties = PersonScalars::properties;
+};
+
+template <> struct json::STRUCT<PersonDict> {
+  static constexpr auto properties = PersonDict::properties;
+};
+
+template <> struct json::STRUCT<PersonDictUniquePtr> {
+  static constexpr auto properties = PersonDictUniquePtr::properties;
+};
+
+template <> struct json::STRUCT<PersonDictSharedPtr> {
+  static constexpr auto properties = PersonDictSharedPtr::properties;
+};
+
+template <> struct json::STRUCT<PersonDictOptional> {
+  static constexpr auto properties = PersonDictOptional::properties;
 };
 
 BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_PERSON) {

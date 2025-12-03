@@ -123,13 +123,6 @@ using StoragePtr = boost::json::storage_ptr;
 /**
  * @brief Trait to check if a type has a static properties member
  */
-template <typename T, typename = void> struct has_properties : std::false_type {};
-
-template <typename T>
-struct has_properties<T, std::void_t<decltype(T::properties)>> : std::true_type {};
-
-template <typename T> inline constexpr bool has_properties_v = has_properties<T>::value;
-
 /**
  * @brief Trait to check if a type is optional (has operator bool)
  */

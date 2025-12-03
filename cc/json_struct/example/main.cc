@@ -2,9 +2,10 @@
 #include <iostream>
 #include <tuple>
 
-#include "json_all.h"
+#include "json.h"
+#include "typing.h"
 
-// using namespace json;
+using namespace json;
 
 class Person {
 public:
@@ -12,11 +13,13 @@ public:
   UniquePtr<UInt64> age_;
   SharedPtr<String> city_;
   Optional<String> email_;
-public:
-  constexpr const static auto properties = std::make_tuple(json::prop(&Person::name_, "name"),
-                                                           json::prop(&Person::age_, "age"),
-                                                           json::prop(&Person::city_, "city"),
-                                                           json::prop(&Person::email_, "email"));
+};
+
+template <> struct json::STRUCT<Person> {
+  static constexpr auto properties = std::make_tuple(prop(&Person::name_, "name"),
+                                                     prop(&Person::age_, "age"),
+                                                     prop(&Person::city_, "city"),
+                                                     prop(&Person::email_, "email"));
 };
 
 void encode_decode_struct() {
@@ -672,8 +675,10 @@ struct ApiResponse {
   String message_;
   HttpStatusCode code_;
   HttpStatus status_;
+};
 
-  constexpr static auto properties = std::make_tuple(json::prop(&ApiResponse::message_, "message"),
+template <> struct json::STRUCT<ApiResponse> {
+  static constexpr auto properties = std::make_tuple(json::prop(&ApiResponse::message_, "message"),
                                                      json::prop(&ApiResponse::code_, "code"),
                                                      json::prop(&ApiResponse::status_, "status"));
 };
@@ -696,8 +701,8 @@ void encode_decode_enum() {
     // Unmarshal back
     ApiResponse response1_decoded;
     json::UnmarshalFromString(json_string1, response1_decoded);
-    std::cout << "Decoded - Message: " << response1_decoded.message_
-              << ", Code: " << static_cast<int>(response1_decoded.code_)
+    std::cout << "Decoded - Message: " << response1_decoded.message_ << ", Code: " << std::dec
+              << static_cast<int>(response1_decoded.code_)
               << ", Status: " << static_cast<int>(response1_decoded.status_) << std::endl;
 
     // Example 2: Different status code (NOT FOUND)
@@ -712,8 +717,8 @@ void encode_decode_enum() {
 
     ApiResponse response2_decoded;
     json::UnmarshalFromString(json_string2, response2_decoded);
-    std::cout << "Decoded - Message: " << response2_decoded.message_
-              << ", Code: " << static_cast<int>(response2_decoded.code_)
+    std::cout << "Decoded - Message: " << response2_decoded.message_ << ", Code: " << std::dec
+              << static_cast<int>(response2_decoded.code_)
               << ", Status: " << static_cast<int>(response2_decoded.status_) << std::endl;
 
     // Example 3: Error response
@@ -728,8 +733,8 @@ void encode_decode_enum() {
 
     ApiResponse response3_decoded;
     json::UnmarshalFromString(json_string3, response3_decoded);
-    std::cout << "Decoded - Message: " << response3_decoded.message_
-              << ", Code: " << static_cast<int>(response3_decoded.code_)
+    std::cout << "Decoded - Message: " << response3_decoded.message_ << ", Code: " << std::dec
+              << static_cast<int>(response3_decoded.code_)
               << ", Status: " << static_cast<int>(response3_decoded.status_) << std::endl;
 
   } catch (const std::exception& e) {

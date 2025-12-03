@@ -90,10 +90,13 @@ foreach(HEADER ${ORDERED_HEADERS})
     file(READ "${HEADER}" HEADER_CONTENT)
     get_filename_component(HEADER_NAME ${HEADER} NAME)
     
-    # Remove include guards
-    string(REGEX REPLACE "#ifndef [A-Z0-9_]+\n" "" HEADER_CONTENT "${HEADER_CONTENT}")
-    string(REGEX REPLACE "#define [A-Z0-9_]+\n" "" HEADER_CONTENT "${HEADER_CONTENT}")
-    string(REGEX REPLACE "#endif // [A-Z0-9_]+" "" HEADER_CONTENT "${HEADER_CONTENT}")
+    # Remove include guards and trailing endif
+    # Match pattern: #ifndef GUARD_NAME followed optionally by #define GUARD_NAME VALUE
+    # string(REGEX REPLACE "#ifndef [A-Z0-9_]+\n(#define [A-Z0-9_]+ [A-Z0-9_]*\n)?" "" HEADER_CONTENT "${HEADER_CONTENT}")
+    # Remove orphaned #endif at end of file (they belong to the removed guards)
+    # string(REGEX REPLACE "\n#endif // [A-Z0-9_]+\n*$" "" HEADER_CONTENT "${HEADER_CONTENT}")
+    # Remove any remaining orphaned #endif from guard removal
+    # string(REGEX REPLACE "\n#endif\n*$" "" HEADER_CONTENT "${HEADER_CONTENT}")
     
     # Remove standard includes and local includes
     string(REGEX REPLACE "#include <[^>]+>\n" "" HEADER_CONTENT "${HEADER_CONTENT}")
