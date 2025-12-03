@@ -1471,11 +1471,11 @@ namespace json {
       const auto& str = value.as_string();
       const std::size_t max_decoded = base64::decoded_size(str.size());
       out->resize(max_decoded);
-      auto [decoded_size, input_size] = base64::decode(out->data(), str.data(), str.size());
-      if (decoded_size == 0 && !str.empty()) {
+      auto [decoded, consumed] = base64::decode(out->data(), str.data(), str.size());
+      if (consumed != str.size() || (decoded == 0 && !str.empty())) {
         throw_invalid_base64();
       }
-      out->resize(decoded_size);
+      out->resize(decoded);
     }
   };
 
@@ -1494,14 +1494,14 @@ namespace json {
       const auto& str = value.as_string();
 
       // Decode the base64 string directly into the array
-      auto [decoded_size, input_size] = base64::decode(out->data(), str.data(), str.size());
-      if (decoded_size == 0 && !str.empty()) {
+      auto [decoded, consumed] = base64::decode(out->data(), str.data(), str.size());
+      if (consumed != str.size() || (decoded == 0 && !str.empty())) {
         throw_invalid_base64();
       }
 
       // Verify that the decoded size matches the expected array size
-      if (decoded_size != N) {
-        throw_byte_array_size_mismatch(decoded_size, N);
+      if (decoded != N) {
+        throw_byte_array_size_mismatch(decoded, N);
       }
     }
   };
@@ -1580,7 +1580,7 @@ namespace json {
         for (const auto& item : obj) {
           T temp;
           Read<T>{}(item.value(), &temp);
-          object->emplace(boost::json::string_view(item.key()), std::move(temp));
+          object->emplace(boost::json::string(item.key(), value.storage()), std::move(temp));
         }
       } else {
         throw_type_mismatch("object", value);
@@ -1602,21 +1602,19 @@ namespace json {
         object->clear();
 
         for (const auto& item : obj) {
-          boost::json::string key(item.key(), value.storage());
-
           if (item.value().is_array()) {
             // Multiple values for this key
             const boost::json::array& arr = item.value().as_array();
             for (const auto& arr_item : arr) {
               T temp;
               Read<T>{}(arr_item, &temp);
-              object->emplace(std::string(key), std::move(temp));
+              object->emplace(boost::json::string(item.key(), value.storage()), std::move(temp));
             }
           } else {
             // Single value for this key
             T temp;
             Read<T>{}(item.value(), &temp);
-            object->emplace(std::string(key), std::move(temp));
+            object->emplace(boost::json::string(item.key(), value.storage()), std::move(temp));
           }
         }
       } else {
@@ -1639,21 +1637,19 @@ namespace json {
         object->clear();
 
         for (const auto& item : obj) {
-          boost::json::string key(item.key(), value.storage());
-
           if (item.value().is_array()) {
             // Multiple values for this key
             const boost::json::array& arr = item.value().as_array();
             for (const auto& arr_item : arr) {
               T temp;
               Read<T>{}(arr_item, &temp);
-              object->emplace(std::string(key), std::move(temp));
+              object->emplace(boost::json::string(item.key(), value.storage()), std::move(temp));
             }
           } else {
             // Single value for this key
             T temp;
             Read<T>{}(item.value(), &temp);
-            object->emplace(std::string(key), std::move(temp));
+            object->emplace(boost::json::string(item.key(), value.storage()), std::move(temp));
           }
         }
       } else {
@@ -1713,7 +1709,7 @@ namespace json {
         for (const auto& item : obj) {
           T temp;
           Read<T>{}(item.value(), &temp);
-          object->emplace(boost::json::string_view(item.key()), std::move(temp));
+          object->emplace(boost::json::string(item.key(), value.storage()), std::move(temp));
         }
       } else {
         throw_type_mismatch("object", value);
