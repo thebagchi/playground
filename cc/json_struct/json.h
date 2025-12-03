@@ -85,13 +85,13 @@ namespace json {
    * @param member Pointer to member variable
    * @param name JSON field name
    */
-    constexpr Props(T C::* member, const char* name) : member_{ member }, name_{ name } {
+    constexpr Props(T C::*member, std::string_view name) : member_(member), name_(name) {
       // Do Nothing ...
     }
 
     using Type = T;                             ///< The smart pointer type
-    T C::* member_;                             ///< Pointer to member variable
-    const char* name_;                          ///< JSON field name
+    T C::*member_;                              ///< Pointer to member variable
+    std::string_view name_;                     ///< JSON field name
     static constexpr bool nullable_ = Nullable; ///< Whether field can be null
     static constexpr bool required_ = Required; ///< Whether field is required
   };
@@ -112,7 +112,7 @@ namespace json {
  * @return Props descriptor (optional field)
  */
   template <typename C, typename T>
-  constexpr Props<C, T, false, false> prop(T C::* member, const char* name) {
+  constexpr Props<C, T, false, false> prop(T C::*member, std::string_view name) {
     return Props<C, T, false, false>{ member, name };
   }
 
@@ -126,7 +126,7 @@ namespace json {
  * @return Props descriptor (nullable field)
  */
   template <typename C, typename T>
-  constexpr Props<C, T, true, false> prop(T C::* member, const char* name, nullable_tag) {
+  constexpr Props<C, T, true, false> prop(T C::*member, std::string_view name, nullable_tag) {
     return Props<C, T, true, false>{ member, name };
   }
 
@@ -140,7 +140,7 @@ namespace json {
  * @return Props descriptor (required field)
  */
   template <typename C, typename T>
-  constexpr Props<C, T, false, true> prop(T C::* member, const char* name, required_tag) {
+  constexpr Props<C, T, false, true> prop(T C::*member, std::string_view name, required_tag) {
     return Props<C, T, false, true>{ member, name };
   }
 
@@ -156,7 +156,7 @@ namespace json {
  */
   template <typename C, typename T>
   constexpr Props<C, T, true, true>
-  prop(T C::* member, const char* name, nullable_tag, required_tag) {
+  prop(T C::*member, std::string_view name, nullable_tag, required_tag) {
     return Props<C, T, true, true>{ member, name };
   }
 
@@ -257,19 +257,17 @@ namespace json {
   /**
  * @brief Helper functions to throw field-related runtime errors
  */
-  [[noreturn]] inline void throw_field_null_not_nullable(const char* field_name) {
+  [[noreturn]] inline void throw_field_null_not_nullable(std::string_view field_name) {
     String msg;
-    const size_t name_len = std::strlen(field_name);
-    msg.reserve(30 + name_len); // Pre-allocate exact space needed
-    msg.append("Field '").append(field_name, name_len).append("' is null but not nullable");
+    msg.reserve(30 + field_name.size()); // Pre-allocate exact space needed
+    msg.append("Field '").append(field_name).append("' is null but not nullable");
     throw std::runtime_error(std::move(msg));
   }
 
-  [[noreturn]] inline void throw_field_missing(const char* field_name) {
+  [[noreturn]] inline void throw_field_missing(std::string_view field_name) {
     String msg;
-    const size_t name_len = std::strlen(field_name);
-    msg.reserve(17 + name_len); // Pre-allocate exact space needed
-    msg.append("Field '").append(field_name, name_len).append("' is missing");
+    msg.reserve(17 + field_name.size()); // Pre-allocate exact space needed
+    msg.append("Field '").append(field_name).append("' is missing");
     throw std::runtime_error(std::move(msg));
   }
 
@@ -863,13 +861,13 @@ namespace json {
       boost::json::object obj(out->storage());
 
       // Group values by key
-      String current_key;
+      boost::json::string current_key(out->storage());
       boost::json::array current_array(out->storage());
 
       for (const auto& item : *object) {
         if (current_key.empty()) {
           // First item
-          current_key = item.first;
+          current_key = boost::json::string(item.first, out->storage());
         } else if (current_key != item.first) {
           // Key changed - emit previous key's values
           if (current_array.size() == 1) {
@@ -880,7 +878,7 @@ namespace json {
             obj.emplace(current_key, std::move(current_array));
           }
           current_array = boost::json::array(out->storage());
-          current_key = item.first;
+          current_key = boost::json::string(item.first, out->storage());
         }
 
         // Add current value to array
@@ -917,12 +915,15 @@ namespace json {
       boost::json::object obj(out->storage());
 
       // Build a map of keys to their values
-      std::unordered_map<String, boost::json::array> key_values;
+      std::unordered_map<boost::json::string, boost::json::array> key_values;
 
       for (const auto& item : *object) {
-        auto it = key_values.find(item.first);
+        auto it = key_values.find(boost::json::string(item.first, out->storage()));
         if (it == key_values.end()) {
-          it = key_values.emplace(item.first, boost::json::array(out->storage())).first;
+          it = key_values
+                   .emplace(boost::json::string(item.first, out->storage()),
+                            boost::json::array(out->storage()))
+                   .first;
         }
 
         Value temp(out->storage());
@@ -1601,7 +1602,7 @@ namespace json {
         object->clear();
 
         for (const auto& item : obj) {
-          const String key = String(item.key());
+          boost::json::string key(item.key(), value.storage());
 
           if (item.value().is_array()) {
             // Multiple values for this key
@@ -1609,13 +1610,13 @@ namespace json {
             for (const auto& arr_item : arr) {
               T temp;
               Read<T>{}(arr_item, &temp);
-              object->emplace(key, std::move(temp));
+              object->emplace(std::string(key), std::move(temp));
             }
           } else {
             // Single value for this key
             T temp;
             Read<T>{}(item.value(), &temp);
-            object->emplace(key, std::move(temp));
+            object->emplace(std::string(key), std::move(temp));
           }
         }
       } else {
@@ -1638,7 +1639,7 @@ namespace json {
         object->clear();
 
         for (const auto& item : obj) {
-          const String key = String(item.key());
+          boost::json::string key(item.key(), value.storage());
 
           if (item.value().is_array()) {
             // Multiple values for this key
@@ -1646,13 +1647,13 @@ namespace json {
             for (const auto& arr_item : arr) {
               T temp;
               Read<T>{}(arr_item, &temp);
-              object->emplace(key, std::move(temp));
+              object->emplace(std::string(key), std::move(temp));
             }
           } else {
             // Single value for this key
             T temp;
             Read<T>{}(item.value(), &temp);
-            object->emplace(key, std::move(temp));
+            object->emplace(std::string(key), std::move(temp));
           }
         }
       } else {
