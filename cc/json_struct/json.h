@@ -4,6 +4,7 @@
 #include <boost/json.hpp>
 #include <boost/json/static_resource.hpp>
 #include <boost/beast/core/detail/base64.hpp>
+#include <array>
 #include <iostream>
 #include <limits>
 #include <map>
@@ -379,10 +380,10 @@ namespace json {
   // =============================================================================
 
   /**
- * @brief Specialization for ByteArray - serialize as Base64 string
+ * @brief Specialization for ByteVector - serialize as Base64 string
  */
-  template <> struct Write<ByteArray> {
-    inline void operator()(const ByteArray* data, Value* out) const noexcept {
+  template <> struct Write<ByteVector> {
+    inline void operator()(const ByteVector* data, Value* out) const noexcept {
       if (!data || data->empty()) [[unlikely]] {
         *out = nullptr;
         return;
@@ -412,6 +413,34 @@ namespace json {
                   "Use std::unique_ptr, std::shared_ptr, or std::optional instead.");
 
     inline void operator()(const Vector<T>* object, Value* out) const {
+      if (!object) [[unlikely]] {
+        *out = nullptr;
+        return;
+      }
+
+      boost::json::array arr(out->storage());
+      arr.reserve(object->size());
+
+      for (const auto& item : *object) {
+        Value temp(out->storage());
+        Write<T>{}(&item, &temp);
+        arr.emplace_back(std::move(temp));
+      }
+
+      *out = std::move(arr);
+    }
+  };
+
+  /**
+ * @brief Specialization for List<T>
+ * @tparam T Element type (can be basic or complex)
+ */
+  template <typename T> struct Write<List<T>> {
+    static_assert(!std::is_pointer_v<T>,
+                  "Raw pointers are not supported in List for serialization. "
+                  "Use std::unique_ptr, std::shared_ptr, or std::optional instead.");
+
+    inline void operator()(const List<T>* object, Value* out) const {
       if (!object) [[unlikely]] {
         *out = nullptr;
         return;
@@ -475,6 +504,35 @@ namespace json {
       }
 
       *out = std::move(obj);
+    }
+  };
+
+  /**
+ * @brief Specialization for Array<T, N>
+ * @tparam T Element type (can be basic or complex)
+ * @tparam N Array size (known at compile time)
+ */
+  template <typename T, std::size_t N> struct Write<Array<T, N>> {
+    static_assert(!std::is_pointer_v<T>,
+                  "Raw pointers are not supported in Array for serialization. "
+                  "Use std::unique_ptr, std::shared_ptr, or std::optional instead.");
+
+    inline void operator()(const Array<T, N>* object, Value* out) const {
+      if (!object) [[unlikely]] {
+        *out = nullptr;
+        return;
+      }
+
+      boost::json::array arr(out->storage());
+      arr.reserve(N);
+
+      for (const auto& item : *object) {
+        Value temp(out->storage());
+        Write<T>{}(&item, &temp);
+        arr.emplace_back(std::move(temp));
+      }
+
+      *out = std::move(arr);
     }
   };
 
@@ -796,10 +854,10 @@ namespace json {
   // =============================================================================
 
   /**
- * @brief Specialization for ByteArray - deserialize from Base64 string
+ * @brief Specialization for ByteVector - deserialize from Base64 string
  */
-  template <> struct Read<ByteArray> {
-    inline void operator()(const Value& value, ByteArray* out) const {
+  template <> struct Read<ByteVector> {
+    inline void operator()(const Value& value, ByteVector* out) const {
       if (value.is_null()) {
         out->clear();
         return;
@@ -838,6 +896,32 @@ namespace json {
         const boost::json::array& arr = value.as_array();
         object->clear();
         object->reserve(arr.size());
+
+        for (const auto& item : arr) {
+          object->emplace_back(); // Construct in-place for better performance
+          Read<T>{}(item, &object->back());
+        }
+      } else {
+        throw_type_mismatch("array", value);
+      }
+    }
+  };
+
+  /**
+ * @brief Specialization for List<T>
+ * @tparam T Element type
+ */
+  template <typename T> struct Read<List<T>> {
+    static_assert(!std::is_pointer_v<T>,
+                  "Raw pointers are not supported in List for deserialization. "
+                  "Use std::unique_ptr, std::shared_ptr, or std::optional instead.");
+
+    inline void operator()(const Value& value, List<T>* object) const {
+      if (value.is_null()) [[unlikely]] {
+        object->clear();
+      } else if (value.is_array()) [[likely]] {
+        const boost::json::array& arr = value.as_array();
+        object->clear();
 
         for (const auto& item : arr) {
           object->emplace_back(); // Construct in-place for better performance
@@ -894,6 +978,40 @@ namespace json {
         }
       } else {
         throw_type_mismatch("object", value);
+      }
+    }
+  };
+
+  /**
+ * @brief Specialization for Array<T, N>
+ * @tparam T Element type
+ * @tparam N Array size (known at compile time)
+ */
+  template <typename T, std::size_t N> struct Read<Array<T, N>> {
+    static_assert(!std::is_pointer_v<T>,
+                  "Raw pointers are not supported in Array for deserialization. "
+                  "Use std::unique_ptr, std::shared_ptr, or std::optional instead.");
+
+    inline void operator()(const Value& value, Array<T, N>* object) const {
+      if (value.is_null()) [[unlikely]] {
+        // For null values, we can't clear a fixed-size array, so we throw an error
+        throw std::runtime_error("Cannot deserialize null value into Array - array size is fixed");
+      } else if (value.is_array()) [[likely]] {
+        const boost::json::array& arr = value.as_array();
+
+        // Check that the JSON array size matches the Array size
+        if (arr.size() != N) {
+          throw std::runtime_error("Array size mismatch: JSON array has " +
+                                   std::to_string(arr.size()) + " elements, but Array expects " +
+                                   std::to_string(N) + " elements");
+        }
+
+        // Deserialize each element
+        for (std::size_t i = 0; i < N; ++i) {
+          Read<T>{}(arr[i], &(*object)[i]);
+        }
+      } else {
+        throw_type_mismatch("array", value);
       }
     }
   };

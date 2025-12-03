@@ -1,6 +1,7 @@
 #define BOOST_TEST_MODULE JSON Benchmark Tests
 #include <boost/json.hpp>
 #include <boost/test/unit_test.hpp>
+#include <array>
 #include <chrono>
 #include <cstdint>
 #include <iostream>
@@ -466,6 +467,312 @@ BOOST_AUTO_TEST_CASE(benchmark_map_deserialization) {
 
   result.print();
   BOOST_TEST_MESSAGE("Benchmark completed successfully");
+}
+
+BOOST_AUTO_TEST_CASE(benchmark_array_serialization) {
+  Array<Person, 10> people;
+  for (size_t i = 0; i < 10; ++i) {
+    people[i] = generate_person(true);
+  }
+
+  auto result = benchmark(
+      "Array<Person, 10> Serialization",
+      [&]() {
+        boost::json::value json = json::Marshal(people);
+        boost::json::serialize(json);
+      },
+      200);
+
+  result.print();
+  BOOST_TEST_MESSAGE("Benchmark completed successfully");
+}
+
+BOOST_AUTO_TEST_CASE(benchmark_array_deserialization) {
+  Array<Person, 10> people;
+  for (size_t i = 0; i < 10; ++i) {
+    people[i] = generate_person(true);
+  }
+  std::string json_str = json::MarshalToString(people);
+
+  auto result = benchmark(
+      "Array<Person, 10> Deserialization",
+      [&]() {
+        Array<Person, 10> a;
+        json::UnmarshalFromString(json_str, a);
+      },
+      200);
+
+  result.print();
+  BOOST_TEST_MESSAGE("Benchmark completed successfully");
+}
+
+BOOST_AUTO_TEST_CASE(benchmark_array_vs_vector_serialization) {
+  // Compare array vs vector with same size
+  Array<Person, 50> people_array;
+  Vector<Person> people_vector;
+
+  for (size_t i = 0; i < 50; ++i) {
+    people_array[i] = generate_person(true);
+    people_vector.push_back(generate_person(true));
+  }
+
+  auto array_result = benchmark(
+      "Array<Person, 50> Serialization",
+      [&]() {
+        boost::json::value json = json::Marshal(people_array);
+        boost::json::serialize(json);
+      },
+      100);
+
+  auto vector_result = benchmark(
+      "Vector<Person, 50> Serialization",
+      [&]() {
+        boost::json::value json = json::Marshal(people_vector);
+        boost::json::serialize(json);
+      },
+      100);
+
+  array_result.print();
+  vector_result.print();
+
+  std::cout << "\nPerformance comparison:\n";
+  std::cout << "  Array is " << (vector_result.avg_us / array_result.avg_us) << "x "
+            << (array_result.avg_us < vector_result.avg_us ? "faster" : "slower")
+            << " than Vector\n";
+
+  BOOST_TEST_MESSAGE("Benchmark comparison completed successfully");
+}
+
+BOOST_AUTO_TEST_CASE(benchmark_array_vs_vector_deserialization) {
+  // Compare array vs vector with same size
+  Array<Person, 50> people_array;
+  Vector<Person> people_vector;
+
+  for (size_t i = 0; i < 50; ++i) {
+    people_array[i] = generate_person(true);
+    people_vector.push_back(generate_person(true));
+  }
+
+  std::string array_json = json::MarshalToString(people_array);
+  std::string vector_json = json::MarshalToString(people_vector);
+
+  auto array_result = benchmark(
+      "Array<Person, 50> Deserialization",
+      [&]() {
+        Array<Person, 50> a;
+        json::UnmarshalFromString(array_json, a);
+      },
+      100);
+
+  auto vector_result = benchmark(
+      "Vector<Person, 50> Deserialization",
+      [&]() {
+        Vector<Person> v;
+        json::UnmarshalFromString(vector_json, v);
+      },
+      100);
+
+  array_result.print();
+  vector_result.print();
+
+  std::cout << "\nPerformance comparison:\n";
+  std::cout << "  Array is " << (vector_result.avg_us / array_result.avg_us) << "x "
+            << (array_result.avg_us < vector_result.avg_us ? "faster" : "slower")
+            << " than Vector\n";
+
+  BOOST_TEST_MESSAGE("Benchmark comparison completed successfully");
+}
+
+BOOST_AUTO_TEST_CASE(benchmark_array_vs_vector_roundtrip) {
+  // Compare array vs vector roundtrip with same size
+  Array<Person, 25> people_array;
+  Vector<Person> people_vector;
+
+  for (size_t i = 0; i < 25; ++i) {
+    people_array[i] = generate_person(true);
+    people_vector.push_back(generate_person(true));
+  }
+
+  auto array_result = benchmark(
+      "Array<Person, 25> Round-trip",
+      [&]() {
+        std::string json_str = json::MarshalToString(people_array);
+        Array<Person, 25> a;
+        json::UnmarshalFromString(json_str, a);
+      },
+      100);
+
+  auto vector_result = benchmark(
+      "Vector<Person, 25> Round-trip",
+      [&]() {
+        std::string json_str = json::MarshalToString(people_vector);
+        Vector<Person> v;
+        json::UnmarshalFromString(json_str, v);
+      },
+      100);
+
+  array_result.print();
+  vector_result.print();
+
+  std::cout << "\nPerformance comparison:\n";
+  std::cout << "  Array is " << (vector_result.avg_us / array_result.avg_us) << "x "
+            << (array_result.avg_us < vector_result.avg_us ? "faster" : "slower")
+            << " than Vector\n";
+
+  BOOST_TEST_MESSAGE("Benchmark comparison completed successfully");
+}
+
+BOOST_AUTO_TEST_CASE(benchmark_list_serialization) {
+  List<Person> people;
+  for (size_t i = 0; i < 100; ++i) {
+    people.push_back(generate_person(true));
+  }
+
+  auto result = benchmark(
+      "List<Person> (100) Serialization",
+      [&]() {
+        boost::json::value json = json::Marshal(people);
+        boost::json::serialize(json);
+      },
+      200);
+
+  result.print();
+  BOOST_TEST_MESSAGE("Benchmark completed successfully");
+}
+
+BOOST_AUTO_TEST_CASE(benchmark_list_deserialization) {
+  List<Person> people;
+  for (size_t i = 0; i < 100; ++i) {
+    people.push_back(generate_person(true));
+  }
+  std::string json_str = json::MarshalToString(people);
+
+  auto result = benchmark(
+      "List<Person> (100) Deserialization",
+      [&]() {
+        List<Person> l;
+        json::UnmarshalFromString(json_str, l);
+      },
+      200);
+
+  result.print();
+  BOOST_TEST_MESSAGE("Benchmark completed successfully");
+}
+
+BOOST_AUTO_TEST_CASE(benchmark_list_vs_vector_serialization) {
+  // Compare list vs vector with same size
+  List<Person> people_list;
+  Vector<Person> people_vector;
+
+  for (size_t i = 0; i < 50; ++i) {
+    people_list.push_back(generate_person(true));
+    people_vector.push_back(generate_person(true));
+  }
+
+  auto list_result = benchmark(
+      "List<Person, 50> Serialization",
+      [&]() {
+        boost::json::value json = json::Marshal(people_list);
+        boost::json::serialize(json);
+      },
+      100);
+
+  auto vector_result = benchmark(
+      "Vector<Person, 50> Serialization",
+      [&]() {
+        boost::json::value json = json::Marshal(people_vector);
+        boost::json::serialize(json);
+      },
+      100);
+
+  list_result.print();
+  vector_result.print();
+
+  std::cout << "\nPerformance comparison:\n";
+  std::cout << "  List is " << (vector_result.avg_us / list_result.avg_us) << "x "
+            << (list_result.avg_us < vector_result.avg_us ? "faster" : "slower")
+            << " than Vector\n";
+
+  BOOST_TEST_MESSAGE("Benchmark comparison completed successfully");
+}
+
+BOOST_AUTO_TEST_CASE(benchmark_list_vs_vector_deserialization) {
+  // Compare list vs vector with same size
+  List<Person> people_list;
+  Vector<Person> people_vector;
+
+  for (size_t i = 0; i < 50; ++i) {
+    people_list.push_back(generate_person(true));
+    people_vector.push_back(generate_person(true));
+  }
+
+  std::string list_json = json::MarshalToString(people_list);
+  std::string vector_json = json::MarshalToString(people_vector);
+
+  auto list_result = benchmark(
+      "List<Person, 50> Deserialization",
+      [&]() {
+        List<Person> l;
+        json::UnmarshalFromString(list_json, l);
+      },
+      100);
+
+  auto vector_result = benchmark(
+      "Vector<Person, 50> Deserialization",
+      [&]() {
+        Vector<Person> v;
+        json::UnmarshalFromString(vector_json, v);
+      },
+      100);
+
+  list_result.print();
+  vector_result.print();
+
+  std::cout << "\nPerformance comparison:\n";
+  std::cout << "  List is " << (vector_result.avg_us / list_result.avg_us) << "x "
+            << (list_result.avg_us < vector_result.avg_us ? "faster" : "slower")
+            << " than Vector\n";
+
+  BOOST_TEST_MESSAGE("Benchmark comparison completed successfully");
+}
+
+BOOST_AUTO_TEST_CASE(benchmark_list_vs_vector_roundtrip) {
+  // Compare list vs vector roundtrip with same size
+  List<Person> people_list;
+  Vector<Person> people_vector;
+
+  for (size_t i = 0; i < 25; ++i) {
+    people_list.push_back(generate_person(true));
+    people_vector.push_back(generate_person(true));
+  }
+
+  auto list_result = benchmark(
+      "List<Person, 25> Round-trip",
+      [&]() {
+        std::string json_str = json::MarshalToString(people_list);
+        List<Person> l;
+        json::UnmarshalFromString(json_str, l);
+      },
+      100);
+
+  auto vector_result = benchmark(
+      "Vector<Person, 25> Round-trip",
+      [&]() {
+        std::string json_str = json::MarshalToString(people_vector);
+        Vector<Person> v;
+        json::UnmarshalFromString(json_str, v);
+      },
+      100);
+
+  list_result.print();
+  vector_result.print();
+
+  std::cout << "\nPerformance comparison:\n";
+  std::cout << "  List is " << (vector_result.avg_us / list_result.avg_us) << "x "
+            << (list_result.avg_us < vector_result.avg_us ? "faster" : "slower")
+            << " than Vector\n";
+
+  BOOST_TEST_MESSAGE("Benchmark comparison completed successfully");
 }
 
 BOOST_AUTO_TEST_CASE(benchmark_unordered_map_serialization) {

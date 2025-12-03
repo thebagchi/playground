@@ -1,3 +1,4 @@
+#include <array>
 #include <boost/json.hpp>
 #include <cstdint>
 #include <iomanip>
@@ -7,6 +8,7 @@
 #include <tuple>
 
 #include "json.h"
+#include "typing.h"
 
 // using namespace json;
 
@@ -246,6 +248,96 @@ void encode_decode_vector() {
   }
 }
 
+void encode_decode_array() {
+  try {
+    // Create array of strings
+    Array<String, 4> original_array = { "apple", "banana", "cherry", "date" };
+    Array<String, 4> decoded_array;
+
+    // Marshal to JSON
+    boost::json::value json_value = json::Marshal(original_array);
+    std::cout << "Encoded array JSON: " << json_value << std::endl;
+
+    // Marshal to JSON string
+    String json_string = json::MarshalToString(original_array);
+    std::cout << "Encoded array JSON string: " << json_string << std::endl;
+
+    // Unmarshal back to array from string
+    json::UnmarshalFromString(json_string, decoded_array);
+
+    // Display decoded results
+    std::cout << "Decoded array:" << std::endl;
+    std::cout << "  Original: [";
+    for (size_t i = 0; i < original_array.size(); ++i) {
+      std::cout << original_array[i];
+      if (i < original_array.size() - 1) {
+        std::cout << ", ";
+      }
+    }
+    std::cout << "]" << std::endl;
+
+    std::cout << "  Decoded:  [";
+    for (size_t i = 0; i < decoded_array.size(); ++i) {
+      std::cout << decoded_array[i];
+      if (i < decoded_array.size() - 1) {
+        std::cout << ", ";
+      }
+    }
+    std::cout << "]" << std::endl;
+
+    std::cout << "  Match: " << (original_array == decoded_array ? "Yes" : "No") << std::endl;
+
+  } catch (const std::exception& e) {
+    std::cout << "Error in encode_decode_array: " << e.what() << std::endl;
+  }
+}
+
+void encode_decode_list() {
+  try {
+    // Create list of strings
+    List<String> original_list = { "apple", "banana", "cherry", "date" };
+    List<String> decoded_list;
+
+    // Marshal to JSON
+    boost::json::value json_value = json::Marshal(original_list);
+    std::cout << "Encoded list JSON: " << json_value << std::endl;
+
+    // Marshal to JSON string
+    String json_string = json::MarshalToString(original_list);
+    std::cout << "Encoded list JSON string: " << json_string << std::endl;
+
+    // Unmarshal back to list from string
+    json::UnmarshalFromString(json_string, decoded_list);
+
+    // Display decoded results
+    std::cout << "Decoded list:" << std::endl;
+    std::cout << "  Original: [";
+    auto it_orig = original_list.begin();
+    for (size_t i = 0; i < original_list.size(); ++i, ++it_orig) {
+      std::cout << "\"" << *it_orig << "\"";
+      if (i < original_list.size() - 1) {
+        std::cout << ", ";
+      }
+    }
+    std::cout << "]" << std::endl;
+
+    std::cout << "  Decoded:  [";
+    auto it_dec = decoded_list.begin();
+    for (size_t i = 0; i < decoded_list.size(); ++i, ++it_dec) {
+      std::cout << "\"" << *it_dec << "\"";
+      if (i < decoded_list.size() - 1) {
+        std::cout << ", ";
+      }
+    }
+    std::cout << "]" << std::endl;
+
+    std::cout << "  Match: " << (original_list == decoded_list ? "Yes" : "No") << std::endl;
+
+  } catch (const std::exception& e) {
+    std::cout << "Error in encode_decode_list: " << e.what() << std::endl;
+  }
+}
+
 void encode_decode_map() {
   try {
     // Create map of string to string
@@ -323,11 +415,11 @@ void encode_decode_optional() {
 void encode_decode_byte_array() {
   try {
     // Create byte array with some sample data
-    ByteArray original_bytes = { std::byte{ 0x48 }, std::byte{ 0x65 }, std::byte{ 0x6C },
-                                 std::byte{ 0x6C }, std::byte{ 0x6F }, std::byte{ 0x20 },
-                                 std::byte{ 0x57 }, std::byte{ 0x6F }, std::byte{ 0x72 },
-                                 std::byte{ 0x6C }, std::byte{ 0x64 }, std::byte{ 0x21 } };
-    ByteArray decoded_bytes;
+    ByteVector original_bytes = { std::byte{ 0x48 }, std::byte{ 0x65 }, std::byte{ 0x6C },
+                                  std::byte{ 0x6C }, std::byte{ 0x6F }, std::byte{ 0x20 },
+                                  std::byte{ 0x57 }, std::byte{ 0x6F }, std::byte{ 0x72 },
+                                  std::byte{ 0x6C }, std::byte{ 0x64 }, std::byte{ 0x21 } };
+    ByteVector decoded_bytes;
 
     // Marshal to JSON
     boost::json::value json_value = json::Marshal(original_bytes);
@@ -406,6 +498,14 @@ void encode_decode_arbitrary() {
 int main(int argc, char* argv[]) {
   std::cout << "hello world" << std::endl;
 
+  struct Foo {};
+
+  std::cout << "type_name<int>() == " << FNAME(int) << std::endl;
+  std::cout << "type_name<std::vector<double>>() == " << FNAME(std::vector<double>) << std::endl;
+  std::cout << "short_type_name<std::vector<double>>() == " << SNAME(std::vector<double>)
+            << std::endl;
+  std::cout << "type_name<Foo>() == " << FNAME(Foo) << std::endl;
+
   try {
     encode_decode_struct();
     encode_decode_uint64();
@@ -414,6 +514,8 @@ int main(int argc, char* argv[]) {
     encode_decode_double();
     encode_decode_bool();
     encode_decode_vector();
+    encode_decode_array();
+    encode_decode_list();
     encode_decode_map();
     encode_decode_optional();
     encode_decode_byte_array();

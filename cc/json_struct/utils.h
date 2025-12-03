@@ -5,15 +5,27 @@
 #include <optional>
 #include <type_traits>
 #include <boost/json.hpp>
+#include <array>
+#include <list>
 
 // =============================================================================
 // Type Aliases for Reduced Verbosity
 // =============================================================================
 
 /**
- * @brief Byte array type for binary data (commonly used with Base64 encoding)
+ * @brief Byte vector type for binary data (commonly used with Base64 encoding)
  */
-using ByteArray = std::vector<std::byte>;
+using ByteVector = std::vector<std::byte>;
+
+/**
+ * @brief Byte array type alias (fixed-size array)
+ */
+template <std::size_t N> using ByteArray = std::array<std::byte, N>;
+
+/**
+ * @brief Byte list type alias (doubly-linked list)
+ */
+using ByteList = std::list<std::byte>;
 
 /**
  * @brief String type alias
@@ -32,6 +44,16 @@ using Bool = bool;
  * @brief Generic vector type alias
  */
 template <typename T> using Vector = std::vector<T>;
+
+/**
+ * @brief Generic array type alias (fixed-size array)
+ */
+template <typename T, std::size_t N> using Array = std::array<T, N>;
+
+/**
+ * @brief Generic list type alias (doubly-linked list)
+ */
+template <typename T> using List = std::list<T>;
 
 /**
  * @brief Map type alias (ordered map with string keys)
