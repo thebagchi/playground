@@ -630,6 +630,113 @@ void encode_decode_arbitrary() {
   }
 }
 
+// =============================================================================
+// HTTP Status Code Enum Examples
+// =============================================================================
+
+// Enum 1: HTTP Status Code as NUMBER (integer values)
+enum class HttpStatusCode : int {
+  OK = 200,
+  Created = 201,
+  BadRequest = 400,
+  Unauthorized = 401,
+  Forbidden = 403,
+  NotFound = 404,
+  InternalServerError = 500
+};
+
+// Specialization for HttpStatusCode with NUMBER encoding
+template <> struct json::ENUM<HttpStatusCode> {
+  static constexpr bool case_insensitive = false;
+  static constexpr json::EnumEncoding encoding = json::EnumEncoding::NUMBER;
+  static constexpr std::array names = std::array<std::string_view, 0>{};
+};
+
+// Enum 2: HTTP Status as STRING (human-readable names)
+enum class HttpStatus {
+  PENDING = 0,
+  PROCESSING = 1,
+  SUCCESS = 2,
+  FAILED = 3
+};
+
+// Specialization for HttpStatus with STRING encoding
+template <> struct json::ENUM<HttpStatus> {
+  static constexpr bool case_insensitive = true;
+  static constexpr json::EnumEncoding encoding = json::EnumEncoding::STRING;
+  static constexpr std::array names = { "PENDING", "PROCESSING", "SUCCESS", "FAILED" };
+};
+
+// API Response struct using both enum types
+struct ApiResponse {
+  String message_;
+  HttpStatusCode code_;
+  HttpStatus status_;
+
+  constexpr static auto properties = std::make_tuple(json::prop(&ApiResponse::message_, "message"),
+                                                     json::prop(&ApiResponse::code_, "code"),
+                                                     json::prop(&ApiResponse::status_, "status"));
+};
+
+void encode_decode_enum() {
+  try {
+    std::cout << "\n=== Enum Serialization Examples ===" << std::endl;
+
+    // Example 1: HttpStatusCode (NUMBER encoding)
+    std::cout << "\n1. HTTP Status Code (NUMBER):" << std::endl;
+    ApiResponse response1;
+    response1.message_ = "User created successfully";
+    response1.code_ = HttpStatusCode::Created;
+    response1.status_ = HttpStatus::SUCCESS;
+
+    // Marshal to JSON
+    String json_string1 = json::MarshalToString(response1);
+    std::cout << "Encoded JSON: " << json_string1 << std::endl;
+
+    // Unmarshal back
+    ApiResponse response1_decoded;
+    json::UnmarshalFromString(json_string1, response1_decoded);
+    std::cout << "Decoded - Message: " << response1_decoded.message_
+              << ", Code: " << static_cast<int>(response1_decoded.code_)
+              << ", Status: " << static_cast<int>(response1_decoded.status_) << std::endl;
+
+    // Example 2: Different status code (NOT FOUND)
+    std::cout << "\n2. HTTP Status Code (NOT FOUND):" << std::endl;
+    ApiResponse response2;
+    response2.message_ = "Resource not found";
+    response2.code_ = HttpStatusCode::NotFound;
+    response2.status_ = HttpStatus::FAILED;
+
+    String json_string2 = json::MarshalToString(response2);
+    std::cout << "Encoded JSON: " << json_string2 << std::endl;
+
+    ApiResponse response2_decoded;
+    json::UnmarshalFromString(json_string2, response2_decoded);
+    std::cout << "Decoded - Message: " << response2_decoded.message_
+              << ", Code: " << static_cast<int>(response2_decoded.code_)
+              << ", Status: " << static_cast<int>(response2_decoded.status_) << std::endl;
+
+    // Example 3: Error response
+    std::cout << "\n3. HTTP Status Code (INTERNAL SERVER ERROR):" << std::endl;
+    ApiResponse response3;
+    response3.message_ = "Internal server error occurred";
+    response3.code_ = HttpStatusCode::InternalServerError;
+    response3.status_ = HttpStatus::FAILED;
+
+    String json_string3 = json::MarshalToString(response3);
+    std::cout << "Encoded JSON: " << json_string3 << std::endl;
+
+    ApiResponse response3_decoded;
+    json::UnmarshalFromString(json_string3, response3_decoded);
+    std::cout << "Decoded - Message: " << response3_decoded.message_
+              << ", Code: " << static_cast<int>(response3_decoded.code_)
+              << ", Status: " << static_cast<int>(response3_decoded.status_) << std::endl;
+
+  } catch (const std::exception& e) {
+    std::cout << "Error in encode_decode_enum: " << e.what() << std::endl;
+  }
+}
+
 int main(int argc, char* argv[]) {
   std::cout << "hello world" << std::endl;
 
@@ -658,6 +765,7 @@ int main(int argc, char* argv[]) {
     encode_decode_byte_array();
     encode_decode_byte_array_fixed();
     encode_decode_arbitrary();
+    encode_decode_enum();
   } catch (const std::exception& e) {
     std::cerr << "Error in main: " << e.what() << std::endl;
     return 1;

@@ -231,7 +231,7 @@ SpacesBeforeTrailingComments: 1
 # Lambda body indentation style: Signature (indent with the signature)
 LambdaBodyIndentation: Signature
 
-# Never put lambdas on a single line (all lambda bodies break to new line)
+# Don't allow short lambdas on a single line (all lambda bodies break to new line)
 # BEFORE (AllowShortLambdasOnASingleLine: Inline):
 #   registerCallback([]() { std::cout << "hello"; });
 # AFTER (AllowShortLambdasOnASingleLine: None):
@@ -239,6 +239,16 @@ LambdaBodyIndentation: Signature
 #     std::cout << "hello";
 #   });
 AllowShortLambdasOnASingleLine: None
+
+# Don't allow short enums on a single line - format like classes
+# BEFORE (AllowShortEnumsOnASingleLine: true):
+#   enum class EnumEncoding { STRING, NUMBER };
+# AFTER (AllowShortEnumsOnASingleLine: false):
+#   enum class EnumEncoding {
+#     STRING,
+#     NUMBER
+#   };
+AllowShortEnumsOnASingleLine: false
 
 # C++ standard: Auto-detect
 Standard: Auto

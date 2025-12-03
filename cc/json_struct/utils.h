@@ -143,6 +143,8 @@ template <typename T> struct is_optional<SharedPtr<T>> : std::true_type {};
 
 template <typename T> inline constexpr bool is_optional_v = is_optional<T>::value;
 
+template <typename T> inline constexpr bool is_enum_v = std::is_enum_v<T>;
+
 /**
  * @brief Trait to check if a type is a JSON value
  */
