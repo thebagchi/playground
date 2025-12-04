@@ -9,15 +9,13 @@ using SockAddr = std::variant<SockAddr4, SockAddr6>;
 
 // Using std::visit with constexpr for compile-time dispatch
 void print_address_visit(const SockAddr& addr) {
-  std::visit(
-      [](const auto& sa) {
-        if constexpr (std::is_same_v<std::decay_t<decltype(sa)>, SockAddr4>) {
-          std::cout << "IPv4 address (visit)\n";
-        } else if constexpr (std::is_same_v<std::decay_t<decltype(sa)>, SockAddr6>) {
-          std::cout << "IPv6 address (visit)\n";
-        }
-      },
-      addr);
+  std::visit([](const auto& sa) {
+    if constexpr (std::is_same_v<std::decay_t<decltype(sa)>, SockAddr4>) {
+      std::cout << "IPv4 address (visit)\n";
+    } else if constexpr (std::is_same_v<std::decay_t<decltype(sa)>, SockAddr6>) {
+      std::cout << "IPv6 address (visit)\n";
+    }
+  }, addr);
 }
 
 // Using std::holds_alternative for runtime type checking

@@ -50,8 +50,8 @@ template <typename T> struct Name {
 // Extracts the raw __PRETTY_FUNCTION__ string at compile time
 // Compatible with GCC and Clang compilers
 template <typename T> constexpr auto RAW() {
-  static_assert(HAS_PRETTY_FUNCTION,
-                "Compiler must support __PRETTY_FUNCTION__ for type name extraction");
+  static_assert(
+   HAS_PRETTY_FUNCTION, "Compiler must support __PRETTY_FUNCTION__ for type name extraction");
 
   std::array<char, sizeof(__PRETTY_FUNCTION__)> name{};
   for (std::size_t i = 0; i < name.size(); ++i) {

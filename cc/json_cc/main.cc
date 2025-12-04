@@ -85,9 +85,9 @@ void test_value_list() {
   // Test inline List initialization
   {
     json::Value value(json::List{
-        json::MakePtr(123),      // Number
-        json::MakePtr("inline"), // String
-        json::MakePtr(true)      // Bool
+     json::MakePtr(123),      // Number
+     json::MakePtr("inline"), // String
+     json::MakePtr(true)      // Bool
     });
     std::cout << "inline value type: " << value.type_name() << std::endl;
   }
@@ -114,8 +114,8 @@ void test_value_dict() {
   // Test Dict constructor using MakePtr
   {
     json::Dict data = { { "name", json::MakePtr("John") },
-                        { "age", json::MakePtr(30) },
-                        { "active", json::MakePtr(true) } };
+      { "age", json::MakePtr(30) },
+      { "active", json::MakePtr(true) } };
 
     json::Value value(data);
     std::cout << "dict value type: " << value.type_name() << std::endl;
@@ -125,16 +125,16 @@ void test_value_dict() {
   // Test inline Dict initialization
   {
     json::Value value(json::Dict{ { "key1", json::MakePtr(123) },
-                                  { "key2", json::MakePtr("value") },
-                                  { "key3", json::MakePtr(false) } });
+     { "key2", json::MakePtr("value") },
+     { "key3", json::MakePtr(false) } });
     std::cout << "inline dict value type: " << value.type_name() << std::endl;
   }
 
   // Test as_dict and for_each methods
   {
     json::Dict test_data = { { "number", json::MakePtr(42.5) },
-                             { "text", json::MakePtr("hello") },
-                             { "flag", json::MakePtr(true) } };
+      { "text", json::MakePtr("hello") },
+      { "flag", json::MakePtr(true) } };
 
     json::Value dict_value(test_data);
 
@@ -316,10 +316,9 @@ void test_debug_string() {
 
   // Test nested structures
   {
-    json::Dict nested_dict = {
-      { "array", json::MakePtr(json::List{ json::MakePtr(1), json::MakePtr(2) }) },
-      { "object", json::MakePtr(json::Dict{ { "nested", json::MakePtr("value") } }) }
-    };
+    json::Dict nested_dict = { { "array",
+                                json::MakePtr(json::List{ json::MakePtr(1), json::MakePtr(2) }) },
+      { "object", json::MakePtr(json::Dict{ { "nested", json::MakePtr("value") } }) } };
     json::Value nested_value(nested_dict);
     std::cout << "nested: " << nested_value.DebugString() << std::endl;
   }

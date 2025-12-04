@@ -35,7 +35,7 @@ NamespaceIndentation: All
 ColumnLimit: 100
 
 # Indentation width for continuation lines
-ContinuationIndentWidth: 4
+ContinuationIndentWidth: 1
 
 # Break string literals that exceed the column limit
 # BEFORE (BreakStringLiterals: false):
@@ -165,7 +165,7 @@ PointerAlignment: Left
 DerivePointerAlignment: false
 
 # Align after opening bracket
-AlignAfterOpenBracket: Align
+AlignAfterOpenBracket: DontAlign
 
 # Align operands in expressions
 AlignOperands: true
@@ -229,7 +229,6 @@ SpacesBeforeTrailingComments: 1
 # ============================================================================
 
 # Lambda body indentation style: Signature (indent with the signature)
-LambdaBodyIndentation: Signature
 
 # Don't allow short lambdas on a single line (all lambda bodies break to new line)
 # BEFORE (AllowShortLambdasOnASingleLine: Inline):
@@ -405,3 +404,6 @@ EmptyLineBeforeAccessModifier: Never
 # - BreakAfterReturnType: All (break long return types)
 # - BreakBeforeConceptDeclarations: Always (break C++20 concepts)
 # - BreakTemplateDeclarations: MultiLine (break template declarations)
+# Lambda body indentation: OuterScope aligns with outer scope
+#LambdaBodyIndentation: Signature
+LambdaBodyIndentation: OuterScope

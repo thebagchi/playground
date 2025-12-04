@@ -36,10 +36,10 @@ void parallel_matrix_multiply(std::uint64_t size, std::uint64_t num) {
     auto srow = i * rows_per_thread;
     auto erow = (i == num - 1) ? size : srow + rows_per_thread;
     threads.emplace_back(matrix_multiply_section,
-                         std::cref(A),
-                         std::cref(B),
-                         std::ref(C),
-                         std::make_tuple(srow, erow, size));
+     std::cref(A),
+     std::cref(B),
+     std::ref(C),
+     std::make_tuple(srow, erow, size));
   }
   for (auto& thread : threads) {
     thread.join();

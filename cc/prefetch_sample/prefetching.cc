@@ -107,8 +107,8 @@ std::size_t PREFETCH_DISTANCE = config::DEFAULT_PREFETCH_DISTANCE;
 std::size_t PREFETCH_STRIDE = config::DEFAULT_PREFETCH_STRIDE;
 
 // Sequential traversal without prefetch
-[[nodiscard]] std::int64_t sequential_no_prefetch(const std::int32_t* arr,
-                                                  std::size_t size) noexcept {
+[[nodiscard]] std::int64_t sequential_no_prefetch(
+ const std::int32_t* arr, std::size_t size) noexcept {
   std::int64_t sum = 0;
   for (std::size_t i = 0; i < size; ++i) {
     sum = sum + *(arr + i);
@@ -117,11 +117,10 @@ std::size_t PREFETCH_STRIDE = config::DEFAULT_PREFETCH_STRIDE;
 }
 
 // Sequential traversal WITH prefetch
-[[nodiscard]] std::int64_t
-sequential_with_prefetch(const std::int32_t* arr,
-                         std::size_t size,
-                         std::size_t distance = config::DEFAULT_PREFETCH_DISTANCE,
-                         std::size_t stride = config::DEFAULT_PREFETCH_STRIDE) noexcept {
+[[nodiscard]] std::int64_t sequential_with_prefetch(const std::int32_t* arr,
+ std::size_t size,
+ std::size_t distance = config::DEFAULT_PREFETCH_DISTANCE,
+ std::size_t stride = config::DEFAULT_PREFETCH_STRIDE) noexcept {
   std::int64_t sum = 0;
   for (std::size_t i = 0; i < size; ++i) {
     // Prefetch far enough ahead

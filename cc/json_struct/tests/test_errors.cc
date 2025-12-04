@@ -16,9 +16,9 @@ public:
   Optional<String> email_;
 public:
   constexpr const static auto properties = std::make_tuple(json::prop(&Person::name_, "name"),
-                                                           json::prop(&Person::age_, "age"),
-                                                           json::prop(&Person::city_, "city"),
-                                                           json::prop(&Person::email_, "email"));
+   json::prop(&Person::age_, "age"),
+   json::prop(&Person::city_, "city"),
+   json::prop(&Person::email_, "email"));
 };
 
 template <> struct json::STRUCT<Person> {

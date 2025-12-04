@@ -19,11 +19,10 @@ public:
   UniquePtr<String> city_;
   UniquePtr<String> email_;
 public:
-  constexpr const static auto properties =
-      std::make_tuple(json::prop(&Person::name_, "name"),
-                      json::prop(&Person::age_, "age"),
-                      json::prop(&Person::city_, "city"),
-                      json::prop(&Person::email_, "email", json::NULLABLE));
+  constexpr const static auto properties = std::make_tuple(json::prop(&Person::name_, "name"),
+   json::prop(&Person::age_, "age"),
+   json::prop(&Person::city_, "city"),
+   json::prop(&Person::email_, "email", json::NULLABLE));
 };
 
 template <> struct json::STRUCT<Person> {
@@ -70,7 +69,7 @@ public:
   std::unique_ptr<boost::json::value> value_;
 public:
   constexpr const static auto properties =
-      std::make_tuple(json::prop(&ArbitraryUniquePtr::value_, "value"));
+   std::make_tuple(json::prop(&ArbitraryUniquePtr::value_, "value"));
 };
 
 template <> struct json::STRUCT<ArbitraryUniquePtr> {
@@ -82,7 +81,7 @@ public:
   SharedPtr<Value> value_;
 public:
   constexpr const static auto properties =
-      std::make_tuple(json::prop(&ArbitrarySharedPtr::value_, "value"));
+   std::make_tuple(json::prop(&ArbitrarySharedPtr::value_, "value"));
 };
 
 template <> struct json::STRUCT<ArbitrarySharedPtr> {
@@ -94,7 +93,7 @@ public:
   Optional<Value> value_;
 public:
   constexpr const static auto properties =
-      std::make_tuple(json::prop(&ArbitraryOptional::value_, "value"));
+   std::make_tuple(json::prop(&ArbitraryOptional::value_, "value"));
 };
 
 template <> struct json::STRUCT<ArbitraryOptional> {
@@ -106,7 +105,7 @@ public:
   ArbitraryList value_;
 public:
   constexpr const static auto properties =
-      std::make_tuple(json::prop(&ArbitraryVector::value_, "value"));
+   std::make_tuple(json::prop(&ArbitraryVector::value_, "value"));
 };
 
 template <> struct json::STRUCT<ArbitraryVector> {
@@ -118,7 +117,7 @@ public:
   ArbitraryMap value_;
 public:
   constexpr const static auto properties =
-      std::make_tuple(json::prop(&ArbitraryDict::value_, "value"));
+   std::make_tuple(json::prop(&ArbitraryDict::value_, "value"));
 };
 
 template <> struct json::STRUCT<ArbitraryDict> {
@@ -130,7 +129,7 @@ public:
   std::unique_ptr<PersonVector> persons_;
 public:
   constexpr const static auto properties =
-      std::make_tuple(json::prop(&PersonList::persons_, "persons"));
+   std::make_tuple(json::prop(&PersonList::persons_, "persons"));
 };
 
 template <> struct json::STRUCT<PersonList> {
@@ -142,7 +141,7 @@ public:
   std::unique_ptr<PersonVectorUniquePtr> persons_;
 public:
   constexpr const static auto properties =
-      std::make_tuple(json::prop(&PersonListUniquePtr::persons_, "persons"));
+   std::make_tuple(json::prop(&PersonListUniquePtr::persons_, "persons"));
 };
 
 template <> struct json::STRUCT<PersonListUniquePtr> {
@@ -154,7 +153,7 @@ public:
   SharedPtr<PersonVectorSharedPtr> persons_;
 public:
   constexpr const static auto properties =
-      std::make_tuple(json::prop(&PersonListSharedPtr::persons_, "persons"));
+   std::make_tuple(json::prop(&PersonListSharedPtr::persons_, "persons"));
 };
 
 template <> struct json::STRUCT<PersonListSharedPtr> {
@@ -166,7 +165,7 @@ public:
   Optional<Vector<Optional<Person>>> persons_;
 public:
   constexpr const static auto properties =
-      std::make_tuple(json::prop(&PersonListOptional::persons_, "persons"));
+   std::make_tuple(json::prop(&PersonListOptional::persons_, "persons"));
 };
 
 template <> struct json::STRUCT<PersonListOptional> {
@@ -180,11 +179,10 @@ public:
   SharedPtr<String> city_;
   SharedPtr<String> email_;
 public:
-  constexpr const static auto properties =
-      std::make_tuple(json::prop(&PersonShared::name_, "name"),
-                      json::prop(&PersonShared::age_, "age"),
-                      json::prop(&PersonShared::city_, "city"),
-                      json::prop(&PersonShared::email_, "email", json::NULLABLE));
+  constexpr const static auto properties = std::make_tuple(json::prop(&PersonShared::name_, "name"),
+   json::prop(&PersonShared::age_, "age"),
+   json::prop(&PersonShared::city_, "city"),
+   json::prop(&PersonShared::email_, "email", json::NULLABLE));
 };
 
 class PersonOptional {
@@ -195,10 +193,10 @@ public:
   Optional<String> email_;
 public:
   constexpr const static auto properties =
-      std::make_tuple(json::prop(&PersonOptional::name_, "name"),
-                      json::prop(&PersonOptional::age_, "age"),
-                      json::prop(&PersonOptional::city_, "city"),
-                      json::prop(&PersonOptional::email_, "email", json::NULLABLE));
+   std::make_tuple(json::prop(&PersonOptional::name_, "name"),
+    json::prop(&PersonOptional::age_, "age"),
+    json::prop(&PersonOptional::city_, "city"),
+    json::prop(&PersonOptional::email_, "email", json::NULLABLE));
 };
 
 class PersonScalars {
@@ -209,10 +207,10 @@ public:
   String email_;
 public:
   constexpr const static auto properties =
-      std::make_tuple(json::prop(&PersonScalars::name_, "name"),
-                      json::prop(&PersonScalars::age_, "age"),
-                      json::prop(&PersonScalars::city_, "city"),
-                      json::prop(&PersonScalars::email_, "email"));
+   std::make_tuple(json::prop(&PersonScalars::name_, "name"),
+    json::prop(&PersonScalars::age_, "age"),
+    json::prop(&PersonScalars::city_, "city"),
+    json::prop(&PersonScalars::email_, "email"));
 };
 
 class PersonDict {
@@ -220,7 +218,7 @@ public:
   std::unique_ptr<PersonMap> persons_;
 public:
   constexpr const static auto properties =
-      std::make_tuple(json::prop(&PersonDict::persons_, "persons"));
+   std::make_tuple(json::prop(&PersonDict::persons_, "persons"));
 };
 
 class PersonDictUniquePtr {
@@ -228,7 +226,7 @@ public:
   std::unique_ptr<PersonMapUniquePtr> persons_;
 public:
   constexpr const static auto properties =
-      std::make_tuple(json::prop(&PersonDictUniquePtr::persons_, "persons"));
+   std::make_tuple(json::prop(&PersonDictUniquePtr::persons_, "persons"));
 };
 
 class PersonDictSharedPtr {
@@ -236,7 +234,7 @@ public:
   SharedPtr<PersonMapSharedPtr> persons_;
 public:
   constexpr const static auto properties =
-      std::make_tuple(json::prop(&PersonDictSharedPtr::persons_, "persons"));
+   std::make_tuple(json::prop(&PersonDictSharedPtr::persons_, "persons"));
 };
 
 class PersonDictOptional {
@@ -244,7 +242,7 @@ public:
   Optional<PersonMapOptional> persons_;
 public:
   constexpr const static auto properties =
-      std::make_tuple(json::prop(&PersonDictOptional::persons_, "persons"));
+   std::make_tuple(json::prop(&PersonDictOptional::persons_, "persons"));
 };
 
 template <> struct json::STRUCT<PersonShared> {
@@ -1358,14 +1356,14 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_ARBITRARY_LIST_UNIQUE_PTR) {
 
     BOOST_CHECK(values2.size() == 6);
 
-    BOOST_CHECK(values2[0] != nullptr && values2[0]->is_string() &&
-                values2[0]->as_string() == "hello world");
+    BOOST_CHECK(
+     values2[0] != nullptr && values2[0]->is_string() && values2[0]->as_string() == "hello world");
     BOOST_CHECK(values2[1] != nullptr && values2[1]->is_int64() && values2[1]->as_int64() == 42);
     BOOST_CHECK(values2[2] != nullptr && values2[2]->is_bool() && values2[2]->as_bool() == true);
     BOOST_CHECK(values2[3] == nullptr);
     BOOST_CHECK(values2[4] != nullptr && values2[4]->is_object());
-    BOOST_CHECK(values2[5] != nullptr && values2[5]->is_array() &&
-                values2[5]->as_array().size() == 3);
+    BOOST_CHECK(
+     values2[5] != nullptr && values2[5]->is_array() && values2[5]->as_array().size() == 3);
 
   } catch (const std::exception& e) {
     std::cout << "Error in 'TEST_PARSE_JSON_ARBITRARY_LIST_UNIQUE_PTR': " << e.what() << std::endl;
@@ -1394,14 +1392,14 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_ARBITRARY_LIST_SHARED_PTR) {
 
     BOOST_CHECK(values2.size() == 6);
 
-    BOOST_CHECK(values2[0] != nullptr && values2[0]->is_string() &&
-                values2[0]->as_string() == "hello world");
+    BOOST_CHECK(
+     values2[0] != nullptr && values2[0]->is_string() && values2[0]->as_string() == "hello world");
     BOOST_CHECK(values2[1] != nullptr && values2[1]->is_int64() && values2[1]->as_int64() == 42);
     BOOST_CHECK(values2[2] != nullptr && values2[2]->is_bool() && values2[2]->as_bool() == true);
     BOOST_CHECK(values2[3] == nullptr);
     BOOST_CHECK(values2[4] != nullptr && values2[4]->is_object());
-    BOOST_CHECK(values2[5] != nullptr && values2[5]->is_array() &&
-                values2[5]->as_array().size() == 3);
+    BOOST_CHECK(
+     values2[5] != nullptr && values2[5]->is_array() && values2[5]->as_array().size() == 3);
 
   } catch (const std::exception& e) {
     std::cout << "Error in 'TEST_PARSE_JSON_ARBITRARY_LIST_SHARED_PTR': " << e.what() << std::endl;
@@ -1430,14 +1428,14 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_ARBITRARY_LIST_OPTIONAL) {
 
     BOOST_CHECK(values2.size() == 6);
 
-    BOOST_CHECK(values2[0].has_value() && values2[0]->is_string() &&
-                values2[0]->as_string() == "hello world");
+    BOOST_CHECK(
+     values2[0].has_value() && values2[0]->is_string() && values2[0]->as_string() == "hello world");
     BOOST_CHECK(values2[1].has_value() && values2[1]->is_int64() && values2[1]->as_int64() == 42);
     BOOST_CHECK(!values2[2].has_value());
     BOOST_CHECK(values2[3].has_value() && values2[3]->is_bool() && values2[3]->as_bool() == true);
     BOOST_CHECK(values2[4].has_value() && values2[4]->is_object());
-    BOOST_CHECK(values2[5].has_value() && values2[5]->is_array() &&
-                values2[5]->as_array().size() == 3);
+    BOOST_CHECK(
+     values2[5].has_value() && values2[5]->is_array() && values2[5]->as_array().size() == 3);
 
   } catch (const std::exception& e) {
     std::cout << "Error in 'TEST_PARSE_JSON_ARBITRARY_LIST_OPTIONAL': " << e.what() << std::endl;
@@ -1712,8 +1710,8 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_ARBITRARY_SHARED_PTR_MEMBER) {
     ArbitrarySharedPtr value2;
     json::Unmarshal(json_value, value2);
 
-    BOOST_CHECK(value2.value_ != nullptr && value2.value_->is_int64() &&
-                value2.value_->as_int64() == 42);
+    BOOST_CHECK(
+     value2.value_ != nullptr && value2.value_->is_int64() && value2.value_->as_int64() == 42);
 
   } catch (const std::exception& e) {
     std::cout << "Error in 'TEST_PARSE_JSON_ARBITRARY_SHARED_PTR_MEMBER': " << e.what()
@@ -1735,8 +1733,8 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_ARBITRARY_OPTIONAL_MEMBER) {
     ArbitraryOptional value2;
     json::Unmarshal(json_value, value2);
 
-    BOOST_CHECK(value2.value_.has_value() && value2.value_->is_bool() &&
-                value2.value_->as_bool() == true);
+    BOOST_CHECK(
+     value2.value_.has_value() && value2.value_->is_bool() && value2.value_->as_bool() == true);
 
   } catch (const std::exception& e) {
     std::cout << "Error in 'TEST_PARSE_JSON_ARBITRARY_OPTIONAL_MEMBER': " << e.what() << std::endl;
@@ -1786,8 +1784,8 @@ BOOST_AUTO_TEST_CASE(TEST_PARSE_JSON_ARBITRARY_DICT) {
     json::Unmarshal(json_value, value2);
 
     BOOST_CHECK(value2.value_.size() == 3);
-    BOOST_CHECK(value2.value_["string"].is_string() &&
-                value2.value_["string"].as_string() == "hello");
+    BOOST_CHECK(
+     value2.value_["string"].is_string() && value2.value_["string"].as_string() == "hello");
     BOOST_CHECK(value2.value_["number"].is_int64() && value2.value_["number"].as_int64() == 42);
     BOOST_CHECK(value2.value_["boolean"].is_bool() && value2.value_["boolean"].as_bool() == true);
 

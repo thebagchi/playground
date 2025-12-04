@@ -117,11 +117,10 @@ struct Address {
   UniquePtr<String> country_;
   UniquePtr<String> postal_code_;
 
-  constexpr const static auto properties =
-      std::make_tuple(json::prop(&Address::street_, "street"),
-                      json::prop(&Address::city_, "city"),
-                      json::prop(&Address::country_, "country"),
-                      json::prop(&Address::postal_code_, "postal_code", json::NULLABLE));
+  constexpr const static auto properties = std::make_tuple(json::prop(&Address::street_, "street"),
+   json::prop(&Address::city_, "city"),
+   json::prop(&Address::country_, "country"),
+   json::prop(&Address::postal_code_, "postal_code", json::NULLABLE));
 };
 
 struct Person {
@@ -131,12 +130,11 @@ struct Person {
   UniquePtr<Address> address_;
   Vector<String> tags_;
 
-  constexpr const static auto properties =
-      std::make_tuple(json::prop(&Person::name_, "name"),
-                      json::prop(&Person::age_, "age"),
-                      json::prop(&Person::email_, "email", json::NULLABLE),
-                      json::prop(&Person::address_, "address", json::NULLABLE),
-                      json::prop(&Person::tags_, "tags"));
+  constexpr const static auto properties = std::make_tuple(json::prop(&Person::name_, "name"),
+   json::prop(&Person::age_, "age"),
+   json::prop(&Person::email_, "email", json::NULLABLE),
+   json::prop(&Person::address_, "address", json::NULLABLE),
+   json::prop(&Person::tags_, "tags"));
 };
 
 struct Company {
@@ -144,35 +142,34 @@ struct Company {
   Vector<Person> employees_;
   Map<String> metadata_;
 
-  constexpr const static auto properties =
-      std::make_tuple(json::prop(&Company::name_, "name"),
-                      json::prop(&Company::employees_, "employees"),
-                      json::prop(&Company::metadata_, "metadata"));
+  constexpr const static auto properties = std::make_tuple(json::prop(&Company::name_, "name"),
+   json::prop(&Company::employees_, "employees"),
+   json::prop(&Company::metadata_, "metadata"));
 };
 
 // Memory benchmark test structures
 struct WithUnique {
   UniquePtr<String> value_;
   constexpr const static auto properties =
-      std::make_tuple(json::prop(&WithUnique::value_, "value"));
+   std::make_tuple(json::prop(&WithUnique::value_, "value"));
 };
 
 struct WithShared {
   SharedPtr<String> value_;
   constexpr const static auto properties =
-      std::make_tuple(json::prop(&WithShared::value_, "value"));
+   std::make_tuple(json::prop(&WithShared::value_, "value"));
 };
 
 struct WithOptional {
   Optional<String> value_;
   constexpr const static auto properties =
-      std::make_tuple(json::prop(&WithOptional::value_, "value", json::NULLABLE));
+   std::make_tuple(json::prop(&WithOptional::value_, "value", json::NULLABLE));
 };
 
 struct WithPointer {
   UniquePtr<String> value_;
   constexpr const static auto properties =
-      std::make_tuple(json::prop(&WithPointer::value_, "value", json::NULLABLE));
+   std::make_tuple(json::prop(&WithPointer::value_, "value", json::NULLABLE));
 };
 
 // =============================================================================
@@ -272,12 +269,9 @@ BOOST_AUTO_TEST_CASE(benchmark_complex_person_serialization) {
 BOOST_AUTO_TEST_CASE(benchmark_small_company_serialization) {
   Company company = generate_company(10);
 
-  auto result = benchmark(
-      "Small Company (10 employees) Serialization",
-      [&]() {
-        (void)json::MarshalToString(company);
-      },
-      500);
+  auto result = benchmark("Small Company (10 employees) Serialization", [&]() {
+    (void)json::MarshalToString(company);
+  }, 500);
 
   result.print();
   BOOST_TEST_MESSAGE("Benchmark completed successfully");
@@ -286,12 +280,9 @@ BOOST_AUTO_TEST_CASE(benchmark_small_company_serialization) {
 BOOST_AUTO_TEST_CASE(benchmark_medium_company_serialization) {
   Company company = generate_company(100);
 
-  auto result = benchmark(
-      "Medium Company (100 employees) Serialization",
-      [&]() {
-        (void)json::MarshalToString(company);
-      },
-      100);
+  auto result = benchmark("Medium Company (100 employees) Serialization", [&]() {
+    (void)json::MarshalToString(company);
+  }, 100);
 
   result.print();
   BOOST_TEST_MESSAGE("Benchmark completed successfully");
@@ -300,12 +291,9 @@ BOOST_AUTO_TEST_CASE(benchmark_medium_company_serialization) {
 BOOST_AUTO_TEST_CASE(benchmark_large_company_serialization) {
   Company company = generate_company(1000);
 
-  auto result = benchmark(
-      "Large Company (1000 employees) Serialization",
-      [&]() {
-        (void)json::MarshalToString(company);
-      },
-      10);
+  auto result = benchmark("Large Company (1000 employees) Serialization", [&]() {
+    (void)json::MarshalToString(company);
+  }, 10);
 
   result.print();
   BOOST_TEST_MESSAGE("Benchmark completed successfully");
@@ -318,13 +306,10 @@ BOOST_AUTO_TEST_CASE(benchmark_vector_serialization) {
     people.push_back(generate_person(true));
   }
 
-  auto result = benchmark(
-      "Vector<Person> (100) Serialization",
-      [&]() {
-        boost::json::value json = json::Marshal(people);
-        boost::json::serialize(json);
-      },
-      200);
+  auto result = benchmark("Vector<Person> (100) Serialization", [&]() {
+    boost::json::value json = json::Marshal(people);
+    boost::json::serialize(json);
+  }, 200);
 
   result.print();
   BOOST_TEST_MESSAGE("Benchmark completed successfully");
@@ -336,13 +321,10 @@ BOOST_AUTO_TEST_CASE(benchmark_map_serialization) {
     people_map[random_string(10)] = generate_person(true);
   }
 
-  auto result = benchmark(
-      "Map<string, Person> (100) Serialization",
-      [&]() {
-        boost::json::value json = json::Marshal(people_map);
-        boost::json::serialize(json);
-      },
-      200);
+  auto result = benchmark("Map<string, Person> (100) Serialization", [&]() {
+    boost::json::value json = json::Marshal(people_map);
+    boost::json::serialize(json);
+  }, 200);
 
   result.print();
   BOOST_TEST_MESSAGE("Benchmark completed successfully");
@@ -386,13 +368,10 @@ BOOST_AUTO_TEST_CASE(benchmark_small_company_deserialization) {
   Company company = generate_company(10);
   std::string json_str = json::MarshalToString(company);
 
-  auto result = benchmark(
-      "Small Company (10 employees) Deserialization",
-      [&]() {
-        Company c;
-        json::UnmarshalFromString(json_str, c);
-      },
-      500);
+  auto result = benchmark("Small Company (10 employees) Deserialization", [&]() {
+    Company c;
+    json::UnmarshalFromString(json_str, c);
+  }, 500);
 
   result.print();
   BOOST_TEST_MESSAGE("Benchmark completed successfully");
@@ -402,13 +381,10 @@ BOOST_AUTO_TEST_CASE(benchmark_medium_company_deserialization) {
   Company company = generate_company(100);
   std::string json_str = json::MarshalToString(company);
 
-  auto result = benchmark(
-      "Medium Company (100 employees) Deserialization",
-      [&]() {
-        Company c;
-        json::UnmarshalFromString(json_str, c);
-      },
-      100);
+  auto result = benchmark("Medium Company (100 employees) Deserialization", [&]() {
+    Company c;
+    json::UnmarshalFromString(json_str, c);
+  }, 100);
 
   result.print();
   BOOST_TEST_MESSAGE("Benchmark completed successfully");
@@ -418,13 +394,10 @@ BOOST_AUTO_TEST_CASE(benchmark_large_company_deserialization) {
   Company company = generate_company(1000);
   std::string json_str = json::MarshalToString(company);
 
-  auto result = benchmark(
-      "Large Company (1000 employees) Deserialization",
-      [&]() {
-        Company c;
-        json::UnmarshalFromString(json_str, c);
-      },
-      10);
+  auto result = benchmark("Large Company (1000 employees) Deserialization", [&]() {
+    Company c;
+    json::UnmarshalFromString(json_str, c);
+  }, 10);
 
   result.print();
   BOOST_TEST_MESSAGE("Benchmark completed successfully");
@@ -438,13 +411,10 @@ BOOST_AUTO_TEST_CASE(benchmark_vector_deserialization) {
   }
   std::string json_str = json::MarshalToString(people);
 
-  auto result = benchmark(
-      "Vector<Person> (100) Deserialization",
-      [&]() {
-        Vector<Person> p;
-        json::UnmarshalFromString(json_str, p);
-      },
-      200);
+  auto result = benchmark("Vector<Person> (100) Deserialization", [&]() {
+    Vector<Person> p;
+    json::UnmarshalFromString(json_str, p);
+  }, 200);
 
   result.print();
   BOOST_TEST_MESSAGE("Benchmark completed successfully");
@@ -457,13 +427,10 @@ BOOST_AUTO_TEST_CASE(benchmark_map_deserialization) {
   }
   std::string json_str = json::MarshalToString(people_map);
 
-  auto result = benchmark(
-      "Map<string, Person> (100) Deserialization",
-      [&]() {
-        Map<Person> m;
-        json::UnmarshalFromString(json_str, m);
-      },
-      200);
+  auto result = benchmark("Map<string, Person> (100) Deserialization", [&]() {
+    Map<Person> m;
+    json::UnmarshalFromString(json_str, m);
+  }, 200);
 
   result.print();
   BOOST_TEST_MESSAGE("Benchmark completed successfully");
@@ -475,13 +442,10 @@ BOOST_AUTO_TEST_CASE(benchmark_array_serialization) {
     people[i] = generate_person(true);
   }
 
-  auto result = benchmark(
-      "Array<Person, 10> Serialization",
-      [&]() {
-        boost::json::value json = json::Marshal(people);
-        boost::json::serialize(json);
-      },
-      200);
+  auto result = benchmark("Array<Person, 10> Serialization", [&]() {
+    boost::json::value json = json::Marshal(people);
+    boost::json::serialize(json);
+  }, 200);
 
   result.print();
   BOOST_TEST_MESSAGE("Benchmark completed successfully");
@@ -494,13 +458,10 @@ BOOST_AUTO_TEST_CASE(benchmark_array_deserialization) {
   }
   std::string json_str = json::MarshalToString(people);
 
-  auto result = benchmark(
-      "Array<Person, 10> Deserialization",
-      [&]() {
-        Array<Person, 10> a;
-        json::UnmarshalFromString(json_str, a);
-      },
-      200);
+  auto result = benchmark("Array<Person, 10> Deserialization", [&]() {
+    Array<Person, 10> a;
+    json::UnmarshalFromString(json_str, a);
+  }, 200);
 
   result.print();
   BOOST_TEST_MESSAGE("Benchmark completed successfully");
@@ -516,21 +477,15 @@ BOOST_AUTO_TEST_CASE(benchmark_array_vs_vector_serialization) {
     people_vector.push_back(generate_person(true));
   }
 
-  auto array_result = benchmark(
-      "Array<Person, 50> Serialization",
-      [&]() {
-        boost::json::value json = json::Marshal(people_array);
-        boost::json::serialize(json);
-      },
-      100);
+  auto array_result = benchmark("Array<Person, 50> Serialization", [&]() {
+    boost::json::value json = json::Marshal(people_array);
+    boost::json::serialize(json);
+  }, 100);
 
-  auto vector_result = benchmark(
-      "Vector<Person, 50> Serialization",
-      [&]() {
-        boost::json::value json = json::Marshal(people_vector);
-        boost::json::serialize(json);
-      },
-      100);
+  auto vector_result = benchmark("Vector<Person, 50> Serialization", [&]() {
+    boost::json::value json = json::Marshal(people_vector);
+    boost::json::serialize(json);
+  }, 100);
 
   array_result.print();
   vector_result.print();
@@ -556,21 +511,15 @@ BOOST_AUTO_TEST_CASE(benchmark_array_vs_vector_deserialization) {
   std::string array_json = json::MarshalToString(people_array);
   std::string vector_json = json::MarshalToString(people_vector);
 
-  auto array_result = benchmark(
-      "Array<Person, 50> Deserialization",
-      [&]() {
-        Array<Person, 50> a;
-        json::UnmarshalFromString(array_json, a);
-      },
-      100);
+  auto array_result = benchmark("Array<Person, 50> Deserialization", [&]() {
+    Array<Person, 50> a;
+    json::UnmarshalFromString(array_json, a);
+  }, 100);
 
-  auto vector_result = benchmark(
-      "Vector<Person, 50> Deserialization",
-      [&]() {
-        Vector<Person> v;
-        json::UnmarshalFromString(vector_json, v);
-      },
-      100);
+  auto vector_result = benchmark("Vector<Person, 50> Deserialization", [&]() {
+    Vector<Person> v;
+    json::UnmarshalFromString(vector_json, v);
+  }, 100);
 
   array_result.print();
   vector_result.print();
@@ -593,23 +542,17 @@ BOOST_AUTO_TEST_CASE(benchmark_array_vs_vector_roundtrip) {
     people_vector.push_back(generate_person(true));
   }
 
-  auto array_result = benchmark(
-      "Array<Person, 25> Round-trip",
-      [&]() {
-        std::string json_str = json::MarshalToString(people_array);
-        Array<Person, 25> a;
-        json::UnmarshalFromString(json_str, a);
-      },
-      100);
+  auto array_result = benchmark("Array<Person, 25> Round-trip", [&]() {
+    std::string json_str = json::MarshalToString(people_array);
+    Array<Person, 25> a;
+    json::UnmarshalFromString(json_str, a);
+  }, 100);
 
-  auto vector_result = benchmark(
-      "Vector<Person, 25> Round-trip",
-      [&]() {
-        std::string json_str = json::MarshalToString(people_vector);
-        Vector<Person> v;
-        json::UnmarshalFromString(json_str, v);
-      },
-      100);
+  auto vector_result = benchmark("Vector<Person, 25> Round-trip", [&]() {
+    std::string json_str = json::MarshalToString(people_vector);
+    Vector<Person> v;
+    json::UnmarshalFromString(json_str, v);
+  }, 100);
 
   array_result.print();
   vector_result.print();
@@ -628,13 +571,10 @@ BOOST_AUTO_TEST_CASE(benchmark_list_serialization) {
     people.push_back(generate_person(true));
   }
 
-  auto result = benchmark(
-      "List<Person> (100) Serialization",
-      [&]() {
-        boost::json::value json = json::Marshal(people);
-        boost::json::serialize(json);
-      },
-      200);
+  auto result = benchmark("List<Person> (100) Serialization", [&]() {
+    boost::json::value json = json::Marshal(people);
+    boost::json::serialize(json);
+  }, 200);
 
   result.print();
   BOOST_TEST_MESSAGE("Benchmark completed successfully");
@@ -647,13 +587,10 @@ BOOST_AUTO_TEST_CASE(benchmark_list_deserialization) {
   }
   std::string json_str = json::MarshalToString(people);
 
-  auto result = benchmark(
-      "List<Person> (100) Deserialization",
-      [&]() {
-        List<Person> l;
-        json::UnmarshalFromString(json_str, l);
-      },
-      200);
+  auto result = benchmark("List<Person> (100) Deserialization", [&]() {
+    List<Person> l;
+    json::UnmarshalFromString(json_str, l);
+  }, 200);
 
   result.print();
   BOOST_TEST_MESSAGE("Benchmark completed successfully");
@@ -669,21 +606,15 @@ BOOST_AUTO_TEST_CASE(benchmark_list_vs_vector_serialization) {
     people_vector.push_back(generate_person(true));
   }
 
-  auto list_result = benchmark(
-      "List<Person, 50> Serialization",
-      [&]() {
-        boost::json::value json = json::Marshal(people_list);
-        boost::json::serialize(json);
-      },
-      100);
+  auto list_result = benchmark("List<Person, 50> Serialization", [&]() {
+    boost::json::value json = json::Marshal(people_list);
+    boost::json::serialize(json);
+  }, 100);
 
-  auto vector_result = benchmark(
-      "Vector<Person, 50> Serialization",
-      [&]() {
-        boost::json::value json = json::Marshal(people_vector);
-        boost::json::serialize(json);
-      },
-      100);
+  auto vector_result = benchmark("Vector<Person, 50> Serialization", [&]() {
+    boost::json::value json = json::Marshal(people_vector);
+    boost::json::serialize(json);
+  }, 100);
 
   list_result.print();
   vector_result.print();
@@ -709,21 +640,15 @@ BOOST_AUTO_TEST_CASE(benchmark_list_vs_vector_deserialization) {
   std::string list_json = json::MarshalToString(people_list);
   std::string vector_json = json::MarshalToString(people_vector);
 
-  auto list_result = benchmark(
-      "List<Person, 50> Deserialization",
-      [&]() {
-        List<Person> l;
-        json::UnmarshalFromString(list_json, l);
-      },
-      100);
+  auto list_result = benchmark("List<Person, 50> Deserialization", [&]() {
+    List<Person> l;
+    json::UnmarshalFromString(list_json, l);
+  }, 100);
 
-  auto vector_result = benchmark(
-      "Vector<Person, 50> Deserialization",
-      [&]() {
-        Vector<Person> v;
-        json::UnmarshalFromString(vector_json, v);
-      },
-      100);
+  auto vector_result = benchmark("Vector<Person, 50> Deserialization", [&]() {
+    Vector<Person> v;
+    json::UnmarshalFromString(vector_json, v);
+  }, 100);
 
   list_result.print();
   vector_result.print();
@@ -746,23 +671,17 @@ BOOST_AUTO_TEST_CASE(benchmark_list_vs_vector_roundtrip) {
     people_vector.push_back(generate_person(true));
   }
 
-  auto list_result = benchmark(
-      "List<Person, 25> Round-trip",
-      [&]() {
-        std::string json_str = json::MarshalToString(people_list);
-        List<Person> l;
-        json::UnmarshalFromString(json_str, l);
-      },
-      100);
+  auto list_result = benchmark("List<Person, 25> Round-trip", [&]() {
+    std::string json_str = json::MarshalToString(people_list);
+    List<Person> l;
+    json::UnmarshalFromString(json_str, l);
+  }, 100);
 
-  auto vector_result = benchmark(
-      "Vector<Person, 25> Round-trip",
-      [&]() {
-        std::string json_str = json::MarshalToString(people_vector);
-        Vector<Person> v;
-        json::UnmarshalFromString(json_str, v);
-      },
-      100);
+  auto vector_result = benchmark("Vector<Person, 25> Round-trip", [&]() {
+    std::string json_str = json::MarshalToString(people_vector);
+    Vector<Person> v;
+    json::UnmarshalFromString(json_str, v);
+  }, 100);
 
   list_result.print();
   vector_result.print();
@@ -781,12 +700,9 @@ BOOST_AUTO_TEST_CASE(benchmark_unordered_map_serialization) {
     people_map[random_string(10)] = generate_person(true);
   }
 
-  auto result = benchmark(
-      "UnorderedMap<string, Person> (100) Serialization",
-      [&]() {
-        std::string json_str = json::MarshalToString(people_map);
-      },
-      200);
+  auto result = benchmark("UnorderedMap<string, Person> (100) Serialization", [&]() {
+    std::string json_str = json::MarshalToString(people_map);
+  }, 200);
 
   result.print();
   BOOST_TEST_MESSAGE("Benchmark completed successfully");
@@ -799,13 +715,10 @@ BOOST_AUTO_TEST_CASE(benchmark_unordered_map_deserialization) {
   }
   std::string json_str = json::MarshalToString(people_map);
 
-  auto result = benchmark(
-      "UnorderedMap<string, Person> (100) Deserialization",
-      [&]() {
-        Dict<Person> m;
-        json::UnmarshalFromString(json_str, m);
-      },
-      200);
+  auto result = benchmark("UnorderedMap<string, Person> (100) Deserialization", [&]() {
+    Dict<Person> m;
+    json::UnmarshalFromString(json_str, m);
+  }, 200);
 
   result.print();
   BOOST_TEST_MESSAGE("Benchmark completed successfully");
@@ -835,14 +748,11 @@ BOOST_AUTO_TEST_CASE(benchmark_person_roundtrip) {
 BOOST_AUTO_TEST_CASE(benchmark_company_roundtrip) {
   Company company = generate_company(50);
 
-  auto result = benchmark(
-      "Company (50 employees) Round-trip",
-      [&]() {
-        std::string json_str = json::MarshalToString(company);
-        Company c;
-        json::UnmarshalFromString(json_str, c);
-      },
-      100);
+  auto result = benchmark("Company (50 employees) Round-trip", [&]() {
+    std::string json_str = json::MarshalToString(company);
+    Company c;
+    json::UnmarshalFromString(json_str, c);
+  }, 100);
 
   result.print();
   BOOST_TEST_MESSAGE("Benchmark completed successfully");
@@ -855,14 +765,11 @@ BOOST_AUTO_TEST_CASE(benchmark_vector_roundtrip) {
     people.push_back(generate_person(true));
   }
 
-  auto result = benchmark(
-      "Vector<Person> (50) Round-trip",
-      [&]() {
-        std::string json_str = json::MarshalToString(people);
-        Vector<Person> p;
-        json::UnmarshalFromString(json_str, p);
-      },
-      200);
+  auto result = benchmark("Vector<Person> (50) Round-trip", [&]() {
+    std::string json_str = json::MarshalToString(people);
+    Vector<Person> p;
+    json::UnmarshalFromString(json_str, p);
+  }, 200);
 
   result.print();
   BOOST_TEST_MESSAGE("Benchmark completed successfully");
@@ -879,21 +786,15 @@ BOOST_AUTO_TEST_SUITE(memory_benchmarks)
 BOOST_AUTO_TEST_CASE(benchmark_shared_ptr_vs_unique_ptr) {
   WithUnique u;
   u.value_ = MAKE_UNIQUE(std::string, random_string(50));
-  auto unique_result = benchmark(
-      "unique_ptr Serialization",
-      [&]() {
-        (void)json::MarshalToString(u);
-      },
-      1000);
+  auto unique_result = benchmark("unique_ptr Serialization", [&]() {
+    (void)json::MarshalToString(u);
+  }, 1000);
 
   WithShared s;
   s.value_ = MAKE_SHARED(std::string, random_string(50));
-  auto shared_result = benchmark(
-      "shared_ptr Serialization",
-      [&]() {
-        (void)json::MarshalToString(s);
-      },
-      1000);
+  auto shared_result = benchmark("shared_ptr Serialization", [&]() {
+    (void)json::MarshalToString(s);
+  }, 1000);
 
   unique_result.print();
   shared_result.print();
@@ -907,21 +808,15 @@ BOOST_AUTO_TEST_CASE(benchmark_shared_ptr_vs_unique_ptr) {
 BOOST_AUTO_TEST_CASE(benchmark_optional_vs_pointer) {
   WithOptional opt;
   opt.value_ = random_string(50);
-  auto opt_result = benchmark(
-      "optional Serialization",
-      [&]() {
-        (void)json::MarshalToString(opt);
-      },
-      1000);
+  auto opt_result = benchmark("optional Serialization", [&]() {
+    (void)json::MarshalToString(opt);
+  }, 1000);
 
   WithPointer ptr;
   ptr.value_ = MAKE_UNIQUE(std::string, random_string(50));
-  auto ptr_result = benchmark(
-      "unique_ptr Serialization",
-      [&]() {
-        (void)json::MarshalToString(ptr);
-      },
-      1000);
+  auto ptr_result = benchmark("unique_ptr Serialization", [&]() {
+    (void)json::MarshalToString(ptr);
+  }, 1000);
 
   opt_result.print();
   ptr_result.print();

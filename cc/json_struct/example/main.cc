@@ -17,9 +17,9 @@ public:
 
 template <> struct json::STRUCT<Person> {
   static constexpr auto properties = std::make_tuple(prop(&Person::name_, "name"),
-                                                     prop(&Person::age_, "age"),
-                                                     prop(&Person::city_, "city"),
-                                                     prop(&Person::email_, "email"));
+   prop(&Person::age_, "age"),
+   prop(&Person::city_, "city"),
+   prop(&Person::email_, "email"));
 };
 
 void encode_decode_struct() {
@@ -504,10 +504,18 @@ void encode_decode_optional() {
 void encode_decode_byte_array() {
   try {
     // Create byte array with some sample data
-    ByteVector original_bytes = { std::byte{ 0x48 }, std::byte{ 0x65 }, std::byte{ 0x6C },
-                                  std::byte{ 0x6C }, std::byte{ 0x6F }, std::byte{ 0x20 },
-                                  std::byte{ 0x57 }, std::byte{ 0x6F }, std::byte{ 0x72 },
-                                  std::byte{ 0x6C }, std::byte{ 0x64 }, std::byte{ 0x21 } };
+    ByteVector original_bytes = { std::byte{ 0x48 },
+      std::byte{ 0x65 },
+      std::byte{ 0x6C },
+      std::byte{ 0x6C },
+      std::byte{ 0x6F },
+      std::byte{ 0x20 },
+      std::byte{ 0x57 },
+      std::byte{ 0x6F },
+      std::byte{ 0x72 },
+      std::byte{ 0x6C },
+      std::byte{ 0x64 },
+      std::byte{ 0x21 } };
     ByteVector decoded_bytes;
 
     // Marshal to JSON
@@ -553,10 +561,18 @@ void encode_decode_byte_array() {
 void encode_decode_byte_array_fixed() {
   try {
     // Create fixed-size byte array with some sample data (12 bytes)
-    ByteArray<12> original_bytes = { std::byte{ 0x48 }, std::byte{ 0x65 }, std::byte{ 0x6C },
-                                     std::byte{ 0x6C }, std::byte{ 0x6F }, std::byte{ 0x20 },
-                                     std::byte{ 0x57 }, std::byte{ 0x6F }, std::byte{ 0x72 },
-                                     std::byte{ 0x6C }, std::byte{ 0x64 }, std::byte{ 0x21 } };
+    ByteArray<12> original_bytes = { std::byte{ 0x48 },
+      std::byte{ 0x65 },
+      std::byte{ 0x6C },
+      std::byte{ 0x6C },
+      std::byte{ 0x6F },
+      std::byte{ 0x20 },
+      std::byte{ 0x57 },
+      std::byte{ 0x6F },
+      std::byte{ 0x72 },
+      std::byte{ 0x6C },
+      std::byte{ 0x64 },
+      std::byte{ 0x21 } };
     ByteArray<12> decoded_bytes{};
 
     // Marshal to JSON
@@ -603,11 +619,10 @@ void encode_decode_arbitrary() {
   try {
     // Create arbitrary JSON value (complex object)
     boost::json::value original_arbitrary = { { "message", "Hello arbitrary JSON!" },
-                                              { "number", 42 },
-                                              { "boolean", true },
-                                              { "array", { 1, 2, 3, 4, 5 } },
-                                              { "nested",
-                                                { { "key", "value" }, { "count", 100 } } } };
+      { "number", 42 },
+      { "boolean", true },
+      { "array", { 1, 2, 3, 4, 5 } },
+      { "nested", { { "key", "value" }, { "count", 100 } } } };
     boost::json::value decoded_arbitrary;
 
     // Marshal to JSON
@@ -679,8 +694,8 @@ struct ApiResponse {
 
 template <> struct json::STRUCT<ApiResponse> {
   static constexpr auto properties = std::make_tuple(json::prop(&ApiResponse::message_, "message"),
-                                                     json::prop(&ApiResponse::code_, "code"),
-                                                     json::prop(&ApiResponse::status_, "status"));
+   json::prop(&ApiResponse::code_, "code"),
+   json::prop(&ApiResponse::status_, "status"));
 };
 
 void encode_decode_enum() {

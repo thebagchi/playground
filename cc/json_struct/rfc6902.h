@@ -36,8 +36,8 @@ namespace rfc6902 {
 
   // Extract a value from a JSON document using a JSON Pointer path
   // Returns empty optional if the path doesn't exist or is invalid
-  inline boost::optional<const boost::json::value&> Extract(const boost::json::value& value,
-                                                            const std::string& path) {
+  inline boost::optional<const boost::json::value&> Extract(
+   const boost::json::value& value, const std::string& path) {
     if (path.empty()) {
       return value;
     }

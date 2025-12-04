@@ -14,7 +14,7 @@ std::condition_variable cv;
 int current_thread = 0;
 
 void matrix_multiply_section(
-    const Matrix& A, const Matrix& B, Matrix& C, Section section, int thread_id) {
+ const Matrix& A, const Matrix& B, Matrix& C, Section section, int thread_id) {
   std::unique_lock<std::mutex> lock(mtx);
   cv.wait(lock, [thread_id] {
     // Wait for this thread's turn ...
@@ -54,11 +54,11 @@ void parallel_matrix_multiply(std::uint64_t size, std::uint64_t num) {
     auto srow = i * rows_per_thread;
     auto erow = (i == num - 1) ? size : srow + rows_per_thread;
     threads.emplace_back(matrix_multiply_section,
-                         std::cref(A),
-                         std::cref(B),
-                         std::ref(C),
-                         std::make_tuple(srow, erow, size),
-                         i);
+     std::cref(A),
+     std::cref(B),
+     std::ref(C),
+     std::make_tuple(srow, erow, size),
+     i);
   }
   {
     // signal the first thread ...

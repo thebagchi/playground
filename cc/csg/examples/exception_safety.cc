@@ -26,8 +26,8 @@ void safe_function() {
 }
 
 void safe_function_with_smart_pointers(std::unique_ptr<Resource> unique_res,
-                                       std::shared_ptr<Resource> shared_res,
-                                       std::optional<Resource> opt_val) {
+ std::shared_ptr<Resource> shared_res,
+ std::optional<Resource> opt_val) {
   if (unique_res) {
     unique_res->use();
   }

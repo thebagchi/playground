@@ -4,15 +4,15 @@
 
 #include "cpuid.h"
 
-std::tuple<std::uint32_t, std::uint32_t, std::uint32_t, std::uint32_t>
-get_cpuid(const std::uint32_t leaf = 0) {
+std::tuple<std::uint32_t, std::uint32_t, std::uint32_t, std::uint32_t> get_cpuid(
+ const std::uint32_t leaf = 0) {
   uint32_t eax, ebx, ecx, edx;
   __get_cpuid(leaf, &eax, &ebx, &ecx, &edx);
   return std::make_tuple(eax, ebx, ecx, edx);
 }
 
-std::tuple<std::uint32_t, std::uint32_t, std::uint32_t, std::uint32_t>
-get_cpuid_count(const std::uint32_t leaf = 0, const std::uint32_t subleaf = 0) {
+std::tuple<std::uint32_t, std::uint32_t, std::uint32_t, std::uint32_t> get_cpuid_count(
+ const std::uint32_t leaf = 0, const std::uint32_t subleaf = 0) {
   uint32_t eax, ebx, ecx, edx;
   __get_cpuid_count(leaf, 0, &eax, &ebx, &ecx, &edx);
   return std::make_tuple(eax, ebx, ecx, edx);

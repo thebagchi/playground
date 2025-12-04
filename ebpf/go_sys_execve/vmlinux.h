@@ -32356,10 +32356,8 @@ typedef union {
     efi_status_t (*set_time)(efi_time_t*);
     efi_status_t (*get_wakeup_time)(efi_bool_t*, efi_bool_t*, efi_time_t*);
     efi_status_t (*set_wakeup_time)(efi_bool_t, efi_time_t*);
-    efi_status_t (*set_virtual_address_map)(long unsigned int,
-                                            long unsigned int,
-                                            u32,
-                                            efi_memory_desc_t*);
+    efi_status_t (*set_virtual_address_map)(
+     long unsigned int, long unsigned int, u32, efi_memory_desc_t*);
     void* convert_pointer;
     efi_status_t (*get_variable)(efi_char16_t*, efi_guid_t*, u32*, long unsigned int*, void*);
     efi_status_t (*get_next_variable)(long unsigned int*, efi_char16_t*, efi_guid_t*);
@@ -33156,12 +33154,12 @@ struct Qdisc_class_ops {
   unsigned int flags;
   struct netdev_queue* (*select_queue)(struct Qdisc*, struct tcmsg*);
   int (*graft)(
-      struct Qdisc*, long unsigned int, struct Qdisc*, struct Qdisc**, struct netlink_ext_ack*);
+   struct Qdisc*, long unsigned int, struct Qdisc*, struct Qdisc**, struct netlink_ext_ack*);
   struct Qdisc* (*leaf)(struct Qdisc*, long unsigned int);
   void (*qlen_notify)(struct Qdisc*, long unsigned int);
   long unsigned int (*find)(struct Qdisc*, u32);
   int (*change)(
-      struct Qdisc*, u32, u32, struct nlattr**, long unsigned int*, struct netlink_ext_ack*);
+   struct Qdisc*, u32, u32, struct nlattr**, long unsigned int*, struct netlink_ext_ack*);
   int (*delete)(struct Qdisc*, long unsigned int, struct netlink_ext_ack*);
   void (*walk)(struct Qdisc*, struct qdisc_walker*);
   struct tcf_block* (*tcf_block)(struct Qdisc*, long unsigned int, struct netlink_ext_ack*);
@@ -35431,12 +35429,10 @@ struct power_supply_desc {
   u32 usb_types;
   const enum power_supply_property* properties;
   size_t num_properties;
-  int (*get_property)(struct power_supply*,
-                      enum power_supply_property,
-                      union power_supply_propval*);
-  int (*set_property)(struct power_supply*,
-                      enum power_supply_property,
-                      const union power_supply_propval*);
+  int (*get_property)(
+   struct power_supply*, enum power_supply_property, union power_supply_propval*);
+  int (*set_property)(
+   struct power_supply*, enum power_supply_property, const union power_supply_propval*);
   int (*property_is_writeable)(struct power_supply*, enum power_supply_property);
   void (*external_power_changed)(struct power_supply*);
   void (*set_charged)(struct power_supply*);
@@ -35750,10 +35746,10 @@ struct bin_attribute {
   struct address_space* (*f_mapping)(void);
   ssize_t (*read)(struct file*, struct kobject*, struct bin_attribute*, char*, loff_t, size_t);
   ssize_t (*read_new)(
-      struct file*, struct kobject*, const struct bin_attribute*, char*, loff_t, size_t);
+   struct file*, struct kobject*, const struct bin_attribute*, char*, loff_t, size_t);
   ssize_t (*write)(struct file*, struct kobject*, struct bin_attribute*, char*, loff_t, size_t);
   ssize_t (*write_new)(
-      struct file*, struct kobject*, const struct bin_attribute*, char*, loff_t, size_t);
+   struct file*, struct kobject*, const struct bin_attribute*, char*, loff_t, size_t);
   loff_t (*llseek)(struct file*, struct kobject*, const struct bin_attribute*, loff_t, int);
   int (*mmap)(struct file*, struct kobject*, const struct bin_attribute*, struct vm_area_struct*);
 };
@@ -38404,8 +38400,8 @@ struct acpi_prmt_module_info {
 
 struct acpi_probe_entry;
 
-typedef bool (*acpi_probe_entry_validate_subtbl)(struct acpi_subtable_header*,
-                                                 struct acpi_probe_entry*);
+typedef bool (*acpi_probe_entry_validate_subtbl)(
+ struct acpi_subtable_header*, struct acpi_probe_entry*);
 
 struct acpi_table_header;
 
@@ -38618,8 +38614,8 @@ struct acpi_region_walk_info {
   u32 address_space_id;
 };
 
-typedef acpi_status (*acpi_repair_function)(struct acpi_evaluate_info*,
-                                            union acpi_operand_object**);
+typedef acpi_status (*acpi_repair_function)(
+ struct acpi_evaluate_info*, union acpi_operand_object**);
 
 struct acpi_repair_info {
   char name[4];
@@ -39095,9 +39091,8 @@ struct acpi_signal_fatal_info {
   u32 argument;
 };
 
-typedef acpi_status (*acpi_object_converter)(struct acpi_namespace_node*,
-                                             union acpi_operand_object*,
-                                             union acpi_operand_object**);
+typedef acpi_status (*acpi_object_converter)(
+ struct acpi_namespace_node*, union acpi_operand_object*, union acpi_operand_object**);
 
 struct acpi_simple_repair_info {
   char name[4];
@@ -39190,9 +39185,8 @@ union acpi_subtable_headers {
   struct acpi_cdat_header cdat;
 };
 
-typedef int (*acpi_tbl_entry_handler_arg)(union acpi_subtable_headers*,
-                                          void*,
-                                          const long unsigned int);
+typedef int (*acpi_tbl_entry_handler_arg)(
+ union acpi_subtable_headers*, void*, const long unsigned int);
 
 struct acpi_subtable_proc {
   int id;
@@ -39797,13 +39791,13 @@ struct ring_buffer_event;
 struct action_data;
 
 typedef void (*action_fn_t)(struct hist_trigger_data*,
-                            struct tracing_map_elt*,
-                            struct trace_buffer*,
-                            void*,
-                            struct ring_buffer_event*,
-                            void*,
-                            struct action_data*,
-                            u64*);
+ struct tracing_map_elt*,
+ struct trace_buffer*,
+ void*,
+ struct ring_buffer_event*,
+ void*,
+ struct action_data*,
+ u64*);
 
 typedef bool (*check_track_val_fn_t)(u64, u64);
 
@@ -39897,14 +39891,9 @@ struct address_space_operations {
   bool (*dirty_folio)(struct address_space*, struct folio*);
   void (*readahead)(struct readahead_control*);
   int (*write_begin)(
-      struct file*, struct address_space*, loff_t, unsigned int, struct folio**, void**);
-  int (*write_end)(struct file*,
-                   struct address_space*,
-                   loff_t,
-                   unsigned int,
-                   unsigned int,
-                   struct folio*,
-                   void*);
+   struct file*, struct address_space*, loff_t, unsigned int, struct folio**, void**);
+  int (*write_end)(
+   struct file*, struct address_space*, loff_t, unsigned int, unsigned int, struct folio*, void*);
   sector_t (*bmap)(struct address_space*, sector_t);
   void (*invalidate_folio)(struct folio*, size_t, size_t);
   bool (*release_folio)(struct folio*, gfp_t);
@@ -40650,11 +40639,11 @@ struct irq_domain_ops {
   int (*map)(struct irq_domain*, unsigned int, irq_hw_number_t);
   void (*unmap)(struct irq_domain*, unsigned int);
   int (*xlate)(struct irq_domain*,
-               struct device_node*,
-               const u32*,
-               unsigned int,
-               long unsigned int*,
-               unsigned int*);
+   struct device_node*,
+   const u32*,
+   unsigned int,
+   long unsigned int*,
+   unsigned int*);
   int (*alloc)(struct irq_domain*, unsigned int, unsigned int, void*);
   void (*free)(struct irq_domain*, unsigned int, unsigned int);
   int (*activate)(struct irq_domain*, struct irq_data*, bool);
@@ -40676,11 +40665,9 @@ struct gpio_irq_chip {
   struct fwnode_handle* fwnode;
   struct irq_domain* parent_domain;
   int (*child_to_parent_hwirq)(
-      struct gpio_chip*, unsigned int, unsigned int, unsigned int*, unsigned int*);
-  int (*populate_parent_alloc_arg)(struct gpio_chip*,
-                                   union gpio_irq_fwspec*,
-                                   unsigned int,
-                                   unsigned int);
+   struct gpio_chip*, unsigned int, unsigned int, unsigned int*, unsigned int*);
+  int (*populate_parent_alloc_arg)(
+   struct gpio_chip*, union gpio_irq_fwspec*, unsigned int, unsigned int);
   unsigned int (*child_offset_to_irq)(struct gpio_chip*, unsigned int);
   struct irq_domain_ops child_irq_domain_ops;
   irq_flow_handler_t handler;
@@ -40847,16 +40834,16 @@ struct iommu_dirty_bitmap;
 
 struct io_pgtable_ops {
   int (*map_pages)(
-      struct io_pgtable_ops*, long unsigned int, phys_addr_t, size_t, size_t, int, gfp_t, size_t*);
+   struct io_pgtable_ops*, long unsigned int, phys_addr_t, size_t, size_t, int, gfp_t, size_t*);
   size_t (*unmap_pages)(
-      struct io_pgtable_ops*, long unsigned int, size_t, size_t, struct iommu_iotlb_gather*);
+   struct io_pgtable_ops*, long unsigned int, size_t, size_t, struct iommu_iotlb_gather*);
   phys_addr_t (*iova_to_phys)(struct io_pgtable_ops*, long unsigned int);
   int (*pgtable_walk)(struct io_pgtable_ops*, long unsigned int, void*);
   int (*read_and_clear_dirty)(struct io_pgtable_ops*,
-                              long unsigned int,
-                              size_t,
-                              long unsigned int,
-                              struct iommu_dirty_bitmap*);
+   long unsigned int,
+   size_t,
+   long unsigned int,
+   struct iommu_dirty_bitmap*);
 };
 
 struct io_pgtable {
@@ -47932,9 +47919,8 @@ struct bpf_iter_priv_data {
   u8 target_private[0];
 };
 
-typedef int (*bpf_iter_attach_target_t)(struct bpf_prog*,
-                                        union bpf_iter_link_info*,
-                                        struct bpf_iter_aux_info*);
+typedef int (*bpf_iter_attach_target_t)(
+ struct bpf_prog*, union bpf_iter_link_info*, struct bpf_iter_aux_info*);
 
 typedef void (*bpf_iter_detach_target_t)(struct bpf_iter_aux_info*);
 
@@ -47944,8 +47930,8 @@ struct bpf_link_info;
 
 typedef int (*bpf_iter_fill_link_info_t)(const struct bpf_iter_aux_info*, struct bpf_link_info*);
 
-typedef const struct bpf_func_proto* (*bpf_iter_get_func_proto_t)(enum bpf_func_id,
-                                                                  const struct bpf_prog*);
+typedef const struct bpf_func_proto* (*bpf_iter_get_func_proto_t)(
+ enum bpf_func_id, const struct bpf_prog*);
 
 struct bpf_iter_reg {
   const char* target;
@@ -48206,10 +48192,10 @@ struct fprobe;
 struct ftrace_regs;
 
 typedef int (*fprobe_entry_cb)(
-    struct fprobe*, long unsigned int, long unsigned int, struct ftrace_regs*, void*);
+ struct fprobe*, long unsigned int, long unsigned int, struct ftrace_regs*, void*);
 
 typedef void (*fprobe_exit_cb)(
-    struct fprobe*, long unsigned int, long unsigned int, struct ftrace_regs*, void*);
+ struct fprobe*, long unsigned int, long unsigned int, struct ftrace_regs*, void*);
 
 struct fprobe_hlist;
 
@@ -48552,10 +48538,8 @@ struct bpf_map_ops {
   int (*map_gen_lookup)(struct bpf_map*, struct bpf_insn*);
   u32 (*map_fd_sys_lookup_elem)(void*);
   void (*map_seq_show_elem)(struct bpf_map*, void*, struct seq_file*);
-  int (*map_check_btf)(const struct bpf_map*,
-                       const struct btf*,
-                       const struct btf_type*,
-                       const struct btf_type*);
+  int (*map_check_btf)(
+   const struct bpf_map*, const struct btf*, const struct btf_type*, const struct btf_type*);
   int (*map_poke_track)(struct bpf_map*, struct bpf_prog_aux*);
   void (*map_poke_untrack)(struct bpf_map*, struct bpf_prog_aux*);
   void (*map_poke_run)(struct bpf_map*, u32, struct bpf_prog*, struct bpf_prog*);
@@ -48564,15 +48548,14 @@ struct bpf_map_ops {
   int (*map_mmap)(struct bpf_map*, struct vm_area_struct*);
   __poll_t (*map_poll)(struct bpf_map*, struct file*, struct poll_table_struct*);
   long unsigned int (*map_get_unmapped_area)(
-      struct file*, long unsigned int, long unsigned int, long unsigned int, long unsigned int);
+   struct file*, long unsigned int, long unsigned int, long unsigned int, long unsigned int);
   int (*map_local_storage_charge)(struct bpf_local_storage_map*, void*, u32);
   void (*map_local_storage_uncharge)(struct bpf_local_storage_map*, void*, u32);
   struct bpf_local_storage** (*map_owner_storage_ptr)(void*);
   long int (*map_redirect)(struct bpf_map*, u64, u64);
   bool (*map_meta_equal)(const struct bpf_map*, const struct bpf_map*);
-  int (*map_set_for_each_callback_args)(struct bpf_verifier_env*,
-                                        struct bpf_func_state*,
-                                        struct bpf_func_state*);
+  int (*map_set_for_each_callback_args)(
+   struct bpf_verifier_env*, struct bpf_func_state*, struct bpf_func_state*);
   long int (*map_for_each_callback)(struct bpf_map*, bpf_callback_t, void*, u64);
   u64 (*map_mem_usage)(const struct bpf_map*);
   int* map_btf_id;
@@ -50836,7 +50819,7 @@ struct hid_bpf_ops {
   int (*hid_device_event)(struct hid_bpf_ctx*, enum hid_report_type, u64);
   int (*hid_rdesc_fixup)(struct hid_bpf_ctx*);
   int (*hid_hw_request)(
-      struct hid_bpf_ctx*, unsigned char, enum hid_report_type, enum hid_class_request, u64);
+   struct hid_bpf_ctx*, unsigned char, enum hid_report_type, enum hid_class_request, u64);
   int (*hid_hw_output_report)(struct hid_bpf_ctx*, u64);
   struct hid_device* hdev;
 };
@@ -51449,12 +51432,12 @@ struct bpf_verifier_env {
 struct bpf_verifier_ops {
   const struct bpf_func_proto* (*get_func_proto)(enum bpf_func_id, const struct bpf_prog*);
   bool (*is_valid_access)(
-      int, int, enum bpf_access_type, const struct bpf_prog*, struct bpf_insn_access_aux*);
+   int, int, enum bpf_access_type, const struct bpf_prog*, struct bpf_insn_access_aux*);
   int (*gen_prologue)(struct bpf_insn*, bool, const struct bpf_prog*);
   int (*gen_epilogue)(struct bpf_insn*, const struct bpf_prog*, s16);
   int (*gen_ld_abs)(const struct bpf_insn*, struct bpf_insn*);
   u32 (*convert_ctx_access)(
-      enum bpf_access_type, const struct bpf_insn*, struct bpf_insn*, struct bpf_prog*, u32*);
+   enum bpf_access_type, const struct bpf_insn*, struct bpf_insn*, struct bpf_prog*, u32*);
   int (*btf_struct_access)(struct bpf_verifier_log*, const struct bpf_reg_state*, int, int);
 };
 
@@ -52036,13 +52019,13 @@ struct btf_kind_operations {
   s32 (*check_meta)(struct btf_verifier_env*, const struct btf_type*, u32);
   int (*resolve)(struct btf_verifier_env*, const struct resolve_vertex*);
   int (*check_member)(struct btf_verifier_env*,
-                      const struct btf_type*,
-                      const struct btf_member*,
-                      const struct btf_type*);
+   const struct btf_type*,
+   const struct btf_member*,
+   const struct btf_type*);
   int (*check_kflag_member)(struct btf_verifier_env*,
-                            const struct btf_type*,
-                            const struct btf_member*,
-                            const struct btf_type*);
+   const struct btf_type*,
+   const struct btf_member*,
+   const struct btf_type*);
   void (*log_details)(struct btf_verifier_env*, const struct btf_type*);
   void (*show)(const struct btf*, const struct btf_type*, u32, void*, u8, struct btf_show*);
 };
@@ -55689,11 +55672,8 @@ struct clk_fractional_divider {
   u8 nshift;
   u8 nwidth;
   u8 flags;
-  void (*approximation)(struct clk_hw*,
-                        long unsigned int,
-                        long unsigned int*,
-                        long unsigned int*,
-                        long unsigned int*);
+  void (*approximation)(
+   struct clk_hw*, long unsigned int, long unsigned int*, long unsigned int*, long unsigned int*);
   spinlock_t* lock;
 };
 
@@ -57372,12 +57352,12 @@ struct component_ops {
 };
 
 typedef int (*decompress_fn)(unsigned char*,
-                             long int,
-                             long int (*)(void*, long unsigned int),
-                             long int (*)(void*, long unsigned int),
-                             unsigned char*,
-                             long int*,
-                             void (*)(char*));
+ long int,
+ long int (*)(void*, long unsigned int),
+ long int (*)(void*, long unsigned int),
+ unsigned char*,
+ long int*,
+ void (*)(char*));
 
 struct compress_format {
   unsigned char magic[2];
@@ -61256,7 +61236,7 @@ struct dax_mapping {
 
 struct dax_operations {
   long int (*direct_access)(
-      struct dax_device*, long unsigned int, long int, enum dax_access_mode, void**, pfn_t*);
+   struct dax_device*, long unsigned int, long int, enum dax_access_mode, void**, pfn_t*);
   int (*zero_page_range)(struct dax_device*, long unsigned int, size_t);
   size_t (*recovery_write)(struct dax_device*, long unsigned int, void*, size_t, struct iov_iter*);
 };
@@ -62450,7 +62430,7 @@ struct dev_pm_opp {
 typedef int (*config_clks_t)(struct device*, struct opp_table*, struct dev_pm_opp*, void*, bool);
 
 typedef int (*config_regulators_t)(
-    struct device*, struct dev_pm_opp*, struct dev_pm_opp*, struct regulator**, unsigned int);
+ struct device*, struct dev_pm_opp*, struct dev_pm_opp*, struct regulator**, unsigned int);
 
 struct dev_pm_opp_config {
   const char* const* clk_names;
@@ -63048,10 +63028,8 @@ struct devlink_health_reporter {
 struct devlink_health_reporter_ops {
   char* name;
   int (*recover)(struct devlink_health_reporter*, void*, struct netlink_ext_ack*);
-  int (*dump)(struct devlink_health_reporter*,
-              struct devlink_fmsg*,
-              void*,
-              struct netlink_ext_ack*);
+  int (*dump)(
+   struct devlink_health_reporter*, struct devlink_fmsg*, void*, struct netlink_ext_ack*);
   int (*diagnose)(struct devlink_health_reporter*, struct devlink_fmsg*, struct netlink_ext_ack*);
   int (*test)(struct devlink_health_reporter*, struct netlink_ext_ack*);
 };
@@ -63082,7 +63060,7 @@ struct devlink_linecard {
 
 struct devlink_linecard_ops {
   int (*provision)(
-      struct devlink_linecard*, void*, const char*, const void*, struct netlink_ext_ack*);
+   struct devlink_linecard*, void*, const char*, const void*, struct netlink_ext_ack*);
   int (*unprovision)(struct devlink_linecard*, void*, struct netlink_ext_ack*);
   bool (*same_provision)(struct devlink_linecard*, void*, const char*, const void*);
   unsigned int (*types_count)(struct devlink_linecard*, void*);
@@ -63140,75 +63118,71 @@ struct devlink_ops {
   long unsigned int reload_actions;
   long unsigned int reload_limits;
   int (*reload_down)(struct devlink*,
-                     bool,
-                     enum devlink_reload_action,
-                     enum devlink_reload_limit,
-                     struct netlink_ext_ack*);
+   bool,
+   enum devlink_reload_action,
+   enum devlink_reload_limit,
+   struct netlink_ext_ack*);
   int (*reload_up)(struct devlink*,
-                   enum devlink_reload_action,
-                   enum devlink_reload_limit,
-                   u32*,
-                   struct netlink_ext_ack*);
+   enum devlink_reload_action,
+   enum devlink_reload_limit,
+   u32*,
+   struct netlink_ext_ack*);
   int (*sb_pool_get)(struct devlink*, unsigned int, u16, struct devlink_sb_pool_info*);
   int (*sb_pool_set)(struct devlink*,
-                     unsigned int,
-                     u16,
-                     u32,
-                     enum devlink_sb_threshold_type,
-                     struct netlink_ext_ack*);
+   unsigned int,
+   u16,
+   u32,
+   enum devlink_sb_threshold_type,
+   struct netlink_ext_ack*);
   int (*sb_port_pool_get)(struct devlink_port*, unsigned int, u16, u32*);
   int (*sb_port_pool_set)(struct devlink_port*, unsigned int, u16, u32, struct netlink_ext_ack*);
   int (*sb_tc_pool_bind_get)(
-      struct devlink_port*, unsigned int, u16, enum devlink_sb_pool_type, u16*, u32*);
+   struct devlink_port*, unsigned int, u16, enum devlink_sb_pool_type, u16*, u32*);
   int (*sb_tc_pool_bind_set)(struct devlink_port*,
-                             unsigned int,
-                             u16,
-                             enum devlink_sb_pool_type,
-                             u16,
-                             u32,
-                             struct netlink_ext_ack*);
+   unsigned int,
+   u16,
+   enum devlink_sb_pool_type,
+   u16,
+   u32,
+   struct netlink_ext_ack*);
   int (*sb_occ_snapshot)(struct devlink*, unsigned int);
   int (*sb_occ_max_clear)(struct devlink*, unsigned int);
   int (*sb_occ_port_pool_get)(struct devlink_port*, unsigned int, u16, u32*, u32*);
   int (*sb_occ_tc_port_bind_get)(
-      struct devlink_port*, unsigned int, u16, enum devlink_sb_pool_type, u32*, u32*);
+   struct devlink_port*, unsigned int, u16, enum devlink_sb_pool_type, u32*, u32*);
   int (*eswitch_mode_get)(struct devlink*, u16*);
   int (*eswitch_mode_set)(struct devlink*, u16, struct netlink_ext_ack*);
   int (*eswitch_inline_mode_get)(struct devlink*, u8*);
   int (*eswitch_inline_mode_set)(struct devlink*, u8, struct netlink_ext_ack*);
   int (*eswitch_encap_mode_get)(struct devlink*, enum devlink_eswitch_encap_mode*);
-  int (*eswitch_encap_mode_set)(struct devlink*,
-                                enum devlink_eswitch_encap_mode,
-                                struct netlink_ext_ack*);
+  int (*eswitch_encap_mode_set)(
+   struct devlink*, enum devlink_eswitch_encap_mode, struct netlink_ext_ack*);
   int (*info_get)(struct devlink*, struct devlink_info_req*, struct netlink_ext_ack*);
-  int (*flash_update)(struct devlink*,
-                      struct devlink_flash_update_params*,
-                      struct netlink_ext_ack*);
+  int (*flash_update)(
+   struct devlink*, struct devlink_flash_update_params*, struct netlink_ext_ack*);
   int (*trap_init)(struct devlink*, const struct devlink_trap*, void*);
   void (*trap_fini)(struct devlink*, const struct devlink_trap*, void*);
-  int (*trap_action_set)(struct devlink*,
-                         const struct devlink_trap*,
-                         enum devlink_trap_action,
-                         struct netlink_ext_ack*);
+  int (*trap_action_set)(
+   struct devlink*, const struct devlink_trap*, enum devlink_trap_action, struct netlink_ext_ack*);
   int (*trap_group_init)(struct devlink*, const struct devlink_trap_group*);
   int (*trap_group_set)(struct devlink*,
-                        const struct devlink_trap_group*,
-                        const struct devlink_trap_policer*,
-                        struct netlink_ext_ack*);
+   const struct devlink_trap_group*,
+   const struct devlink_trap_policer*,
+   struct netlink_ext_ack*);
   int (*trap_group_action_set)(struct devlink*,
-                               const struct devlink_trap_group*,
-                               enum devlink_trap_action,
-                               struct netlink_ext_ack*);
+   const struct devlink_trap_group*,
+   enum devlink_trap_action,
+   struct netlink_ext_ack*);
   int (*trap_drop_counter_get)(struct devlink*, const struct devlink_trap*, u64*);
   int (*trap_policer_init)(struct devlink*, const struct devlink_trap_policer*);
   void (*trap_policer_fini)(struct devlink*, const struct devlink_trap_policer*);
   int (*trap_policer_set)(
-      struct devlink*, const struct devlink_trap_policer*, u64, u64, struct netlink_ext_ack*);
+   struct devlink*, const struct devlink_trap_policer*, u64, u64, struct netlink_ext_ack*);
   int (*trap_policer_counter_get)(struct devlink*, const struct devlink_trap_policer*, u64*);
   int (*port_new)(struct devlink*,
-                  const struct devlink_port_new_attrs*,
-                  struct netlink_ext_ack*,
-                  struct devlink_port**);
+   const struct devlink_port_new_attrs*,
+   struct netlink_ext_ack*,
+   struct devlink_port**);
   int (*rate_leaf_tx_share_set)(struct devlink_rate*, void*, u64, struct netlink_ext_ack*);
   int (*rate_leaf_tx_max_set)(struct devlink_rate*, void*, u64, struct netlink_ext_ack*);
   int (*rate_leaf_tx_priority_set)(struct devlink_rate*, void*, u32, struct netlink_ext_ack*);
@@ -63220,13 +63194,12 @@ struct devlink_ops {
   int (*rate_node_new)(struct devlink_rate*, void**, struct netlink_ext_ack*);
   int (*rate_node_del)(struct devlink_rate*, void*, struct netlink_ext_ack*);
   int (*rate_leaf_parent_set)(
-      struct devlink_rate*, struct devlink_rate*, void*, void*, struct netlink_ext_ack*);
+   struct devlink_rate*, struct devlink_rate*, void*, void*, struct netlink_ext_ack*);
   int (*rate_node_parent_set)(
-      struct devlink_rate*, struct devlink_rate*, void*, void*, struct netlink_ext_ack*);
+   struct devlink_rate*, struct devlink_rate*, void*, void*, struct netlink_ext_ack*);
   bool (*selftest_check)(struct devlink*, unsigned int, struct netlink_ext_ack*);
-  enum devlink_selftest_status (*selftest_run)(struct devlink*,
-                                               unsigned int,
-                                               struct netlink_ext_ack*);
+  enum devlink_selftest_status (*selftest_run)(
+   struct devlink*, unsigned int, struct netlink_ext_ack*);
 };
 
 struct devlink_param_gset_ctx;
@@ -63368,12 +63341,11 @@ struct devlink_port_ops {
   int (*port_fn_migratable_get)(struct devlink_port*, bool*, struct netlink_ext_ack*);
   int (*port_fn_migratable_set)(struct devlink_port*, bool, struct netlink_ext_ack*);
   int (*port_fn_state_get)(struct devlink_port*,
-                           enum devlink_port_fn_state*,
-                           enum devlink_port_fn_opstate*,
-                           struct netlink_ext_ack*);
-  int (*port_fn_state_set)(struct devlink_port*,
-                           enum devlink_port_fn_state,
-                           struct netlink_ext_ack*);
+   enum devlink_port_fn_state*,
+   enum devlink_port_fn_opstate*,
+   struct netlink_ext_ack*);
+  int (*port_fn_state_set)(
+   struct devlink_port*, enum devlink_port_fn_state, struct netlink_ext_ack*);
   int (*port_fn_ipsec_crypto_get)(struct devlink_port*, bool*, struct netlink_ext_ack*);
   int (*port_fn_ipsec_crypto_set)(struct devlink_port*, bool, struct netlink_ext_ack*);
   int (*port_fn_ipsec_packet_get)(struct devlink_port*, bool*, struct netlink_ext_ack*);
@@ -63385,16 +63357,14 @@ struct devlink_port_ops {
 struct devlink_port_region_ops {
   const char* name;
   void (*destructor)(const void*);
-  int (*snapshot)(struct devlink_port*,
-                  const struct devlink_port_region_ops*,
-                  struct netlink_ext_ack*,
-                  u8**);
+  int (*snapshot)(
+   struct devlink_port*, const struct devlink_port_region_ops*, struct netlink_ext_ack*, u8**);
   int (*read)(struct devlink_port*,
-              const struct devlink_port_region_ops*,
-              struct netlink_ext_ack*,
-              u64,
-              u32,
-              u8*);
+   const struct devlink_port_region_ops*,
+   struct netlink_ext_ack*,
+   u64,
+   u32,
+   u8*);
   void* priv;
 };
 
@@ -63439,7 +63409,7 @@ struct devlink_region_ops {
   void (*destructor)(const void*);
   int (*snapshot)(struct devlink*, const struct devlink_region_ops*, struct netlink_ext_ack*, u8**);
   int (*read)(
-      struct devlink*, const struct devlink_region_ops*, struct netlink_ext_ack*, u64, u32, u8*);
+   struct devlink*, const struct devlink_region_ops*, struct netlink_ext_ack*, u64, u32, u8*);
   void* priv;
 };
 
@@ -64687,55 +64657,45 @@ struct dma_device {
   int (*device_router_config)(struct dma_chan*);
   void (*device_free_chan_resources)(struct dma_chan*);
   struct dma_async_tx_descriptor* (*device_prep_dma_memcpy)(
-      struct dma_chan*, dma_addr_t, dma_addr_t, size_t, long unsigned int);
+   struct dma_chan*, dma_addr_t, dma_addr_t, size_t, long unsigned int);
   struct dma_async_tx_descriptor* (*device_prep_dma_xor)(
-      struct dma_chan*, dma_addr_t, dma_addr_t*, unsigned int, size_t, long unsigned int);
-  struct dma_async_tx_descriptor* (*device_prep_dma_xor_val)(struct dma_chan*,
-                                                             dma_addr_t*,
-                                                             unsigned int,
-                                                             size_t,
-                                                             enum sum_check_flags*,
-                                                             long unsigned int);
+   struct dma_chan*, dma_addr_t, dma_addr_t*, unsigned int, size_t, long unsigned int);
+  struct dma_async_tx_descriptor* (*device_prep_dma_xor_val)(
+   struct dma_chan*, dma_addr_t*, unsigned int, size_t, enum sum_check_flags*, long unsigned int);
   struct dma_async_tx_descriptor* (*device_prep_dma_pq)(struct dma_chan*,
-                                                        dma_addr_t*,
-                                                        dma_addr_t*,
-                                                        unsigned int,
-                                                        const unsigned char*,
-                                                        size_t,
-                                                        long unsigned int);
+   dma_addr_t*,
+   dma_addr_t*,
+   unsigned int,
+   const unsigned char*,
+   size_t,
+   long unsigned int);
   struct dma_async_tx_descriptor* (*device_prep_dma_pq_val)(struct dma_chan*,
-                                                            dma_addr_t*,
-                                                            dma_addr_t*,
-                                                            unsigned int,
-                                                            const unsigned char*,
-                                                            size_t,
-                                                            enum sum_check_flags*,
-                                                            long unsigned int);
+   dma_addr_t*,
+   dma_addr_t*,
+   unsigned int,
+   const unsigned char*,
+   size_t,
+   enum sum_check_flags*,
+   long unsigned int);
   struct dma_async_tx_descriptor* (*device_prep_dma_memset)(
-      struct dma_chan*, dma_addr_t, int, size_t, long unsigned int);
+   struct dma_chan*, dma_addr_t, int, size_t, long unsigned int);
   struct dma_async_tx_descriptor* (*device_prep_dma_memset_sg)(
-      struct dma_chan*, struct scatterlist*, unsigned int, int, long unsigned int);
+   struct dma_chan*, struct scatterlist*, unsigned int, int, long unsigned int);
   struct dma_async_tx_descriptor* (*device_prep_dma_interrupt)(struct dma_chan*, long unsigned int);
-  struct dma_async_tx_descriptor* (*device_prep_peripheral_dma_vec)(struct dma_chan*,
-                                                                    const struct dma_vec*,
-                                                                    size_t,
-                                                                    enum dma_transfer_direction,
-                                                                    long unsigned int);
+  struct dma_async_tx_descriptor* (*device_prep_peripheral_dma_vec)(
+   struct dma_chan*, const struct dma_vec*, size_t, enum dma_transfer_direction, long unsigned int);
   struct dma_async_tx_descriptor* (*device_prep_slave_sg)(struct dma_chan*,
-                                                          struct scatterlist*,
-                                                          unsigned int,
-                                                          enum dma_transfer_direction,
-                                                          long unsigned int,
-                                                          void*);
+   struct scatterlist*,
+   unsigned int,
+   enum dma_transfer_direction,
+   long unsigned int,
+   void*);
   struct dma_async_tx_descriptor* (*device_prep_dma_cyclic)(
-      struct dma_chan*, dma_addr_t, size_t, size_t, enum dma_transfer_direction, long unsigned int);
-  struct dma_async_tx_descriptor* (*device_prep_interleaved_dma)(struct dma_chan*,
-                                                                 struct dma_interleaved_template*,
-                                                                 long unsigned int);
-  struct dma_async_tx_descriptor* (*device_prep_dma_imm_data)(struct dma_chan*,
-                                                              dma_addr_t,
-                                                              u64,
-                                                              long unsigned int);
+   struct dma_chan*, dma_addr_t, size_t, size_t, enum dma_transfer_direction, long unsigned int);
+  struct dma_async_tx_descriptor* (*device_prep_interleaved_dma)(
+   struct dma_chan*, struct dma_interleaved_template*, long unsigned int);
+  struct dma_async_tx_descriptor* (*device_prep_dma_imm_data)(
+   struct dma_chan*, dma_addr_t, u64, long unsigned int);
   void (*device_caps)(struct dma_chan*, struct dma_slave_caps*);
   int (*device_config)(struct dma_chan*, struct dma_slave_config*);
   int (*device_pause)(struct dma_chan*);
@@ -64873,27 +64833,27 @@ struct dma_map_ops {
   void* (*alloc)(struct device*, size_t, dma_addr_t*, gfp_t, long unsigned int);
   void (*free)(struct device*, size_t, void*, dma_addr_t, long unsigned int);
   struct page* (*alloc_pages_op)(
-      struct device*, size_t, dma_addr_t*, enum dma_data_direction, gfp_t);
+   struct device*, size_t, dma_addr_t*, enum dma_data_direction, gfp_t);
   void (*free_pages)(struct device*, size_t, struct page*, dma_addr_t, enum dma_data_direction);
   int (*mmap)(struct device*, struct vm_area_struct*, void*, dma_addr_t, size_t, long unsigned int);
   int (*get_sgtable)(
-      struct device*, struct sg_table*, void*, dma_addr_t, size_t, long unsigned int);
+   struct device*, struct sg_table*, void*, dma_addr_t, size_t, long unsigned int);
   dma_addr_t (*map_page)(struct device*,
-                         struct page*,
-                         long unsigned int,
-                         size_t,
-                         enum dma_data_direction,
-                         long unsigned int);
+   struct page*,
+   long unsigned int,
+   size_t,
+   enum dma_data_direction,
+   long unsigned int);
   void (*unmap_page)(
-      struct device*, dma_addr_t, size_t, enum dma_data_direction, long unsigned int);
+   struct device*, dma_addr_t, size_t, enum dma_data_direction, long unsigned int);
   int (*map_sg)(
-      struct device*, struct scatterlist*, int, enum dma_data_direction, long unsigned int);
+   struct device*, struct scatterlist*, int, enum dma_data_direction, long unsigned int);
   void (*unmap_sg)(
-      struct device*, struct scatterlist*, int, enum dma_data_direction, long unsigned int);
+   struct device*, struct scatterlist*, int, enum dma_data_direction, long unsigned int);
   dma_addr_t (*map_resource)(
-      struct device*, phys_addr_t, size_t, enum dma_data_direction, long unsigned int);
+   struct device*, phys_addr_t, size_t, enum dma_data_direction, long unsigned int);
   void (*unmap_resource)(
-      struct device*, dma_addr_t, size_t, enum dma_data_direction, long unsigned int);
+   struct device*, dma_addr_t, size_t, enum dma_data_direction, long unsigned int);
   void (*sync_single_for_cpu)(struct device*, dma_addr_t, size_t, enum dma_data_direction);
   void (*sync_single_for_device)(struct device*, dma_addr_t, size_t, enum dma_data_direction);
   void (*sync_sg_for_cpu)(struct device*, struct scatterlist*, int, enum dma_data_direction);
@@ -65122,7 +65082,7 @@ struct iommu_domain_geometry {
 struct iommu_domain;
 
 typedef int (*iommu_fault_handler_t)(
-    struct iommu_domain*, struct device*, long unsigned int, int, void*);
+ struct iommu_domain*, struct device*, long unsigned int, int, void*);
 
 struct iommu_domain_ops;
 
@@ -65511,15 +65471,13 @@ struct dpll_device {
 struct dpll_device_ops {
   int (*mode_get)(const struct dpll_device*, void*, enum dpll_mode*, struct netlink_ext_ack*);
   int (*lock_status_get)(const struct dpll_device*,
-                         void*,
-                         enum dpll_lock_status*,
-                         enum dpll_lock_status_error*,
-                         struct netlink_ext_ack*);
+   void*,
+   enum dpll_lock_status*,
+   enum dpll_lock_status_error*,
+   struct netlink_ext_ack*);
   int (*temp_get)(const struct dpll_device*, void*, s32*, struct netlink_ext_ack*);
-  int (*clock_quality_level_get)(const struct dpll_device*,
-                                 void*,
-                                 long unsigned int*,
-                                 struct netlink_ext_ack*);
+  int (*clock_quality_level_get)(
+   const struct dpll_device*, void*, long unsigned int*, struct netlink_ext_ack*);
 };
 
 struct dpll_device_registration {
@@ -65576,101 +65534,77 @@ struct dpll_pin_frequency {
 
 struct dpll_pin_ops {
   int (*frequency_set)(const struct dpll_pin*,
-                       void*,
-                       const struct dpll_device*,
-                       void*,
-                       const u64,
-                       struct netlink_ext_ack*);
-  int (*frequency_get)(const struct dpll_pin*,
-                       void*,
-                       const struct dpll_device*,
-                       void*,
-                       u64*,
-                       struct netlink_ext_ack*);
+   void*,
+   const struct dpll_device*,
+   void*,
+   const u64,
+   struct netlink_ext_ack*);
+  int (*frequency_get)(
+   const struct dpll_pin*, void*, const struct dpll_device*, void*, u64*, struct netlink_ext_ack*);
   int (*direction_set)(const struct dpll_pin*,
-                       void*,
-                       const struct dpll_device*,
-                       void*,
-                       const enum dpll_pin_direction,
-                       struct netlink_ext_ack*);
+   void*,
+   const struct dpll_device*,
+   void*,
+   const enum dpll_pin_direction,
+   struct netlink_ext_ack*);
   int (*direction_get)(const struct dpll_pin*,
-                       void*,
-                       const struct dpll_device*,
-                       void*,
-                       enum dpll_pin_direction*,
-                       struct netlink_ext_ack*);
+   void*,
+   const struct dpll_device*,
+   void*,
+   enum dpll_pin_direction*,
+   struct netlink_ext_ack*);
   int (*state_on_pin_get)(const struct dpll_pin*,
-                          void*,
-                          const struct dpll_pin*,
-                          void*,
-                          enum dpll_pin_state*,
-                          struct netlink_ext_ack*);
+   void*,
+   const struct dpll_pin*,
+   void*,
+   enum dpll_pin_state*,
+   struct netlink_ext_ack*);
   int (*state_on_dpll_get)(const struct dpll_pin*,
-                           void*,
-                           const struct dpll_device*,
-                           void*,
-                           enum dpll_pin_state*,
-                           struct netlink_ext_ack*);
+   void*,
+   const struct dpll_device*,
+   void*,
+   enum dpll_pin_state*,
+   struct netlink_ext_ack*);
   int (*state_on_pin_set)(const struct dpll_pin*,
-                          void*,
-                          const struct dpll_pin*,
-                          void*,
-                          const enum dpll_pin_state,
-                          struct netlink_ext_ack*);
+   void*,
+   const struct dpll_pin*,
+   void*,
+   const enum dpll_pin_state,
+   struct netlink_ext_ack*);
   int (*state_on_dpll_set)(const struct dpll_pin*,
-                           void*,
-                           const struct dpll_device*,
-                           void*,
-                           const enum dpll_pin_state,
-                           struct netlink_ext_ack*);
-  int (*prio_get)(const struct dpll_pin*,
-                  void*,
-                  const struct dpll_device*,
-                  void*,
-                  u32*,
-                  struct netlink_ext_ack*);
+   void*,
+   const struct dpll_device*,
+   void*,
+   const enum dpll_pin_state,
+   struct netlink_ext_ack*);
+  int (*prio_get)(
+   const struct dpll_pin*, void*, const struct dpll_device*, void*, u32*, struct netlink_ext_ack*);
   int (*prio_set)(const struct dpll_pin*,
-                  void*,
-                  const struct dpll_device*,
-                  void*,
-                  const u32,
-                  struct netlink_ext_ack*);
-  int (*phase_offset_get)(const struct dpll_pin*,
-                          void*,
-                          const struct dpll_device*,
-                          void*,
-                          s64*,
-                          struct netlink_ext_ack*);
-  int (*phase_adjust_get)(const struct dpll_pin*,
-                          void*,
-                          const struct dpll_device*,
-                          void*,
-                          s32*,
-                          struct netlink_ext_ack*);
+   void*,
+   const struct dpll_device*,
+   void*,
+   const u32,
+   struct netlink_ext_ack*);
+  int (*phase_offset_get)(
+   const struct dpll_pin*, void*, const struct dpll_device*, void*, s64*, struct netlink_ext_ack*);
+  int (*phase_adjust_get)(
+   const struct dpll_pin*, void*, const struct dpll_device*, void*, s32*, struct netlink_ext_ack*);
   int (*phase_adjust_set)(const struct dpll_pin*,
-                          void*,
-                          const struct dpll_device*,
-                          void*,
-                          const s32,
-                          struct netlink_ext_ack*);
-  int (*ffo_get)(const struct dpll_pin*,
-                 void*,
-                 const struct dpll_device*,
-                 void*,
-                 s64*,
-                 struct netlink_ext_ack*);
-  int (*esync_set)(const struct dpll_pin*,
-                   void*,
-                   const struct dpll_device*,
-                   void*,
-                   u64,
-                   struct netlink_ext_ack*);
+   void*,
+   const struct dpll_device*,
+   void*,
+   const s32,
+   struct netlink_ext_ack*);
+  int (*ffo_get)(
+   const struct dpll_pin*, void*, const struct dpll_device*, void*, s64*, struct netlink_ext_ack*);
+  int (*esync_set)(
+   const struct dpll_pin*, void*, const struct dpll_device*, void*, u64, struct netlink_ext_ack*);
   int (*esync_get)(const struct dpll_pin*,
-                   void*,
-                   const struct dpll_device*,
-                   void*,
-                   struct dpll_pin_esync*,
-                   struct netlink_ext_ack*);
+   void*,
+   const struct dpll_device*,
+   void*,
+   struct dpll_pin_esync*,
+   struct netlink_ext_ack*);
 };
 
 struct dpll_pin_ref {
@@ -65989,15 +65923,13 @@ struct drm_bridge_state;
 struct drm_bridge_funcs {
   int (*attach)(struct drm_bridge*, enum drm_bridge_attach_flags);
   void (*detach)(struct drm_bridge*);
-  enum drm_mode_status (*mode_valid)(struct drm_bridge*,
-                                     const struct drm_display_info*,
-                                     const struct drm_display_mode*);
+  enum drm_mode_status (*mode_valid)(
+   struct drm_bridge*, const struct drm_display_info*, const struct drm_display_mode*);
   bool (*mode_fixup)(struct drm_bridge*, const struct drm_display_mode*, struct drm_display_mode*);
   void (*disable)(struct drm_bridge*);
   void (*post_disable)(struct drm_bridge*);
-  void (*mode_set)(struct drm_bridge*,
-                   const struct drm_display_mode*,
-                   const struct drm_display_mode*);
+  void (*mode_set)(
+   struct drm_bridge*, const struct drm_display_mode*, const struct drm_display_mode*);
   void (*pre_enable)(struct drm_bridge*);
   void (*enable)(struct drm_bridge*);
   void (*atomic_pre_enable)(struct drm_bridge*, struct drm_bridge_state*);
@@ -66007,20 +65939,20 @@ struct drm_bridge_funcs {
   struct drm_bridge_state* (*atomic_duplicate_state)(struct drm_bridge*);
   void (*atomic_destroy_state)(struct drm_bridge*, struct drm_bridge_state*);
   u32* (*atomic_get_output_bus_fmts)(struct drm_bridge*,
-                                     struct drm_bridge_state*,
-                                     struct drm_crtc_state*,
-                                     struct drm_connector_state*,
-                                     unsigned int*);
+   struct drm_bridge_state*,
+   struct drm_crtc_state*,
+   struct drm_connector_state*,
+   unsigned int*);
   u32* (*atomic_get_input_bus_fmts)(struct drm_bridge*,
-                                    struct drm_bridge_state*,
-                                    struct drm_crtc_state*,
-                                    struct drm_connector_state*,
-                                    u32,
-                                    unsigned int*);
+   struct drm_bridge_state*,
+   struct drm_crtc_state*,
+   struct drm_connector_state*,
+   u32,
+   unsigned int*);
   int (*atomic_check)(struct drm_bridge*,
-                      struct drm_bridge_state*,
-                      struct drm_crtc_state*,
-                      struct drm_connector_state*);
+   struct drm_bridge_state*,
+   struct drm_crtc_state*,
+   struct drm_connector_state*);
   struct drm_bridge_state* (*atomic_reset)(struct drm_bridge*);
   enum drm_connector_status (*detect)(struct drm_bridge*);
   int (*get_modes)(struct drm_bridge*, struct drm_connector*);
@@ -66028,16 +65960,13 @@ struct drm_bridge_funcs {
   void (*hpd_notify)(struct drm_bridge*, enum drm_connector_status);
   void (*hpd_enable)(struct drm_bridge*);
   void (*hpd_disable)(struct drm_bridge*);
-  enum drm_mode_status (*hdmi_tmds_char_rate_valid)(const struct drm_bridge*,
-                                                    const struct drm_display_mode*,
-                                                    long long unsigned int);
+  enum drm_mode_status (*hdmi_tmds_char_rate_valid)(
+   const struct drm_bridge*, const struct drm_display_mode*, long long unsigned int);
   int (*hdmi_clear_infoframe)(struct drm_bridge*, enum hdmi_infoframe_type);
   int (*hdmi_write_infoframe)(struct drm_bridge*, enum hdmi_infoframe_type, const u8*, size_t);
   int (*hdmi_audio_startup)(struct drm_connector*, struct drm_bridge*);
-  int (*hdmi_audio_prepare)(struct drm_connector*,
-                            struct drm_bridge*,
-                            struct hdmi_codec_daifmt*,
-                            struct hdmi_codec_params*);
+  int (*hdmi_audio_prepare)(
+   struct drm_connector*, struct drm_bridge*, struct hdmi_codec_daifmt*, struct hdmi_codec_params*);
   void (*hdmi_audio_shutdown)(struct drm_connector*, struct drm_bridge*);
   int (*hdmi_audio_mute_stream)(struct drm_connector*, struct drm_bridge*, bool, int);
   void (*debugfs_init)(struct drm_bridge*, struct dentry*);
@@ -66505,14 +66434,10 @@ struct drm_connector_funcs {
   void (*destroy)(struct drm_connector*);
   struct drm_connector_state* (*atomic_duplicate_state)(struct drm_connector*);
   void (*atomic_destroy_state)(struct drm_connector*, struct drm_connector_state*);
-  int (*atomic_set_property)(struct drm_connector*,
-                             struct drm_connector_state*,
-                             struct drm_property*,
-                             uint64_t);
-  int (*atomic_get_property)(struct drm_connector*,
-                             const struct drm_connector_state*,
-                             struct drm_property*,
-                             uint64_t*);
+  int (*atomic_set_property)(
+   struct drm_connector*, struct drm_connector_state*, struct drm_property*, uint64_t);
+  int (*atomic_get_property)(
+   struct drm_connector*, const struct drm_connector_state*, struct drm_property*, uint64_t*);
   void (*atomic_print_state)(struct drm_printer*, const struct drm_connector_state*);
   void (*oob_hotplug_event)(struct drm_connector*, enum drm_connector_status);
   void (*debugfs_init)(struct drm_connector*, struct dentry*);
@@ -66526,9 +66451,8 @@ struct drm_connector_hdmi_audio_funcs {
 };
 
 struct drm_connector_hdmi_funcs {
-  enum drm_mode_status (*tmds_char_rate_valid)(const struct drm_connector*,
-                                               const struct drm_display_mode*,
-                                               long long unsigned int);
+  enum drm_mode_status (*tmds_char_rate_valid)(
+   const struct drm_connector*, const struct drm_display_mode*, long long unsigned int);
   int (*clear_infoframe)(struct drm_connector*, enum hdmi_infoframe_type);
   int (*write_infoframe)(struct drm_connector*, enum hdmi_infoframe_type, const u8*, size_t);
   const struct drm_edid* (*read_edid)(struct drm_connector*);
@@ -66557,9 +66481,9 @@ struct drm_connector_helper_funcs {
   int (*detect_ctx)(struct drm_connector*, struct drm_modeset_acquire_ctx*, bool);
   enum drm_mode_status (*mode_valid)(struct drm_connector*, struct drm_display_mode*);
   int (*mode_valid_ctx)(struct drm_connector*,
-                        struct drm_display_mode*,
-                        struct drm_modeset_acquire_ctx*,
-                        enum drm_mode_status*);
+   struct drm_display_mode*,
+   struct drm_modeset_acquire_ctx*,
+   enum drm_mode_status*);
   struct drm_encoder* (*best_encoder)(struct drm_connector*);
   struct drm_encoder* (*atomic_best_encoder)(struct drm_connector*, struct drm_atomic_state*);
   int (*atomic_check)(struct drm_connector*, struct drm_atomic_state*);
@@ -66727,33 +66651,29 @@ struct drm_crtc_funcs {
   void (*reset)(struct drm_crtc*);
   int (*cursor_set)(struct drm_crtc*, struct drm_file*, uint32_t, uint32_t, uint32_t);
   int (*cursor_set2)(
-      struct drm_crtc*, struct drm_file*, uint32_t, uint32_t, uint32_t, int32_t, int32_t);
+   struct drm_crtc*, struct drm_file*, uint32_t, uint32_t, uint32_t, int32_t, int32_t);
   int (*cursor_move)(struct drm_crtc*, int, int);
   int (*gamma_set)(struct drm_crtc*, u16*, u16*, u16*, uint32_t, struct drm_modeset_acquire_ctx*);
   void (*destroy)(struct drm_crtc*);
   int (*set_config)(struct drm_mode_set*, struct drm_modeset_acquire_ctx*);
   int (*page_flip)(struct drm_crtc*,
-                   struct drm_framebuffer*,
-                   struct drm_pending_vblank_event*,
-                   uint32_t,
-                   struct drm_modeset_acquire_ctx*);
+   struct drm_framebuffer*,
+   struct drm_pending_vblank_event*,
+   uint32_t,
+   struct drm_modeset_acquire_ctx*);
   int (*page_flip_target)(struct drm_crtc*,
-                          struct drm_framebuffer*,
-                          struct drm_pending_vblank_event*,
-                          uint32_t,
-                          uint32_t,
-                          struct drm_modeset_acquire_ctx*);
+   struct drm_framebuffer*,
+   struct drm_pending_vblank_event*,
+   uint32_t,
+   uint32_t,
+   struct drm_modeset_acquire_ctx*);
   int (*set_property)(struct drm_crtc*, struct drm_property*, uint64_t);
   struct drm_crtc_state* (*atomic_duplicate_state)(struct drm_crtc*);
   void (*atomic_destroy_state)(struct drm_crtc*, struct drm_crtc_state*);
-  int (*atomic_set_property)(struct drm_crtc*,
-                             struct drm_crtc_state*,
-                             struct drm_property*,
-                             uint64_t);
-  int (*atomic_get_property)(struct drm_crtc*,
-                             const struct drm_crtc_state*,
-                             struct drm_property*,
-                             uint64_t*);
+  int (*atomic_set_property)(
+   struct drm_crtc*, struct drm_crtc_state*, struct drm_property*, uint64_t);
+  int (*atomic_get_property)(
+   struct drm_crtc*, const struct drm_crtc_state*, struct drm_property*, uint64_t*);
   int (*late_register)(struct drm_crtc*);
   void (*early_unregister)(struct drm_crtc*);
   int (*set_crc_source)(struct drm_crtc*, const char*);
@@ -66780,15 +66700,15 @@ struct drm_crtc_helper_funcs {
   enum drm_mode_status (*mode_valid)(struct drm_crtc*, const struct drm_display_mode*);
   bool (*mode_fixup)(struct drm_crtc*, const struct drm_display_mode*, struct drm_display_mode*);
   int (*mode_set)(struct drm_crtc*,
-                  struct drm_display_mode*,
-                  struct drm_display_mode*,
-                  int,
-                  int,
-                  struct drm_framebuffer*);
+   struct drm_display_mode*,
+   struct drm_display_mode*,
+   int,
+   int,
+   struct drm_framebuffer*);
   void (*mode_set_nofb)(struct drm_crtc*);
   int (*mode_set_base)(struct drm_crtc*, int, int, struct drm_framebuffer*);
   int (*mode_set_base_atomic)(
-      struct drm_crtc*, struct drm_framebuffer*, int, int, enum mode_set_atomic);
+   struct drm_crtc*, struct drm_framebuffer*, int, int, enum mode_set_atomic);
   void (*disable)(struct drm_crtc*);
   int (*atomic_check)(struct drm_crtc*, struct drm_atomic_state*);
   void (*atomic_begin)(struct drm_crtc*, struct drm_atomic_state*);
@@ -66796,7 +66716,7 @@ struct drm_crtc_helper_funcs {
   void (*atomic_enable)(struct drm_crtc*, struct drm_atomic_state*);
   void (*atomic_disable)(struct drm_crtc*, struct drm_atomic_state*);
   bool (*get_scanout_position)(
-      struct drm_crtc*, bool, int*, int*, ktime_t*, ktime_t*, const struct drm_display_mode*);
+   struct drm_crtc*, bool, int*, int*, ktime_t*, ktime_t*, const struct drm_display_mode*);
 };
 
 struct drm_crtc_queue_sequence {
@@ -67047,9 +66967,8 @@ struct drm_driver {
   int (*prime_handle_to_fd)(struct drm_device*, struct drm_file*, uint32_t, uint32_t, int*);
   int (*prime_fd_to_handle)(struct drm_device*, struct drm_file*, int, uint32_t*);
   struct drm_gem_object* (*gem_prime_import)(struct drm_device*, struct dma_buf*);
-  struct drm_gem_object* (*gem_prime_import_sg_table)(struct drm_device*,
-                                                      struct dma_buf_attachment*,
-                                                      struct sg_table*);
+  struct drm_gem_object* (*gem_prime_import_sg_table)(
+   struct drm_device*, struct dma_buf_attachment*, struct sg_table*);
   int (*dumb_create)(struct drm_file*, struct drm_device*, struct drm_mode_create_dumb*);
   int (*dumb_map_offset)(struct drm_file*, struct drm_device*, uint32_t, uint64_t*);
   int (*fbdev_probe)(struct drm_fb_helper*, struct drm_fb_helper_surface_size*);
@@ -67451,11 +67370,11 @@ struct drm_framebuffer_funcs {
   void (*destroy)(struct drm_framebuffer*);
   int (*create_handle)(struct drm_framebuffer*, struct drm_file*, unsigned int*);
   int (*dirty)(struct drm_framebuffer*,
-               struct drm_file*,
-               unsigned int,
-               unsigned int,
-               struct drm_clip_rect*,
-               unsigned int);
+   struct drm_file*,
+   unsigned int,
+   unsigned int,
+   struct drm_clip_rect*,
+   unsigned int);
 };
 
 struct drm_gem_close {
@@ -67845,9 +67764,8 @@ struct drm_mode_closefb {
 struct drm_mode_fb_cmd2;
 
 struct drm_mode_config_funcs {
-  struct drm_framebuffer* (*fb_create)(struct drm_device*,
-                                       struct drm_file*,
-                                       const struct drm_mode_fb_cmd2*);
+  struct drm_framebuffer* (*fb_create)(
+   struct drm_device*, struct drm_file*, const struct drm_mode_fb_cmd2*);
   const struct drm_format_info* (*get_format_info)(const struct drm_mode_fb_cmd2*);
   enum drm_mode_status (*mode_valid)(struct drm_device*, const struct drm_display_mode*);
   int (*atomic_check)(struct drm_device*, struct drm_atomic_state*);
@@ -68286,31 +68204,27 @@ struct drm_plane {
 
 struct drm_plane_funcs {
   int (*update_plane)(struct drm_plane*,
-                      struct drm_crtc*,
-                      struct drm_framebuffer*,
-                      int,
-                      int,
-                      unsigned int,
-                      unsigned int,
-                      uint32_t,
-                      uint32_t,
-                      uint32_t,
-                      uint32_t,
-                      struct drm_modeset_acquire_ctx*);
+   struct drm_crtc*,
+   struct drm_framebuffer*,
+   int,
+   int,
+   unsigned int,
+   unsigned int,
+   uint32_t,
+   uint32_t,
+   uint32_t,
+   uint32_t,
+   struct drm_modeset_acquire_ctx*);
   int (*disable_plane)(struct drm_plane*, struct drm_modeset_acquire_ctx*);
   void (*destroy)(struct drm_plane*);
   void (*reset)(struct drm_plane*);
   int (*set_property)(struct drm_plane*, struct drm_property*, uint64_t);
   struct drm_plane_state* (*atomic_duplicate_state)(struct drm_plane*);
   void (*atomic_destroy_state)(struct drm_plane*, struct drm_plane_state*);
-  int (*atomic_set_property)(struct drm_plane*,
-                             struct drm_plane_state*,
-                             struct drm_property*,
-                             uint64_t);
-  int (*atomic_get_property)(struct drm_plane*,
-                             const struct drm_plane_state*,
-                             struct drm_property*,
-                             uint64_t*);
+  int (*atomic_set_property)(
+   struct drm_plane*, struct drm_plane_state*, struct drm_property*, uint64_t);
+  int (*atomic_get_property)(
+   struct drm_plane*, const struct drm_plane_state*, struct drm_property*, uint64_t*);
   int (*late_register)(struct drm_plane*);
   void (*early_unregister)(struct drm_plane*);
   void (*atomic_print_state)(struct drm_printer*, const struct drm_plane_state*);
@@ -68518,8 +68432,8 @@ struct drm_simple_display_pipe {
 };
 
 struct drm_simple_display_pipe_funcs {
-  enum drm_mode_status (*mode_valid)(struct drm_simple_display_pipe*,
-                                     const struct drm_display_mode*);
+  enum drm_mode_status (*mode_valid)(
+   struct drm_simple_display_pipe*, const struct drm_display_mode*);
   void (*enable)(struct drm_simple_display_pipe*, struct drm_crtc_state*, struct drm_plane_state*);
   void (*disable)(struct drm_simple_display_pipe*);
   int (*check)(struct drm_simple_display_pipe*, struct drm_plane_state*, struct drm_crtc_state*);
@@ -68966,9 +68880,8 @@ struct dsa_port {
 struct kernel_hwtstamp_config;
 
 struct dsa_stubs {
-  int (*conduit_hwtstamp_validate)(struct net_device*,
-                                   const struct kernel_hwtstamp_config*,
-                                   struct netlink_ext_ack*);
+  int (*conduit_hwtstamp_validate)(
+   struct net_device*, const struct kernel_hwtstamp_config*, struct netlink_ext_ack*);
 };
 
 struct dsa_8021q_context;
@@ -69095,10 +69008,8 @@ struct dsa_switch_ops {
   void (*get_eth_phy_stats)(struct dsa_switch*, int, struct ethtool_eth_phy_stats*);
   void (*get_eth_mac_stats)(struct dsa_switch*, int, struct ethtool_eth_mac_stats*);
   void (*get_eth_ctrl_stats)(struct dsa_switch*, int, struct ethtool_eth_ctrl_stats*);
-  void (*get_rmon_stats)(struct dsa_switch*,
-                         int,
-                         struct ethtool_rmon_stats*,
-                         const struct ethtool_rmon_hist_range**);
+  void (*get_rmon_stats)(
+   struct dsa_switch*, int, struct ethtool_rmon_stats*, const struct ethtool_rmon_hist_range**);
   void (*get_ts_stats)(struct dsa_switch*, int, struct ethtool_ts_stats*);
   void (*get_stats64)(struct dsa_switch*, int, struct rtnl_link_stats64*);
   void (*get_pause_stats)(struct dsa_switch*, int, struct ethtool_pause_stats*);
@@ -69132,26 +69043,20 @@ struct dsa_switch_ops {
   int (*port_prechangeupper)(struct dsa_switch*, int, struct netdev_notifier_changeupper_info*);
   int (*set_ageing_time)(struct dsa_switch*, unsigned int);
   int (*port_bridge_join)(
-      struct dsa_switch*, int, struct dsa_bridge, bool*, struct netlink_ext_ack*);
+   struct dsa_switch*, int, struct dsa_bridge, bool*, struct netlink_ext_ack*);
   void (*port_bridge_leave)(struct dsa_switch*, int, struct dsa_bridge);
   void (*port_stp_state_set)(struct dsa_switch*, int, u8);
   int (*port_mst_state_set)(struct dsa_switch*, int, const struct switchdev_mst_state*);
   void (*port_fast_age)(struct dsa_switch*, int);
   int (*port_vlan_fast_age)(struct dsa_switch*, int, u16);
-  int (*port_pre_bridge_flags)(struct dsa_switch*,
-                               int,
-                               struct switchdev_brport_flags,
-                               struct netlink_ext_ack*);
-  int (*port_bridge_flags)(struct dsa_switch*,
-                           int,
-                           struct switchdev_brport_flags,
-                           struct netlink_ext_ack*);
+  int (*port_pre_bridge_flags)(
+   struct dsa_switch*, int, struct switchdev_brport_flags, struct netlink_ext_ack*);
+  int (*port_bridge_flags)(
+   struct dsa_switch*, int, struct switchdev_brport_flags, struct netlink_ext_ack*);
   void (*port_set_host_flood)(struct dsa_switch*, int, bool, bool);
   int (*port_vlan_filtering)(struct dsa_switch*, int, bool, struct netlink_ext_ack*);
-  int (*port_vlan_add)(struct dsa_switch*,
-                       int,
-                       const struct switchdev_obj_port_vlan*,
-                       struct netlink_ext_ack*);
+  int (*port_vlan_add)(
+   struct dsa_switch*, int, const struct switchdev_obj_port_vlan*, struct netlink_ext_ack*);
   int (*port_vlan_del)(struct dsa_switch*, int, const struct switchdev_obj_port_vlan*);
   int (*vlan_msti_set)(struct dsa_switch*, struct dsa_bridge, const struct switchdev_vlan_msti*);
   int (*port_fdb_add)(struct dsa_switch*, int, const unsigned char*, u16, struct dsa_db);
@@ -69167,21 +69072,21 @@ struct dsa_switch_ops {
   int (*cls_flower_del)(struct dsa_switch*, int, struct flow_cls_offload*, bool);
   int (*cls_flower_stats)(struct dsa_switch*, int, struct flow_cls_offload*, bool);
   int (*port_mirror_add)(
-      struct dsa_switch*, int, struct dsa_mall_mirror_tc_entry*, bool, struct netlink_ext_ack*);
+   struct dsa_switch*, int, struct dsa_mall_mirror_tc_entry*, bool, struct netlink_ext_ack*);
   void (*port_mirror_del)(struct dsa_switch*, int, struct dsa_mall_mirror_tc_entry*);
   int (*port_policer_add)(struct dsa_switch*, int, struct dsa_mall_policer_tc_entry*);
   void (*port_policer_del)(struct dsa_switch*, int);
   int (*port_setup_tc)(struct dsa_switch*, int, enum tc_setup_type, void*);
   int (*crosschip_bridge_join)(
-      struct dsa_switch*, int, int, int, struct dsa_bridge, struct netlink_ext_ack*);
+   struct dsa_switch*, int, int, int, struct dsa_bridge, struct netlink_ext_ack*);
   void (*crosschip_bridge_leave)(struct dsa_switch*, int, int, int, struct dsa_bridge);
   int (*crosschip_lag_change)(struct dsa_switch*, int, int);
   int (*crosschip_lag_join)(struct dsa_switch*,
-                            int,
-                            int,
-                            struct dsa_lag,
-                            struct netdev_lag_upper_info*,
-                            struct netlink_ext_ack*);
+   int,
+   int,
+   struct dsa_lag,
+   struct netdev_lag_upper_info*,
+   struct netlink_ext_ack*);
   int (*crosschip_lag_leave)(struct dsa_switch*, int, int, struct dsa_lag);
   int (*port_hwtstamp_get)(struct dsa_switch*, int, struct ifreq*);
   int (*port_hwtstamp_set)(struct dsa_switch*, int, struct ifreq*);
@@ -69192,37 +69097,34 @@ struct dsa_switch_ops {
   int (*devlink_info_get)(struct dsa_switch*, struct devlink_info_req*, struct netlink_ext_ack*);
   int (*devlink_sb_pool_get)(struct dsa_switch*, unsigned int, u16, struct devlink_sb_pool_info*);
   int (*devlink_sb_pool_set)(struct dsa_switch*,
-                             unsigned int,
-                             u16,
-                             u32,
-                             enum devlink_sb_threshold_type,
-                             struct netlink_ext_ack*);
+   unsigned int,
+   u16,
+   u32,
+   enum devlink_sb_threshold_type,
+   struct netlink_ext_ack*);
   int (*devlink_sb_port_pool_get)(struct dsa_switch*, int, unsigned int, u16, u32*);
   int (*devlink_sb_port_pool_set)(
-      struct dsa_switch*, int, unsigned int, u16, u32, struct netlink_ext_ack*);
+   struct dsa_switch*, int, unsigned int, u16, u32, struct netlink_ext_ack*);
   int (*devlink_sb_tc_pool_bind_get)(
-      struct dsa_switch*, int, unsigned int, u16, enum devlink_sb_pool_type, u16*, u32*);
+   struct dsa_switch*, int, unsigned int, u16, enum devlink_sb_pool_type, u16*, u32*);
   int (*devlink_sb_tc_pool_bind_set)(struct dsa_switch*,
-                                     int,
-                                     unsigned int,
-                                     u16,
-                                     enum devlink_sb_pool_type,
-                                     u16,
-                                     u32,
-                                     struct netlink_ext_ack*);
+   int,
+   unsigned int,
+   u16,
+   enum devlink_sb_pool_type,
+   u16,
+   u32,
+   struct netlink_ext_ack*);
   int (*devlink_sb_occ_snapshot)(struct dsa_switch*, unsigned int);
   int (*devlink_sb_occ_max_clear)(struct dsa_switch*, unsigned int);
   int (*devlink_sb_occ_port_pool_get)(struct dsa_switch*, int, unsigned int, u16, u32*, u32*);
   int (*devlink_sb_occ_tc_port_bind_get)(
-      struct dsa_switch*, int, unsigned int, u16, enum devlink_sb_pool_type, u32*, u32*);
+   struct dsa_switch*, int, unsigned int, u16, enum devlink_sb_pool_type, u32*, u32*);
   int (*port_change_mtu)(struct dsa_switch*, int, int);
   int (*port_max_mtu)(struct dsa_switch*, int);
   int (*port_lag_change)(struct dsa_switch*, int);
-  int (*port_lag_join)(struct dsa_switch*,
-                       int,
-                       struct dsa_lag,
-                       struct netdev_lag_upper_info*,
-                       struct netlink_ext_ack*);
+  int (*port_lag_join)(
+   struct dsa_switch*, int, struct dsa_lag, struct netdev_lag_upper_info*, struct netlink_ext_ack*);
   int (*port_lag_leave)(struct dsa_switch*, int, struct dsa_lag);
   int (*port_hsr_join)(struct dsa_switch*, int, struct net_device*, struct netlink_ext_ack*);
   int (*port_hsr_leave)(struct dsa_switch*, int, struct net_device*);
@@ -71196,8 +71098,8 @@ typedef efi_status_t efi_get_wakeup_time_t(efi_bool_t*, efi_bool_t*, efi_time_t*
 
 typedef efi_status_t efi_set_wakeup_time_t(efi_bool_t, efi_time_t*);
 
-typedef efi_status_t
-efi_get_variable_t(efi_char16_t*, efi_guid_t*, u32*, long unsigned int*, void*);
+typedef efi_status_t efi_get_variable_t(
+ efi_char16_t*, efi_guid_t*, u32*, long unsigned int*, void*);
 
 typedef efi_status_t efi_get_next_variable_t(long unsigned int*, efi_char16_t*, efi_guid_t*);
 
@@ -71205,11 +71107,11 @@ typedef efi_status_t efi_set_variable_t(efi_char16_t*, efi_guid_t*, u32, long un
 
 typedef efi_status_t efi_query_variable_info_t(u32, u64*, u64*, u64*);
 
-typedef efi_status_t
-efi_update_capsule_t(efi_capsule_header_t**, long unsigned int, long unsigned int);
+typedef efi_status_t efi_update_capsule_t(
+ efi_capsule_header_t**, long unsigned int, long unsigned int);
 
-typedef efi_status_t
-efi_query_capsule_caps_t(efi_capsule_header_t**, long unsigned int, u64*, int*);
+typedef efi_status_t efi_query_capsule_caps_t(
+ efi_capsule_header_t**, long unsigned int, u64*, int*);
 
 typedef efi_status_t efi_get_next_high_mono_count_t(u32*);
 
@@ -72545,9 +72447,8 @@ struct ethnl_request_ops {
   bool allow_nodev_do;
   u8 set_ntf_cmd;
   int (*parse_request)(struct ethnl_req_info*, struct nlattr**, struct netlink_ext_ack*);
-  int (*prepare_data)(const struct ethnl_req_info*,
-                      struct ethnl_reply_data*,
-                      const struct genl_info*);
+  int (*prepare_data)(
+   const struct ethnl_req_info*, struct ethnl_reply_data*, const struct genl_info*);
   int (*reply_size)(const struct ethnl_req_info*, const struct ethnl_reply_data*);
   int (*fill_reply)(struct sk_buff*, const struct ethnl_req_info*, const struct ethnl_reply_data*);
   void (*cleanup_data)(struct ethnl_reply_data*);
@@ -73023,21 +72924,21 @@ struct ethtool_ops {
   int (*get_eeprom)(struct net_device*, struct ethtool_eeprom*, u8*);
   int (*set_eeprom)(struct net_device*, struct ethtool_eeprom*, u8*);
   int (*get_coalesce)(struct net_device*,
-                      struct ethtool_coalesce*,
-                      struct kernel_ethtool_coalesce*,
-                      struct netlink_ext_ack*);
+   struct ethtool_coalesce*,
+   struct kernel_ethtool_coalesce*,
+   struct netlink_ext_ack*);
   int (*set_coalesce)(struct net_device*,
-                      struct ethtool_coalesce*,
-                      struct kernel_ethtool_coalesce*,
-                      struct netlink_ext_ack*);
+   struct ethtool_coalesce*,
+   struct kernel_ethtool_coalesce*,
+   struct netlink_ext_ack*);
   void (*get_ringparam)(struct net_device*,
-                        struct ethtool_ringparam*,
-                        struct kernel_ethtool_ringparam*,
-                        struct netlink_ext_ack*);
+   struct ethtool_ringparam*,
+   struct kernel_ethtool_ringparam*,
+   struct netlink_ext_ack*);
   int (*set_ringparam)(struct net_device*,
-                       struct ethtool_ringparam*,
-                       struct kernel_ethtool_ringparam*,
-                       struct netlink_ext_ack*);
+   struct ethtool_ringparam*,
+   struct kernel_ethtool_ringparam*,
+   struct netlink_ext_ack*);
   void (*get_pause_stats)(struct net_device*, struct ethtool_pause_stats*);
   void (*get_pauseparam)(struct net_device*, struct ethtool_pauseparam*);
   int (*set_pauseparam)(struct net_device*, struct ethtool_pauseparam*);
@@ -73059,17 +72960,15 @@ struct ethtool_ops {
   int (*get_rxfh)(struct net_device*, struct ethtool_rxfh_param*);
   int (*set_rxfh)(struct net_device*, struct ethtool_rxfh_param*, struct netlink_ext_ack*);
   int (*create_rxfh_context)(struct net_device*,
-                             struct ethtool_rxfh_context*,
-                             const struct ethtool_rxfh_param*,
-                             struct netlink_ext_ack*);
+   struct ethtool_rxfh_context*,
+   const struct ethtool_rxfh_param*,
+   struct netlink_ext_ack*);
   int (*modify_rxfh_context)(struct net_device*,
-                             struct ethtool_rxfh_context*,
-                             const struct ethtool_rxfh_param*,
-                             struct netlink_ext_ack*);
-  int (*remove_rxfh_context)(struct net_device*,
-                             struct ethtool_rxfh_context*,
-                             u32,
-                             struct netlink_ext_ack*);
+   struct ethtool_rxfh_context*,
+   const struct ethtool_rxfh_param*,
+   struct netlink_ext_ack*);
+  int (*remove_rxfh_context)(
+   struct net_device*, struct ethtool_rxfh_context*, u32, struct netlink_ext_ack*);
   void (*get_channels)(struct net_device*, struct ethtool_channels*);
   int (*set_channels)(struct net_device*, struct ethtool_channels*);
   int (*get_dump_flag)(struct net_device*, struct ethtool_dump*);
@@ -73093,24 +72992,19 @@ struct ethtool_ops {
   void (*get_ethtool_phy_stats)(struct net_device*, struct ethtool_stats*, u64*);
   int (*get_phy_tunable)(struct net_device*, const struct ethtool_tunable*, void*);
   int (*set_phy_tunable)(struct net_device*, const struct ethtool_tunable*, const void*);
-  int (*get_module_eeprom_by_page)(struct net_device*,
-                                   const struct ethtool_module_eeprom*,
-                                   struct netlink_ext_ack*);
-  int (*set_module_eeprom_by_page)(struct net_device*,
-                                   const struct ethtool_module_eeprom*,
-                                   struct netlink_ext_ack*);
+  int (*get_module_eeprom_by_page)(
+   struct net_device*, const struct ethtool_module_eeprom*, struct netlink_ext_ack*);
+  int (*set_module_eeprom_by_page)(
+   struct net_device*, const struct ethtool_module_eeprom*, struct netlink_ext_ack*);
   void (*get_eth_phy_stats)(struct net_device*, struct ethtool_eth_phy_stats*);
   void (*get_eth_mac_stats)(struct net_device*, struct ethtool_eth_mac_stats*);
   void (*get_eth_ctrl_stats)(struct net_device*, struct ethtool_eth_ctrl_stats*);
-  void (*get_rmon_stats)(struct net_device*,
-                         struct ethtool_rmon_stats*,
-                         const struct ethtool_rmon_hist_range**);
-  int (*get_module_power_mode)(struct net_device*,
-                               struct ethtool_module_power_mode_params*,
-                               struct netlink_ext_ack*);
-  int (*set_module_power_mode)(struct net_device*,
-                               const struct ethtool_module_power_mode_params*,
-                               struct netlink_ext_ack*);
+  void (*get_rmon_stats)(
+   struct net_device*, struct ethtool_rmon_stats*, const struct ethtool_rmon_hist_range**);
+  int (*get_module_power_mode)(
+   struct net_device*, struct ethtool_module_power_mode_params*, struct netlink_ext_ack*);
+  int (*set_module_power_mode)(
+   struct net_device*, const struct ethtool_module_power_mode_params*, struct netlink_ext_ack*);
   int (*get_mm)(struct net_device*, struct ethtool_mm_state*);
   int (*set_mm)(struct net_device*, struct ethtool_mm_cfg*, struct netlink_ext_ack*);
   void (*get_mm_stats)(struct net_device*, struct ethtool_mm_stats*);
@@ -73164,9 +73058,8 @@ struct ethtool_phy_ops {
   int (*set_plca_cfg)(struct phy_device*, const struct phy_plca_cfg*, struct netlink_ext_ack*);
   int (*get_plca_status)(struct phy_device*, struct phy_plca_status*);
   int (*start_cable_test)(struct phy_device*, struct netlink_ext_ack*);
-  int (*start_cable_test_tdr)(struct phy_device*,
-                              struct netlink_ext_ack*,
-                              const struct phy_tdr_config*);
+  int (*start_cable_test_tdr)(
+   struct phy_device*, struct netlink_ext_ack*, const struct phy_tdr_config*);
 };
 
 struct ethtool_phy_stats {
@@ -73552,10 +73445,8 @@ struct perf_cpu_context;
 
 struct perf_event_context;
 
-typedef void (*event_f)(struct perf_event*,
-                        struct perf_cpu_context*,
-                        struct perf_event_context*,
-                        void*);
+typedef void (*event_f)(
+ struct perf_event*, struct perf_cpu_context*, struct perf_event_context*, void*);
 
 struct event_function_struct {
   struct perf_event* event;
@@ -73619,10 +73510,8 @@ struct event_trigger_data {
 };
 
 struct event_trigger_ops {
-  void (*trigger)(struct event_trigger_data*,
-                  struct trace_buffer*,
-                  void*,
-                  struct ring_buffer_event*);
+  void (*trigger)(
+   struct event_trigger_data*, struct trace_buffer*, void*, struct ring_buffer_event*);
   int (*init)(struct event_trigger_data*);
   void (*free)(struct event_trigger_data*);
   int (*print)(struct seq_file*, struct event_trigger_data*);
@@ -75875,7 +75764,7 @@ struct fb_ops {
   int (*fb_check_var)(struct fb_var_screeninfo*, struct fb_info*);
   int (*fb_set_par)(struct fb_info*);
   int (*fb_setcolreg)(
-      unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, struct fb_info*);
+   unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, struct fb_info*);
   int (*fb_setcmap)(struct fb_cmap*, struct fb_info*);
   int (*fb_blank)(int, struct fb_info*);
   int (*fb_pan_display)(struct fb_var_screeninfo*, struct fb_info*);
@@ -75988,7 +75877,7 @@ struct fbcon_ops {
   void (*bmove)(struct vc_data*, struct fb_info*, int, int, int, int, int, int);
   void (*clear)(struct vc_data*, struct fb_info*, int, int, int, int, int, int);
   void (*putcs)(
-      struct vc_data*, struct fb_info*, const short unsigned int*, int, int, int, int, int);
+   struct vc_data*, struct fb_info*, const short unsigned int*, int, int, int, int, int);
   void (*clear_margins)(struct vc_data*, struct fb_info*, int, int);
   void (*cursor)(struct vc_data*, struct fb_info*, bool, int, int);
   int (*update_start)(struct fb_info*);
@@ -76339,18 +76228,14 @@ struct fgraph_data {
 
 struct fgraph_ops;
 
-typedef int (*trace_func_graph_ent_t)(struct ftrace_graph_ent*,
-                                      struct fgraph_ops*,
-                                      struct ftrace_regs*);
+typedef int (*trace_func_graph_ent_t)(
+ struct ftrace_graph_ent*, struct fgraph_ops*, struct ftrace_regs*);
 
-typedef void (*trace_func_graph_ret_t)(struct ftrace_graph_ret*,
-                                       struct fgraph_ops*,
-                                       struct ftrace_regs*);
+typedef void (*trace_func_graph_ret_t)(
+ struct ftrace_graph_ret*, struct fgraph_ops*, struct ftrace_regs*);
 
-typedef void (*ftrace_func_t)(long unsigned int,
-                              long unsigned int,
-                              struct ftrace_ops*,
-                              struct ftrace_regs*);
+typedef void (*ftrace_func_t)(
+ long unsigned int, long unsigned int, struct ftrace_ops*, struct ftrace_regs*);
 
 struct ftrace_hash;
 
@@ -76958,10 +76843,10 @@ struct fib_rules_ops {
   bool (*suppress)(struct fib_rule*, int, struct fib_lookup_arg*);
   int (*match)(struct fib_rule*, struct flowi*, int);
   int (*configure)(struct fib_rule*,
-                   struct sk_buff*,
-                   struct fib_rule_hdr*,
-                   struct nlattr**,
-                   struct netlink_ext_ack*);
+   struct sk_buff*,
+   struct fib_rule_hdr*,
+   struct nlattr**,
+   struct netlink_ext_ack*);
   int (*delete)(struct fib_rule*);
   int (*compare)(struct fib_rule*, struct fib_rule_hdr*, struct nlattr**);
   int (*fill)(struct fib_rule*, struct sk_buff*, struct fib_rule_hdr*);
@@ -77192,7 +77077,7 @@ struct file_operations {
   int (*fasync)(int, struct file*, int);
   int (*lock)(struct file*, int, struct file_lock*);
   long unsigned int (*get_unmapped_area)(
-      struct file*, long unsigned int, long unsigned int, long unsigned int, long unsigned int);
+   struct file*, long unsigned int, long unsigned int, long unsigned int, long unsigned int);
   int (*check_flags)(int);
   int (*flock)(struct file*, int, struct file_lock*);
   ssize_t (*splice_write)(struct pipe_inode_info*, struct file*, loff_t*, size_t, unsigned int);
@@ -77931,12 +77816,12 @@ struct flow_indir_dev_info {
 };
 
 typedef int flow_indr_block_bind_cb_t(struct net_device*,
-                                      struct Qdisc*,
-                                      void*,
-                                      enum tc_setup_type,
-                                      void*,
-                                      void*,
-                                      void (*)(struct flow_block_cb*));
+ struct Qdisc*,
+ void*,
+ enum tc_setup_type,
+ void*,
+ void*,
+ void (*)(struct flow_block_cb*));
 
 struct flow_indr_dev {
   struct list_head list;
@@ -78861,10 +78746,8 @@ struct fs_parameter {
 
 struct fs_parse_result;
 
-typedef int fs_param_type(struct p_log*,
-                          const struct fs_parameter_spec*,
-                          struct fs_parameter*,
-                          struct fs_parse_result*);
+typedef int fs_param_type(
+ struct p_log*, const struct fs_parameter_spec*, struct fs_parameter*, struct fs_parse_result*);
 
 struct fs_parameter_spec {
   const char* name;
@@ -79318,15 +79201,15 @@ struct fsnotify_mark_connector {
 
 struct fsnotify_ops {
   int (*handle_event)(struct fsnotify_group*,
-                      u32,
-                      const void*,
-                      int,
-                      struct inode*,
-                      const struct qstr*,
-                      u32,
-                      struct fsnotify_iter_info*);
+   u32,
+   const void*,
+   int,
+   struct inode*,
+   const struct qstr*,
+   u32,
+   struct fsnotify_iter_info*);
   int (*handle_inode_event)(
-      struct fsnotify_mark*, u32, struct inode*, struct inode*, const struct qstr*, u32);
+   struct fsnotify_mark*, u32, struct inode*, struct inode*, const struct qstr*, u32);
   void (*free_group_priv)(struct fsnotify_group*);
   void (*freeing_mark)(struct fsnotify_mark*, struct fsnotify_group*);
   void (*free_event)(struct fsnotify_group*, struct fsnotify_event*);
@@ -79646,7 +79529,7 @@ struct ftrace_page {
 
 struct ftrace_probe_ops {
   void (*func)(
-      long unsigned int, long unsigned int, struct trace_array*, struct ftrace_probe_ops*, void*);
+   long unsigned int, long unsigned int, struct trace_array*, struct ftrace_probe_ops*, void*);
   int (*init)(struct ftrace_probe_ops*, struct trace_array*, long unsigned int, void*, void**);
   void (*free)(struct ftrace_probe_ops*, struct trace_array*, long unsigned int, void*);
   int (*print)(struct seq_file*, long unsigned int, struct ftrace_probe_ops*, void*);
@@ -80999,7 +80882,7 @@ struct fwnode_operations {
   bool (*property_present)(const struct fwnode_handle*, const char*);
   bool (*property_read_bool)(const struct fwnode_handle*, const char*);
   int (*property_read_int_array)(
-      const struct fwnode_handle*, const char*, unsigned int, void*, size_t);
+   const struct fwnode_handle*, const char*, unsigned int, void*, size_t);
   int (*property_read_string_array)(const struct fwnode_handle*, const char*, const char**, size_t);
   const char* (*get_name)(const struct fwnode_handle*);
   const char* (*get_name_prefix)(const struct fwnode_handle*);
@@ -81007,13 +80890,13 @@ struct fwnode_operations {
   struct fwnode_handle* (*get_next_child_node)(const struct fwnode_handle*, struct fwnode_handle*);
   struct fwnode_handle* (*get_named_child_node)(const struct fwnode_handle*, const char*);
   int (*get_reference_args)(const struct fwnode_handle*,
-                            const char*,
-                            const char*,
-                            unsigned int,
-                            unsigned int,
-                            struct fwnode_reference_args*);
-  struct fwnode_handle* (*graph_get_next_endpoint)(const struct fwnode_handle*,
-                                                   struct fwnode_handle*);
+   const char*,
+   const char*,
+   unsigned int,
+   unsigned int,
+   struct fwnode_reference_args*);
+  struct fwnode_handle* (*graph_get_next_endpoint)(
+   const struct fwnode_handle*, struct fwnode_handle*);
   struct fwnode_handle* (*graph_get_remote_endpoint)(const struct fwnode_handle*);
   struct fwnode_handle* (*graph_get_port_parent)(struct fwnode_handle*);
   int (*graph_parse_endpoint)(const struct fwnode_handle*, struct fwnode_endpoint*);
@@ -81597,12 +81480,12 @@ struct gen_cookie {
 struct gen_pool;
 
 typedef long unsigned int (*genpool_algo_t)(long unsigned int*,
-                                            long unsigned int,
-                                            long unsigned int,
-                                            unsigned int,
-                                            void*,
-                                            struct gen_pool*,
-                                            long unsigned int);
+ long unsigned int,
+ long unsigned int,
+ unsigned int,
+ void*,
+ struct gen_pool*,
+ long unsigned int);
 
 struct gen_pool {
   spinlock_t lock;
@@ -82975,13 +82858,13 @@ struct hc_driver {
   int (*alloc_dev)(struct usb_hcd*, struct usb_device*);
   void (*free_dev)(struct usb_hcd*, struct usb_device*);
   int (*alloc_streams)(struct usb_hcd*,
-                       struct usb_device*,
-                       struct usb_host_endpoint**,
-                       unsigned int,
-                       unsigned int,
-                       gfp_t);
+   struct usb_device*,
+   struct usb_host_endpoint**,
+   unsigned int,
+   unsigned int,
+   gfp_t);
   int (*free_streams)(
-      struct usb_hcd*, struct usb_device*, struct usb_host_endpoint**, unsigned int, gfp_t);
+   struct usb_hcd*, struct usb_device*, struct usb_host_endpoint**, unsigned int, gfp_t);
   int (*add_endpoint)(struct usb_hcd*, struct usb_device*, struct usb_host_endpoint*);
   int (*drop_endpoint)(struct usb_hcd*, struct usb_device*, struct usb_host_endpoint*);
   int (*check_bandwidth)(struct usb_hcd*, struct usb_device*);
@@ -83013,12 +82896,8 @@ struct header_iter {
 struct hh_cache;
 
 struct header_ops {
-  int (*create)(struct sk_buff*,
-                struct net_device*,
-                short unsigned int,
-                const void*,
-                const void*,
-                unsigned int);
+  int (*create)(
+   struct sk_buff*, struct net_device*, short unsigned int, const void*, const void*, unsigned int);
   int (*parse)(const struct sk_buff*, unsigned char*);
   int (*cache)(const struct neighbour*, struct hh_cache*, __be16);
   void (*cache_update)(struct hh_cache*, const struct net_device*, const unsigned char*);
@@ -83227,17 +83106,17 @@ struct hid_driver {
   void (*report)(struct hid_device*, struct hid_report*);
   const __u8* (*report_fixup)(struct hid_device*, __u8*, unsigned int*);
   int (*input_mapping)(struct hid_device*,
-                       struct hid_input*,
-                       struct hid_field*,
-                       struct hid_usage*,
-                       long unsigned int**,
-                       int*);
+   struct hid_input*,
+   struct hid_field*,
+   struct hid_usage*,
+   long unsigned int**,
+   int*);
   int (*input_mapped)(struct hid_device*,
-                      struct hid_input*,
-                      struct hid_field*,
-                      struct hid_usage*,
-                      long unsigned int**,
-                      int*);
+   struct hid_input*,
+   struct hid_field*,
+   struct hid_usage*,
+   long unsigned int**,
+   int*);
   int (*input_configured)(struct hid_device*, struct hid_input*);
   void (*feature_mapping)(struct hid_device*, struct hid_field*, struct hid_usage*);
   int (*suspend)(struct hid_device*, pm_message_t);
@@ -83310,13 +83189,13 @@ struct hid_ll_driver {
 struct hid_ops {
   struct hid_report* (*hid_get_report)(struct hid_report_enum*, const u8*);
   int (*hid_hw_raw_request)(struct hid_device*,
-                            unsigned char,
-                            __u8*,
-                            size_t,
-                            enum hid_report_type,
-                            enum hid_class_request,
-                            u64,
-                            bool);
+   unsigned char,
+   __u8*,
+   size_t,
+   enum hid_report_type,
+   enum hid_class_request,
+   u64,
+   bool);
   int (*hid_hw_output_report)(struct hid_device*, __u8*, size_t, u64, bool);
   int (*hid_input_report)(struct hid_device*, enum hid_report_type, u8*, u32, int, u64, bool, bool);
   struct module* owner;
@@ -84958,9 +84837,9 @@ struct i2c_algorithm {
     int (*master_xfer_atomic)(struct i2c_adapter*, struct i2c_msg*, int);
   };
   int (*smbus_xfer)(
-      struct i2c_adapter*, u16, short unsigned int, char, u8, int, union i2c_smbus_data*);
+   struct i2c_adapter*, u16, short unsigned int, char, u8, int, union i2c_smbus_data*);
   int (*smbus_xfer_atomic)(
-      struct i2c_adapter*, u16, short unsigned int, char, u8, int, union i2c_smbus_data*);
+   struct i2c_adapter*, u16, short unsigned int, char, u8, int, union i2c_smbus_data*);
   u32 (*functionality)(struct i2c_adapter*);
   union {
     int (*reg_target)(struct i2c_client*);
@@ -85372,14 +85251,14 @@ struct ib_device_ops {
   int (*req_notify_cq)(struct ib_cq*, enum ib_cq_notify_flags);
   int (*post_srq_recv)(struct ib_srq*, const struct ib_recv_wr*, const struct ib_recv_wr**);
   int (*process_mad)(struct ib_device*,
-                     int,
-                     u32,
-                     const struct ib_wc*,
-                     const struct ib_grh*,
-                     const struct ib_mad*,
-                     struct ib_mad*,
-                     size_t*,
-                     u16*);
+   int,
+   u32,
+   const struct ib_wc*,
+   const struct ib_grh*,
+   const struct ib_mad*,
+   struct ib_mad*,
+   size_t*,
+   u16*);
   int (*query_device)(struct ib_device*, struct ib_device_attr*, struct ib_udata*);
   int (*modify_device)(struct ib_device*, int, struct ib_device_modify*);
   void (*get_dev_fw_str)(struct ib_device*, char*);
@@ -85390,15 +85269,13 @@ struct ib_device_ops {
   enum rdma_link_layer (*get_link_layer)(struct ib_device*, u32);
   struct net_device* (*get_netdev)(struct ib_device*, u32);
   struct net_device* (*alloc_rdma_netdev)(struct ib_device*,
-                                          u32,
-                                          enum rdma_netdev_t,
-                                          const char*,
-                                          unsigned char,
-                                          void (*)(struct net_device*));
-  int (*rdma_netdev_get_params)(struct ib_device*,
-                                u32,
-                                enum rdma_netdev_t,
-                                struct rdma_netdev_alloc_params*);
+   u32,
+   enum rdma_netdev_t,
+   const char*,
+   unsigned char,
+   void (*)(struct net_device*));
+  int (*rdma_netdev_get_params)(
+   struct ib_device*, u32, enum rdma_netdev_t, struct rdma_netdev_alloc_params*);
   int (*query_gid)(struct ib_device*, u32, int, union ib_gid*);
   int (*add_gid)(const struct ib_gid_attr*, void**);
   int (*del_gid)(const struct ib_gid_attr*, void**);
@@ -85430,18 +85307,18 @@ struct ib_device_ops {
   struct ib_mr* (*get_dma_mr)(struct ib_pd*, int);
   struct ib_mr* (*reg_user_mr)(struct ib_pd*, u64, u64, u64, int, struct ib_udata*);
   struct ib_mr* (*reg_user_mr_dmabuf)(
-      struct ib_pd*, u64, u64, u64, int, int, struct uverbs_attr_bundle*);
+   struct ib_pd*, u64, u64, u64, int, int, struct uverbs_attr_bundle*);
   struct ib_mr* (*rereg_user_mr)(
-      struct ib_mr*, int, u64, u64, u64, int, struct ib_pd*, struct ib_udata*);
+   struct ib_mr*, int, u64, u64, u64, int, struct ib_pd*, struct ib_udata*);
   int (*dereg_mr)(struct ib_mr*, struct ib_udata*);
   struct ib_mr* (*alloc_mr)(struct ib_pd*, enum ib_mr_type, u32);
   struct ib_mr* (*alloc_mr_integrity)(struct ib_pd*, u32, u32);
   int (*advise_mr)(struct ib_pd*,
-                   enum ib_uverbs_advise_mr_advice,
-                   u32,
-                   struct ib_sge*,
-                   u32,
-                   struct uverbs_attr_bundle*);
+   enum ib_uverbs_advise_mr_advice,
+   u32,
+   struct ib_sge*,
+   u32,
+   struct uverbs_attr_bundle*);
   int (*map_mr_sg)(struct ib_mr*, struct scatterlist*, int, unsigned int*);
   int (*check_mr_status)(struct ib_mr*, u32, struct ib_mr_status*);
   int (*alloc_mw)(struct ib_mw*, struct ib_udata*);
@@ -85461,31 +85338,20 @@ struct ib_device_ops {
   struct ib_wq* (*create_wq)(struct ib_pd*, struct ib_wq_init_attr*, struct ib_udata*);
   int (*destroy_wq)(struct ib_wq*, struct ib_udata*);
   int (*modify_wq)(struct ib_wq*, struct ib_wq_attr*, u32, struct ib_udata*);
-  int (*create_rwq_ind_table)(struct ib_rwq_ind_table*,
-                              struct ib_rwq_ind_table_init_attr*,
-                              struct ib_udata*);
+  int (*create_rwq_ind_table)(
+   struct ib_rwq_ind_table*, struct ib_rwq_ind_table_init_attr*, struct ib_udata*);
   int (*destroy_rwq_ind_table)(struct ib_rwq_ind_table*);
-  struct ib_dm* (*alloc_dm)(struct ib_device*,
-                            struct ib_ucontext*,
-                            struct ib_dm_alloc_attr*,
-                            struct uverbs_attr_bundle*);
+  struct ib_dm* (*alloc_dm)(
+   struct ib_device*, struct ib_ucontext*, struct ib_dm_alloc_attr*, struct uverbs_attr_bundle*);
   int (*dealloc_dm)(struct ib_dm*, struct uverbs_attr_bundle*);
-  struct ib_mr* (*reg_dm_mr)(struct ib_pd*,
-                             struct ib_dm*,
-                             struct ib_dm_mr_attr*,
-                             struct uverbs_attr_bundle*);
+  struct ib_mr* (*reg_dm_mr)(
+   struct ib_pd*, struct ib_dm*, struct ib_dm_mr_attr*, struct uverbs_attr_bundle*);
   int (*create_counters)(struct ib_counters*, struct uverbs_attr_bundle*);
   int (*destroy_counters)(struct ib_counters*);
-  int (*read_counters)(struct ib_counters*,
-                       struct ib_counters_read_attr*,
-                       struct uverbs_attr_bundle*);
-  int (*map_mr_sg_pi)(struct ib_mr*,
-                      struct scatterlist*,
-                      int,
-                      unsigned int*,
-                      struct scatterlist*,
-                      int,
-                      unsigned int*);
+  int (*read_counters)(
+   struct ib_counters*, struct ib_counters_read_attr*, struct uverbs_attr_bundle*);
+  int (*map_mr_sg_pi)(
+   struct ib_mr*, struct scatterlist*, int, unsigned int*, struct scatterlist*, int, unsigned int*);
   struct rdma_hw_stats* (*alloc_hw_device_stats)(struct ib_device*);
   struct rdma_hw_stats* (*alloc_hw_port_stats)(struct ib_device*, u32);
   int (*get_hw_stats)(struct ib_device*, struct rdma_hw_stats*, u32, int);
@@ -88190,11 +88056,11 @@ struct inet_connection_sock_af_ops {
   void (*sk_rx_dst_set)(struct sock*, const struct sk_buff*);
   int (*conn_request)(struct sock*, struct sk_buff*);
   struct sock* (*syn_recv_sock)(const struct sock*,
-                                struct sk_buff*,
-                                struct request_sock*,
-                                struct dst_entry*,
-                                struct request_sock*,
-                                bool*);
+   struct sk_buff*,
+   struct request_sock*,
+   struct dst_entry*,
+   struct request_sock*,
+   bool*);
   u16 net_header_len;
   u16 sockaddr_len;
   int (*setsockopt)(struct sock*, int, int, sockptr_t, unsigned int);
@@ -88467,12 +88333,8 @@ struct inode_operations {
   int (*mkdir)(struct mnt_idmap*, struct inode*, struct dentry*, umode_t);
   int (*rmdir)(struct inode*, struct dentry*);
   int (*mknod)(struct mnt_idmap*, struct inode*, struct dentry*, umode_t, dev_t);
-  int (*rename)(struct mnt_idmap*,
-                struct inode*,
-                struct dentry*,
-                struct inode*,
-                struct dentry*,
-                unsigned int);
+  int (*rename)(
+   struct mnt_idmap*, struct inode*, struct dentry*, struct inode*, struct dentry*, unsigned int);
   int (*setattr)(struct mnt_idmap*, struct dentry*, struct iattr*);
   int (*getattr)(struct mnt_idmap*, const struct path*, struct kstat*, u32, unsigned int);
   ssize_t (*listxattr)(struct dentry*, char*, size_t);
@@ -91388,11 +91250,8 @@ struct iommu_dirty_bitmap {
 
 struct iommu_dirty_ops {
   int (*set_dirty_tracking)(struct iommu_domain*, bool);
-  int (*read_and_clear_dirty)(struct iommu_domain*,
-                              long unsigned int,
-                              size_t,
-                              long unsigned int,
-                              struct iommu_dirty_bitmap*);
+  int (*read_and_clear_dirty)(
+   struct iommu_domain*, long unsigned int, size_t, long unsigned int, struct iommu_dirty_bitmap*);
 };
 
 struct iova {
@@ -91465,9 +91324,9 @@ struct iommu_domain_ops {
   int (*attach_dev)(struct iommu_domain*, struct device*);
   int (*set_dev_pasid)(struct iommu_domain*, struct device*, ioasid_t, struct iommu_domain*);
   int (*map_pages)(
-      struct iommu_domain*, long unsigned int, phys_addr_t, size_t, size_t, int, gfp_t, size_t*);
+   struct iommu_domain*, long unsigned int, phys_addr_t, size_t, size_t, int, gfp_t, size_t*);
   size_t (*unmap_pages)(
-      struct iommu_domain*, long unsigned int, size_t, size_t, struct iommu_iotlb_gather*);
+   struct iommu_domain*, long unsigned int, size_t, size_t, struct iommu_iotlb_gather*);
   void (*flush_iotlb_all)(struct iommu_domain*);
   int (*iotlb_sync_map)(struct iommu_domain*, long unsigned int, size_t);
   void (*iotlb_sync)(struct iommu_domain*, struct iommu_iotlb_gather*);
@@ -91581,15 +91440,12 @@ struct iommu_ops {
   bool (*capable)(struct device*, enum iommu_cap);
   void* (*hw_info)(struct device*, u32*, u32*);
   struct iommu_domain* (*domain_alloc)(unsigned int);
-  struct iommu_domain* (*domain_alloc_paging_flags)(struct device*,
-                                                    u32,
-                                                    const struct iommu_user_data*);
+  struct iommu_domain* (*domain_alloc_paging_flags)(
+   struct device*, u32, const struct iommu_user_data*);
   struct iommu_domain* (*domain_alloc_paging)(struct device*);
   struct iommu_domain* (*domain_alloc_sva)(struct device*, struct mm_struct*);
-  struct iommu_domain* (*domain_alloc_nested)(struct device*,
-                                              struct iommu_domain*,
-                                              u32,
-                                              const struct iommu_user_data*);
+  struct iommu_domain* (*domain_alloc_nested)(
+   struct device*, struct iommu_domain*, u32, const struct iommu_user_data*);
   struct iommu_device* (*probe_device)(struct device*);
   void (*release_device)(struct device*);
   void (*probe_finalize)(struct device*);
@@ -91601,10 +91457,8 @@ struct iommu_ops {
   int (*dev_disable_feat)(struct device*, enum iommu_dev_features);
   void (*page_response)(struct device*, struct iopf_fault*, struct iommu_page_response*);
   int (*def_domain_type)(struct device*);
-  struct iommufd_viommu* (*viommu_alloc)(struct device*,
-                                         struct iommu_domain*,
-                                         struct iommufd_ctx*,
-                                         unsigned int);
+  struct iommufd_viommu* (*viommu_alloc)(
+   struct device*, struct iommu_domain*, struct iommufd_ctx*, unsigned int);
   const struct iommu_domain_ops* default_domain_ops;
   long unsigned int pgsize_bitmap;
   struct module* owner;
@@ -91744,9 +91598,8 @@ struct iommufd_viommu {
 
 struct iommufd_viommu_ops {
   void (*destroy)(struct iommufd_viommu*);
-  struct iommu_domain* (*alloc_domain_nested)(struct iommufd_viommu*,
-                                              u32,
-                                              const struct iommu_user_data*);
+  struct iommu_domain* (*alloc_domain_nested)(
+   struct iommufd_viommu*, u32, const struct iommu_user_data*);
   int (*cache_invalidate)(struct iommufd_viommu*, struct iommu_user_data_array*);
 };
 
@@ -92550,21 +92403,18 @@ struct udp_table;
 struct ipv6_bpf_stub {
   int (*inet6_bind)(struct sock*, struct sockaddr*, int, u32);
   struct sock* (*udp6_lib_lookup)(const struct net*,
-                                  const struct in6_addr*,
-                                  __be16,
-                                  const struct in6_addr*,
-                                  __be16,
-                                  int,
-                                  int,
-                                  struct udp_table*,
-                                  struct sk_buff*);
+   const struct in6_addr*,
+   __be16,
+   const struct in6_addr*,
+   __be16,
+   int,
+   int,
+   struct udp_table*,
+   struct sk_buff*);
   int (*ipv6_setsockopt)(struct sock*, int, int, sockptr_t, unsigned int);
   int (*ipv6_getsockopt)(struct sock*, int, int, sockptr_t, sockptr_t);
-  int (*ipv6_dev_get_saddr)(struct net*,
-                            const struct net_device*,
-                            const struct in6_addr*,
-                            unsigned int,
-                            struct in6_addr*);
+  int (*ipv6_dev_get_saddr)(
+   struct net*, const struct net_device*, const struct in6_addr*, unsigned int, struct in6_addr*);
 };
 
 struct ipv6_destopt_hao {
@@ -92716,27 +92566,19 @@ struct neigh_table;
 struct ipv6_stub {
   int (*ipv6_sock_mc_join)(struct sock*, int, const struct in6_addr*);
   int (*ipv6_sock_mc_drop)(struct sock*, int, const struct in6_addr*);
-  struct dst_entry* (*ipv6_dst_lookup_flow)(struct net*,
-                                            const struct sock*,
-                                            struct flowi6*,
-                                            const struct in6_addr*);
+  struct dst_entry* (*ipv6_dst_lookup_flow)(
+   struct net*, const struct sock*, struct flowi6*, const struct in6_addr*);
   int (*ipv6_route_input)(struct sk_buff*);
   struct fib6_table* (*fib6_get_table)(struct net*, u32);
   int (*fib6_lookup)(struct net*, int, struct flowi6*, struct fib6_result*, int);
   int (*fib6_table_lookup)(
-      struct net*, struct fib6_table*, int, struct flowi6*, struct fib6_result*, int);
-  void (*fib6_select_path)(const struct net*,
-                           struct fib6_result*,
-                           struct flowi6*,
-                           int,
-                           bool,
-                           const struct sk_buff*,
-                           int);
-  u32 (*ip6_mtu_from_fib6)(const struct fib6_result*,
-                           const struct in6_addr*,
-                           const struct in6_addr*);
+   struct net*, struct fib6_table*, int, struct flowi6*, struct fib6_result*, int);
+  void (*fib6_select_path)(
+   const struct net*, struct fib6_result*, struct flowi6*, int, bool, const struct sk_buff*, int);
+  u32 (*ip6_mtu_from_fib6)(
+   const struct fib6_result*, const struct in6_addr*, const struct in6_addr*);
   int (*fib6_nh_init)(
-      struct net*, struct fib6_nh*, struct fib6_config*, gfp_t, struct netlink_ext_ack*);
+   struct net*, struct fib6_nh*, struct fib6_config*, gfp_t, struct netlink_ext_ack*);
   void (*fib6_nh_release)(struct fib6_nh*);
   void (*fib6_nh_release_dsts)(struct fib6_nh*);
   void (*fib6_update_sernum)(struct net*, struct fib6_info*);
@@ -92744,19 +92586,17 @@ struct ipv6_stub {
   void (*fib6_rt_update)(struct net*, struct fib6_info*, struct nl_info*);
   void (*udpv6_encap_enable)(void);
   void (*ndisc_send_na)(
-      struct net_device*, const struct in6_addr*, const struct in6_addr*, bool, bool, bool, bool);
+   struct net_device*, const struct in6_addr*, const struct in6_addr*, bool, bool, bool, bool);
   void (*xfrm6_local_rxpmtu)(struct sk_buff*, u32);
   int (*xfrm6_udp_encap_rcv)(struct sock*, struct sk_buff*);
   struct sk_buff* (*xfrm6_gro_udp_encap_rcv)(struct sock*, struct list_head*, struct sk_buff*);
   int (*xfrm6_rcv_encap)(struct sk_buff*, int, __be32, int);
   struct neigh_table* nd_tbl;
-  int (*ipv6_fragment)(struct net*,
-                       struct sock*,
-                       struct sk_buff*,
-                       int (*)(struct net*, struct sock*, struct sk_buff*));
+  int (*ipv6_fragment)(
+   struct net*, struct sock*, struct sk_buff*, int (*)(struct net*, struct sock*, struct sk_buff*));
   struct net_device* (*ipv6_dev_find)(struct net*, const struct in6_addr*, struct net_device*);
   int (*ip6_xmit)(
-      const struct sock*, struct sk_buff*, struct flowi6*, __u32, struct ipv6_txoptions*, int, u32);
+   const struct sock*, struct sk_buff*, struct flowi6*, __u32, struct ipv6_txoptions*, int, u32);
 };
 
 struct ipv6_txoptions {
@@ -94455,7 +94295,7 @@ struct kexec_entry64_regs {
 typedef int kexec_probe_t(const char*, long unsigned int);
 
 typedef void* kexec_load_t(
-    struct kimage*, char*, long unsigned int, char*, long unsigned int, char*, long unsigned int);
+ struct kimage*, char*, long unsigned int, char*, long unsigned int, char*, long unsigned int);
 
 typedef int kexec_cleanup_t(void*);
 
@@ -94599,10 +94439,8 @@ struct key_preparsed_payload {
   time64_t expiry;
 };
 
-typedef int (*key_restrict_link_func_t)(struct key*,
-                                        const struct key_type*,
-                                        const union key_payload*,
-                                        struct key*);
+typedef int (*key_restrict_link_func_t)(
+ struct key*, const struct key_type*, const union key_payload*, struct key*);
 
 struct key_restriction {
   key_restrict_link_func_t check;
@@ -97179,10 +97017,8 @@ struct kvm_x86_ops {
   void (*write_tsc_multiplier)(struct kvm_vcpu*);
   void (*get_exit_info)(struct kvm_vcpu*, u32*, u64*, u64*, u32*, u32*);
   void (*get_entry_info)(struct kvm_vcpu*, u32*, u32*);
-  int (*check_intercept)(struct kvm_vcpu*,
-                         struct x86_instruction_info*,
-                         enum x86_intercept_stage,
-                         struct x86_exception*);
+  int (*check_intercept)(
+   struct kvm_vcpu*, struct x86_instruction_info*, enum x86_intercept_stage, struct x86_exception*);
   void (*handle_exit_irqoff)(struct kvm_vcpu*);
   int cpu_dirty_log_size;
   void (*update_cpu_dirty_logging)(struct kvm_vcpu*);
@@ -98619,11 +98455,11 @@ struct lwq_node {
 
 struct lwtunnel_encap_ops {
   int (*build_state)(struct net*,
-                     struct nlattr*,
-                     unsigned int,
-                     const void*,
-                     struct lwtunnel_state**,
-                     struct netlink_ext_ack*);
+   struct nlattr*,
+   unsigned int,
+   const void*,
+   struct lwtunnel_state**,
+   struct netlink_ext_ack*);
   void (*destroy_state)(struct lwtunnel_state*);
   int (*output)(struct net*, struct sock*, struct sk_buff*);
   int (*input)(struct sk_buff*);
@@ -101598,7 +101434,7 @@ struct mm_walk_ops {
   int (*pte_entry)(pte_t*, long unsigned int, long unsigned int, struct mm_walk*);
   int (*pte_hole)(long unsigned int, long unsigned int, int, struct mm_walk*);
   int (*hugetlb_entry)(
-      pte_t*, long unsigned int, long unsigned int, long unsigned int, struct mm_walk*);
+   pte_t*, long unsigned int, long unsigned int, long unsigned int, struct mm_walk*);
   int (*test_walk)(long unsigned int, long unsigned int, struct mm_walk*);
   int (*pre_vma)(long unsigned int, long unsigned int, struct mm_walk*);
   void (*post_vma)(struct mm_walk*);
@@ -102370,25 +102206,20 @@ struct mmu_interval_notifier {
 };
 
 struct mmu_interval_notifier_ops {
-  bool (*invalidate)(struct mmu_interval_notifier*,
-                     const struct mmu_notifier_range*,
-                     long unsigned int);
+  bool (*invalidate)(
+   struct mmu_interval_notifier*, const struct mmu_notifier_range*, long unsigned int);
 };
 
 struct mmu_notifier_ops {
   void (*release)(struct mmu_notifier*, struct mm_struct*);
-  int (*clear_flush_young)(struct mmu_notifier*,
-                           struct mm_struct*,
-                           long unsigned int,
-                           long unsigned int);
+  int (*clear_flush_young)(
+   struct mmu_notifier*, struct mm_struct*, long unsigned int, long unsigned int);
   int (*clear_young)(struct mmu_notifier*, struct mm_struct*, long unsigned int, long unsigned int);
   int (*test_young)(struct mmu_notifier*, struct mm_struct*, long unsigned int);
   int (*invalidate_range_start)(struct mmu_notifier*, const struct mmu_notifier_range*);
   void (*invalidate_range_end)(struct mmu_notifier*, const struct mmu_notifier_range*);
-  void (*arch_invalidate_secondary_tlbs)(struct mmu_notifier*,
-                                         struct mm_struct*,
-                                         long unsigned int,
-                                         long unsigned int);
+  void (*arch_invalidate_secondary_tlbs)(
+   struct mmu_notifier*, struct mm_struct*, long unsigned int, long unsigned int);
   struct mmu_notifier* (*alloc_notifier)(struct mm_struct*);
   void (*free_notifier)(struct mmu_notifier*);
 };
@@ -104034,11 +103865,8 @@ struct msi_domain_info {
 
 struct msi_domain_ops {
   irq_hw_number_t (*get_hwirq)(struct msi_domain_info*, msi_alloc_info_t*);
-  int (*msi_init)(struct irq_domain*,
-                  struct msi_domain_info*,
-                  unsigned int,
-                  irq_hw_number_t,
-                  msi_alloc_info_t*);
+  int (*msi_init)(
+   struct irq_domain*, struct msi_domain_info*, unsigned int, irq_hw_number_t, msi_alloc_info_t*);
   void (*msi_free)(struct irq_domain*, struct msi_domain_info*, unsigned int);
   int (*msi_prepare)(struct irq_domain*, struct device*, int, msi_alloc_info_t*);
   void (*prepare_desc)(struct irq_domain*, msi_alloc_info_t*, struct msi_desc*);
@@ -104067,10 +103895,8 @@ struct msi_parent_ops {
   u32 bus_select_token;
   u32 bus_select_mask;
   const char* prefix;
-  bool (*init_dev_msi_info)(struct device*,
-                            struct irq_domain*,
-                            struct irq_domain*,
-                            struct msi_domain_info*);
+  bool (*init_dev_msi_info)(
+   struct device*, struct irq_domain*, struct irq_domain*, struct msi_domain_info*);
 };
 
 struct msix_entry {
@@ -105219,7 +105045,7 @@ struct nd_namespace_common {
   struct device* claim;
   enum nvdimm_claim_class claim_class;
   int (*rw_bytes)(
-      struct nd_namespace_common*, resource_size_t, void*, size_t, int, long unsigned int);
+   struct nd_namespace_common*, resource_size_t, void*, size_t, int, long unsigned int);
 };
 
 struct nd_namespace_index {
@@ -105396,17 +105222,17 @@ struct ndisc_ops {
   int (*opt_addr_space)(const struct net_device*, u8, struct neighbour*, u8*, u8**);
   void (*fill_addr_option)(const struct net_device*, struct sk_buff*, u8, const u8*);
   void (*prefix_rcv_add_addr)(struct net*,
-                              struct net_device*,
-                              const struct prefix_info*,
-                              struct inet6_dev*,
-                              struct in6_addr*,
-                              int,
-                              u32,
-                              bool,
-                              bool,
-                              __u32,
-                              u32,
-                              bool);
+   struct net_device*,
+   const struct prefix_info*,
+   struct inet6_dev*,
+   struct in6_addr*,
+   int,
+   u32,
+   bool,
+   bool,
+   __u32,
+   u32,
+   bool);
 };
 
 struct ndisc_options {
@@ -107054,31 +106880,31 @@ struct net_device_ops {
   int (*ndo_neigh_construct)(struct net_device*, struct neighbour*);
   void (*ndo_neigh_destroy)(struct net_device*, struct neighbour*);
   int (*ndo_fdb_add)(struct ndmsg*,
-                     struct nlattr**,
-                     struct net_device*,
-                     const unsigned char*,
-                     u16,
-                     u16,
-                     bool*,
-                     struct netlink_ext_ack*);
+   struct nlattr**,
+   struct net_device*,
+   const unsigned char*,
+   u16,
+   u16,
+   bool*,
+   struct netlink_ext_ack*);
   int (*ndo_fdb_del)(struct ndmsg*,
-                     struct nlattr**,
-                     struct net_device*,
-                     const unsigned char*,
-                     u16,
-                     bool*,
-                     struct netlink_ext_ack*);
+   struct nlattr**,
+   struct net_device*,
+   const unsigned char*,
+   u16,
+   bool*,
+   struct netlink_ext_ack*);
   int (*ndo_fdb_del_bulk)(struct nlmsghdr*, struct net_device*, struct netlink_ext_ack*);
   int (*ndo_fdb_dump)(
-      struct sk_buff*, struct netlink_callback*, struct net_device*, struct net_device*, int*);
+   struct sk_buff*, struct netlink_callback*, struct net_device*, struct net_device*, int*);
   int (*ndo_fdb_get)(struct sk_buff*,
-                     struct nlattr**,
-                     struct net_device*,
-                     const unsigned char*,
-                     u16,
-                     u32,
-                     u32,
-                     struct netlink_ext_ack*);
+   struct nlattr**,
+   struct net_device*,
+   const unsigned char*,
+   u16,
+   u32,
+   u32,
+   struct netlink_ext_ack*);
   int (*ndo_mdb_add)(struct net_device*, struct nlattr**, u16, struct netlink_ext_ack*);
   int (*ndo_mdb_del)(struct net_device*, struct nlattr**, struct netlink_ext_ack*);
   int (*ndo_mdb_del_bulk)(struct net_device*, struct nlattr**, struct netlink_ext_ack*);
@@ -107106,9 +106932,8 @@ struct net_device_ops {
   int (*ndo_fill_forward_path)(struct net_device_path_ctx*, struct net_device_path*);
   ktime_t (*ndo_get_tstamp)(struct net_device*, const struct skb_shared_hwtstamps*, bool);
   int (*ndo_hwtstamp_get)(struct net_device*, struct kernel_hwtstamp_config*);
-  int (*ndo_hwtstamp_set)(struct net_device*,
-                          struct kernel_hwtstamp_config*,
-                          struct netlink_ext_ack*);
+  int (*ndo_hwtstamp_set)(
+   struct net_device*, struct kernel_hwtstamp_config*, struct netlink_ext_ack*);
   const struct net_shaper_ops* net_shaper_ops;
 };
 
@@ -107187,10 +107012,8 @@ struct net_dm_alert_ops {
   void (*napi_poll_probe)(void*, struct napi_struct*, int, int);
   void (*work_item_func)(struct work_struct*);
   void (*hw_work_item_func)(struct work_struct*);
-  void (*hw_trap_probe)(void*,
-                        const struct devlink*,
-                        struct sk_buff*,
-                        const struct devlink_trap_metadata*);
+  void (*hw_trap_probe)(
+   void*, const struct devlink*, struct sk_buff*, const struct devlink_trap_metadata*);
 };
 
 struct net_dm_hw_entry {
@@ -107421,14 +107244,13 @@ struct net_shaper_nl_ctx {
 
 struct net_shaper_ops {
   int (*group)(struct net_shaper_binding*,
-               int,
-               const struct net_shaper*,
-               const struct net_shaper*,
-               struct netlink_ext_ack*);
+   int,
+   const struct net_shaper*,
+   const struct net_shaper*,
+   struct netlink_ext_ack*);
   int (*set)(struct net_shaper_binding*, const struct net_shaper*, struct netlink_ext_ack*);
-  int (*delete)(struct net_shaper_binding*,
-                const struct net_shaper_handle*,
-                struct netlink_ext_ack*);
+  int (*delete)(
+   struct net_shaper_binding*, const struct net_shaper_handle*, struct netlink_ext_ack*);
   void (*capabilities)(struct net_shaper_binding*, enum net_shaper_scope, long unsigned int*);
 };
 
@@ -107734,9 +107556,8 @@ struct netdev_rx_queue {
 struct netdev_stat_ops {
   void (*get_queue_stats_rx)(struct net_device*, int, struct netdev_queue_stats_rx*);
   void (*get_queue_stats_tx)(struct net_device*, int, struct netdev_queue_stats_tx*);
-  void (*get_base_stats)(struct net_device*,
-                         struct netdev_queue_stats_rx*,
-                         struct netdev_queue_stats_tx*);
+  void (*get_base_stats)(
+   struct net_device*, struct netdev_queue_stats_rx*, struct netdev_queue_stats_tx*);
 };
 
 struct netdev_xmit {
@@ -107940,15 +107761,13 @@ struct netlbl_calipso_ops {
   int (*sock_getattr)(struct sock*, struct netlbl_lsm_secattr*);
   int (*sock_setattr)(struct sock*, const struct calipso_doi*, const struct netlbl_lsm_secattr*);
   void (*sock_delattr)(struct sock*);
-  int (*req_setattr)(struct request_sock*,
-                     const struct calipso_doi*,
-                     const struct netlbl_lsm_secattr*);
+  int (*req_setattr)(
+   struct request_sock*, const struct calipso_doi*, const struct netlbl_lsm_secattr*);
   void (*req_delattr)(struct request_sock*);
   int (*opt_getattr)(const unsigned char*, struct netlbl_lsm_secattr*);
   unsigned char* (*skbuff_optptr)(const struct sk_buff*);
-  int (*skbuff_setattr)(struct sk_buff*,
-                        const struct calipso_doi*,
-                        const struct netlbl_lsm_secattr*);
+  int (*skbuff_setattr)(
+   struct sk_buff*, const struct calipso_doi*, const struct netlbl_lsm_secattr*);
   int (*skbuff_delattr)(struct sk_buff*);
   void (*cache_invalidate)(void);
   int (*cache_add)(const unsigned char*, const struct netlbl_lsm_secattr*);
@@ -108592,10 +108411,8 @@ struct nf_queue_entry;
 
 struct nf_ipv6_ops {
   void (*route_input)(struct sk_buff*);
-  int (*fragment)(struct net*,
-                  struct sock*,
-                  struct sk_buff*,
-                  int (*)(struct net*, struct sock*, struct sk_buff*));
+  int (*fragment)(
+   struct net*, struct sock*, struct sk_buff*, int (*)(struct net*, struct sock*, struct sk_buff*));
   int (*reroute)(struct sk_buff*, const struct nf_queue_entry*);
 };
 
@@ -108607,13 +108424,13 @@ struct nf_log_buf {
 struct nf_loginfo;
 
 typedef void nf_logfn(struct net*,
-                      u_int8_t,
-                      unsigned int,
-                      const struct sk_buff*,
-                      const struct net_device*,
-                      const struct net_device*,
-                      const struct nf_loginfo*,
-                      const char*);
+ u_int8_t,
+ unsigned int,
+ const struct sk_buff*,
+ const struct net_device*,
+ const struct net_device*,
+ const struct nf_loginfo*,
+ const char*);
 
 struct nf_logger {
   char* name;
@@ -108808,11 +108625,8 @@ struct nfs4_lock_state {
 struct nfs_fh;
 
 struct nfs4_mig_recovery_ops {
-  int (*get_locations)(struct nfs_server*,
-                       struct nfs_fh*,
-                       struct nfs4_fs_locations*,
-                       struct page*,
-                       const struct cred*);
+  int (*get_locations)(
+   struct nfs_server*, struct nfs_fh*, struct nfs4_fs_locations*, struct page*, const struct cred*);
   int (*fsid_present)(struct inode*, const struct cred*);
 };
 
@@ -109448,7 +109262,7 @@ struct nfs_rpc_ops {
   int (*getattr)(struct nfs_server*, struct nfs_fh*, struct nfs_fattr*, struct inode*);
   int (*setattr)(struct dentry*, struct nfs_fattr*, struct iattr*);
   int (*lookup)(
-      struct inode*, struct dentry*, const struct qstr*, struct nfs_fh*, struct nfs_fattr*);
+   struct inode*, struct dentry*, const struct qstr*, struct nfs_fh*, struct nfs_fattr*);
   int (*lookupp)(struct inode*, struct nfs_fh*, struct nfs_fattr*);
   int (*access)(struct inode*, struct nfs_access_entry*, const struct cred*);
   int (*readlink)(struct inode*, struct page*, unsigned int, unsigned int);
@@ -109490,10 +109304,8 @@ struct nfs_rpc_ops {
   struct nfs_client* (*init_client)(struct nfs_client*, const struct nfs_client_initdata*);
   void (*free_client)(struct nfs_client*);
   struct nfs_server* (*create_server)(struct fs_context*);
-  struct nfs_server* (*clone_server)(struct nfs_server*,
-                                     struct nfs_fh*,
-                                     struct nfs_fattr*,
-                                     rpc_authflavor_t);
+  struct nfs_server* (*clone_server)(
+   struct nfs_server*, struct nfs_fh*, struct nfs_fattr*, rpc_authflavor_t);
   int (*discover_trunking)(struct nfs_server*, struct nfs_fh*);
   void (*enable_swap)(struct inode*);
   void (*disable_swap)(struct inode*);
@@ -110220,7 +110032,7 @@ struct nvdimm_bus {
 };
 
 typedef int (*ndctl_fn)(
-    struct nvdimm_bus_descriptor*, struct nvdimm*, unsigned int, void*, unsigned int, int*);
+ struct nvdimm_bus_descriptor*, struct nvdimm*, unsigned int, void*, unsigned int, int*);
 
 struct nvdimm_bus_fw_ops;
 
@@ -110292,9 +110104,9 @@ struct nvdimm_security_ops {
   long unsigned int (*get_flags)(struct nvdimm*, enum nvdimm_passphrase_type);
   int (*freeze)(struct nvdimm*);
   int (*change_key)(struct nvdimm*,
-                    const struct nvdimm_key_data*,
-                    const struct nvdimm_key_data*,
-                    enum nvdimm_passphrase_type);
+   const struct nvdimm_key_data*,
+   const struct nvdimm_key_data*,
+   enum nvdimm_passphrase_type);
   int (*unlock)(struct nvdimm*, const struct nvdimm_key_data*);
   int (*disable)(struct nvdimm*, const struct nvdimm_key_data*);
   int (*erase)(struct nvdimm*, const struct nvdimm_key_data*, enum nvdimm_passphrase_type);
@@ -111989,15 +111801,15 @@ struct palmas_pmic_driver_data {
   struct of_regulator_match* palmas_matches;
   struct palmas_sleep_requestor_info* sleep_req_info;
   int (*smps_register)(struct palmas_pmic*,
-                       struct palmas_pmic_driver_data*,
-                       struct palmas_pmic_platform_data*,
-                       const char*,
-                       struct regulator_config);
+   struct palmas_pmic_driver_data*,
+   struct palmas_pmic_platform_data*,
+   const char*,
+   struct regulator_config);
   int (*ldo_register)(struct palmas_pmic*,
-                      struct palmas_pmic_driver_data*,
-                      struct palmas_pmic_platform_data*,
-                      const char*,
-                      struct regulator_config);
+   struct palmas_pmic_driver_data*,
+   struct palmas_pmic_platform_data*,
+   const char*,
+   struct regulator_config);
 };
 
 struct palmas_reg_init;
@@ -113080,7 +112892,7 @@ struct pci_host_bridge {
   unsigned int size_windows : 1;
   unsigned int msi_domain : 1;
   resource_size_t (*align_resource)(
-      struct pci_dev*, const struct resource*, resource_size_t, resource_size_t, resource_size_t);
+   struct pci_dev*, const struct resource*, resource_size_t, resource_size_t, resource_size_t);
   long : 64;
   long : 64;
   long : 64;
@@ -114134,9 +113946,8 @@ struct perf_event_attr {
   __u64 config3;
 };
 
-typedef void (*perf_overflow_handler_t)(struct perf_event*,
-                                        struct perf_sample_data*,
-                                        struct pt_regs*);
+typedef void (*perf_overflow_handler_t)(
+ struct perf_event*, struct perf_sample_data*, struct pt_regs*);
 
 struct perf_event {
   struct list_head event_entry;
@@ -114874,9 +114685,8 @@ struct phy_driver {
   int (*cable_test_start)(struct phy_device*);
   int (*cable_test_tdr_start)(struct phy_device*, const struct phy_tdr_config*);
   int (*cable_test_get_status)(struct phy_device*, bool*);
-  void (*get_phy_stats)(struct phy_device*,
-                        struct ethtool_eth_phy_stats*,
-                        struct ethtool_phy_stats*);
+  void (*get_phy_stats)(
+   struct phy_device*, struct ethtool_eth_phy_stats*, struct ethtool_phy_stats*);
   void (*get_link_stats)(struct phy_device*, struct ethtool_link_ext_stats*);
   int (*update_stats)(struct phy_device*);
   int (*get_sset_count)(struct phy_device*);
@@ -114994,9 +114804,8 @@ struct phy_tdr_config {
 struct phylib_stubs {
   int (*hwtstamp_get)(struct phy_device*, struct kernel_hwtstamp_config*);
   int (*hwtstamp_set)(struct phy_device*, struct kernel_hwtstamp_config*, struct netlink_ext_ack*);
-  void (*get_phy_stats)(struct phy_device*,
-                        struct ethtool_eth_phy_stats*,
-                        struct ethtool_phy_stats*);
+  void (*get_phy_stats)(
+   struct phy_device*, struct ethtool_eth_phy_stats*, struct ethtool_phy_stats*);
   void (*get_link_ext_stats)(struct phy_device*, struct ethtool_link_ext_stats*);
 };
 
@@ -115021,14 +114830,8 @@ struct phylink_mac_ops {
   void (*mac_config)(struct phylink_config*, unsigned int, const struct phylink_link_state*);
   int (*mac_finish)(struct phylink_config*, unsigned int, phy_interface_t);
   void (*mac_link_down)(struct phylink_config*, unsigned int, phy_interface_t);
-  void (*mac_link_up)(struct phylink_config*,
-                      struct phy_device*,
-                      unsigned int,
-                      phy_interface_t,
-                      int,
-                      int,
-                      bool,
-                      bool);
+  void (*mac_link_up)(
+   struct phylink_config*, struct phy_device*, unsigned int, phy_interface_t, int, int, bool, bool);
   void (*mac_disable_tx_lpi)(struct phylink_config*);
   int (*mac_enable_tx_lpi)(struct phylink_config*, u32, bool);
 };
@@ -115053,7 +114856,7 @@ struct phylink_pcs_ops {
   int (*pcs_post_config)(struct phylink_pcs*, phy_interface_t);
   void (*pcs_get_state)(struct phylink_pcs*, unsigned int, struct phylink_link_state*);
   int (*pcs_config)(
-      struct phylink_pcs*, unsigned int, phy_interface_t, const long unsigned int*, bool);
+   struct phylink_pcs*, unsigned int, phy_interface_t, const long unsigned int*, bool);
   void (*pcs_an_restart)(struct phylink_pcs*);
   void (*pcs_link_up)(struct phylink_pcs*, unsigned int, phy_interface_t, int, int);
   int (*pcs_pre_init)(struct phylink_pcs*);
@@ -115369,10 +115172,8 @@ struct pinctrl_ops {
   const char* (*get_group_name)(struct pinctrl_dev*, unsigned int);
   int (*get_group_pins)(struct pinctrl_dev*, unsigned int, const unsigned int**, unsigned int*);
   void (*pin_dbg_show)(struct pinctrl_dev*, struct seq_file*, unsigned int);
-  int (*dt_node_to_map)(struct pinctrl_dev*,
-                        struct device_node*,
-                        struct pinctrl_map**,
-                        unsigned int*);
+  int (*dt_node_to_map)(
+   struct pinctrl_dev*, struct device_node*, struct pinctrl_map**, unsigned int*);
   void (*dt_free_map)(struct pinctrl_dev*, struct pinctrl_map*, unsigned int);
 };
 
@@ -116621,19 +116422,17 @@ struct power_supply_ext {
   const enum power_supply_property* properties;
   size_t num_properties;
   int (*get_property)(struct power_supply*,
-                      const struct power_supply_ext*,
-                      void*,
-                      enum power_supply_property,
-                      union power_supply_propval*);
+   const struct power_supply_ext*,
+   void*,
+   enum power_supply_property,
+   union power_supply_propval*);
   int (*set_property)(struct power_supply*,
-                      const struct power_supply_ext*,
-                      void*,
-                      enum power_supply_property,
-                      const union power_supply_propval*);
-  int (*property_is_writeable)(struct power_supply*,
-                               const struct power_supply_ext*,
-                               void*,
-                               enum power_supply_property);
+   const struct power_supply_ext*,
+   void*,
+   enum power_supply_property,
+   const union power_supply_propval*);
+  int (*property_is_writeable)(
+   struct power_supply*, const struct power_supply_ext*, void*, enum power_supply_property);
 };
 
 struct power_supply_ext_registration {
@@ -116851,9 +116650,8 @@ struct ppp_channel {
 struct ppp_channel_ops {
   int (*start_xmit)(struct ppp_channel*, struct sk_buff*);
   int (*ioctl)(struct ppp_channel*, unsigned int, long unsigned int);
-  int (*fill_forward_path)(struct net_device_path_ctx*,
-                           struct net_device_path*,
-                           const struct ppp_channel*);
+  int (*fill_forward_path)(
+   struct net_device_path_ctx*, struct net_device_path*, const struct ppp_channel*);
 };
 
 struct ppp_comp_stats {
@@ -117476,7 +117274,7 @@ struct proc_ops {
   long int (*proc_compat_ioctl)(struct file*, unsigned int, long unsigned int);
   int (*proc_mmap)(struct file*, struct vm_area_struct*);
   long unsigned int (*proc_get_unmapped_area)(
-      struct file*, long unsigned int, long unsigned int, long unsigned int, long unsigned int);
+   struct file*, long unsigned int, long unsigned int, long unsigned int, long unsigned int);
 };
 
 struct proc_timens_offset {
@@ -118578,14 +118376,10 @@ struct pwm_ops {
   void (*free)(struct pwm_chip*, struct pwm_device*);
   int (*capture)(struct pwm_chip*, struct pwm_device*, struct pwm_capture*, long unsigned int);
   size_t sizeof_wfhw;
-  int (*round_waveform_tohw)(struct pwm_chip*,
-                             struct pwm_device*,
-                             const struct pwm_waveform*,
-                             void*);
-  int (*round_waveform_fromhw)(struct pwm_chip*,
-                               struct pwm_device*,
-                               const void*,
-                               struct pwm_waveform*);
+  int (*round_waveform_tohw)(
+   struct pwm_chip*, struct pwm_device*, const struct pwm_waveform*, void*);
+  int (*round_waveform_fromhw)(
+   struct pwm_chip*, struct pwm_device*, const void*, struct pwm_waveform*);
   int (*read_waveform)(struct pwm_chip*, struct pwm_device*, void*);
   int (*write_waveform)(struct pwm_chip*, struct pwm_device*, const void*);
   int (*apply)(struct pwm_chip*, struct pwm_device*, const struct pwm_state*);
@@ -120132,7 +119926,7 @@ typedef int (*regmap_hw_write)(void*, const void*, size_t);
 typedef int (*regmap_hw_gather_write)(void*, const void*, size_t, const void*, size_t);
 
 typedef int (*regmap_hw_async_write)(
-    void*, const void*, size_t, const void*, size_t, struct regmap_async*);
+ void*, const void*, size_t, const void*, size_t, struct regmap_async*);
 
 typedef int (*regmap_hw_reg_write)(void*, unsigned int, unsigned int);
 
@@ -120944,10 +120738,8 @@ struct residency_counts {
   u64 hits_after;
 };
 
-typedef resource_size_t (*resource_alignf)(void*,
-                                           const struct resource*,
-                                           resource_size_t,
-                                           resource_size_t);
+typedef resource_size_t (*resource_alignf)(
+ void*, const struct resource*, resource_size_t, resource_size_t);
 
 struct resource_constraint {
   resource_size_t min;
@@ -123013,7 +122805,7 @@ struct rtnl_link_ops {
   const char* kind;
   size_t priv_size;
   struct net_device* (*alloc)(
-      struct nlattr**, const char*, unsigned char, unsigned int, unsigned int);
+   struct nlattr**, const char*, unsigned char, unsigned int, unsigned int);
   void (*setup)(struct net_device*);
   bool netns_refund;
   const u16 peer_type;
@@ -123021,7 +122813,7 @@ struct rtnl_link_ops {
   const struct nla_policy* policy;
   int (*validate)(struct nlattr**, struct nlattr**, struct netlink_ext_ack*);
   int (*newlink)(
-      struct net*, struct net_device*, struct nlattr**, struct nlattr**, struct netlink_ext_ack*);
+   struct net*, struct net_device*, struct nlattr**, struct nlattr**, struct netlink_ext_ack*);
   int (*changelink)(struct net_device*, struct nlattr**, struct nlattr**, struct netlink_ext_ack*);
   void (*dellink)(struct net_device*, struct list_head*);
   size_t (*get_size)(const struct net_device*);
@@ -123033,10 +122825,10 @@ struct rtnl_link_ops {
   unsigned int slave_maxtype;
   const struct nla_policy* slave_policy;
   int (*slave_changelink)(struct net_device*,
-                          struct net_device*,
-                          struct nlattr**,
-                          struct nlattr**,
-                          struct netlink_ext_ack*);
+   struct net_device*,
+   struct nlattr**,
+   struct nlattr**,
+   struct netlink_ext_ack*);
   size_t (*get_slave_size)(const struct net_device*, const struct net_device*);
   int (*fill_slave_info)(struct sk_buff*, const struct net_device*, const struct net_device*);
   struct net* (*get_link_net)(const struct net_device*);
@@ -125176,7 +124968,7 @@ struct sctp_stream_interleave {
   __u16 data_chunk_len;
   __u16 ftsn_chunk_len;
   struct sctp_chunk* (*make_datafrag)(
-      const struct sctp_association*, const struct sctp_sndrcvinfo*, int, __u8, gfp_t);
+   const struct sctp_association*, const struct sctp_sndrcvinfo*, int, __u8, gfp_t);
   void (*assign_number)(struct sctp_chunk*);
   bool (*validate_data)(struct sctp_chunk*);
   int (*ulpevent_data)(struct sctp_ulpq*, struct sctp_chunk*, gfp_t);
@@ -125944,11 +125736,8 @@ union security_list_options {
   int (*ptrace_access_check)(struct task_struct*, unsigned int);
   int (*ptrace_traceme)(struct task_struct*);
   int (*capget)(const struct task_struct*, kernel_cap_t*, kernel_cap_t*, kernel_cap_t*);
-  int (*capset)(struct cred*,
-                const struct cred*,
-                const kernel_cap_t*,
-                const kernel_cap_t*,
-                const kernel_cap_t*);
+  int (*capset)(
+   struct cred*, const struct cred*, const kernel_cap_t*, const kernel_cap_t*, const kernel_cap_t*);
   int (*capable)(const struct cred*, struct user_namespace*, int, unsigned int);
   int (*quotactl)(int, int, int, const struct super_block*);
   int (*quota_on)(struct dentry*);
@@ -125977,15 +125766,13 @@ union security_list_options {
   int (*sb_umount)(struct vfsmount*, int);
   int (*sb_pivotroot)(const struct path*, const struct path*);
   int (*sb_set_mnt_opts)(struct super_block*, void*, long unsigned int, long unsigned int*);
-  int (*sb_clone_mnt_opts)(const struct super_block*,
-                           struct super_block*,
-                           long unsigned int,
-                           long unsigned int*);
+  int (*sb_clone_mnt_opts)(
+   const struct super_block*, struct super_block*, long unsigned int, long unsigned int*);
   int (*move_mount)(const struct path*, const struct path*);
   int (*dentry_init_security)(
-      struct dentry*, int, const struct qstr*, const char**, struct lsm_context*);
+   struct dentry*, int, const struct qstr*, const char**, struct lsm_context*);
   int (*dentry_create_files_as)(
-      struct dentry*, int, struct qstr*, const struct cred*, struct cred*);
+   struct dentry*, int, struct qstr*, const struct cred*, struct cred*);
   int (*path_unlink)(const struct path*, struct dentry*);
   int (*path_mkdir)(const struct path*, struct dentry*, umode_t);
   int (*path_rmdir)(const struct path*, struct dentry*);
@@ -125995,7 +125782,7 @@ union security_list_options {
   int (*path_symlink)(const struct path*, struct dentry*, const char*);
   int (*path_link)(struct dentry*, const struct path*, struct dentry*);
   int (*path_rename)(
-      const struct path*, struct dentry*, const struct path*, struct dentry*, unsigned int);
+   const struct path*, struct dentry*, const struct path*, struct dentry*, unsigned int);
   int (*path_chmod)(const struct path*, umode_t);
   int (*path_chown)(const struct path*, kuid_t, kgid_t);
   int (*path_chroot)(const struct path*);
@@ -126092,7 +125879,7 @@ union security_list_options {
   int (*task_movememory)(struct task_struct*);
   int (*task_kill)(struct task_struct*, struct kernel_siginfo*, int, const struct cred*);
   int (*task_prctl)(
-      int, long unsigned int, long unsigned int, long unsigned int, long unsigned int);
+   int, long unsigned int, long unsigned int, long unsigned int, long unsigned int);
   void (*task_to_inode)(struct task_struct*, struct inode*);
   int (*userns_create)(const struct cred*);
   int (*ipc_permission)(struct kern_ipc_perm*, short int);
@@ -126105,7 +125892,7 @@ union security_list_options {
   int (*msg_queue_msgctl)(struct kern_ipc_perm*, int);
   int (*msg_queue_msgsnd)(struct kern_ipc_perm*, struct msg_msg*, int);
   int (*msg_queue_msgrcv)(
-      struct kern_ipc_perm*, struct msg_msg*, struct task_struct*, long int, int);
+   struct kern_ipc_perm*, struct msg_msg*, struct task_struct*, long int, int);
   int (*shm_alloc_security)(struct kern_ipc_perm*);
   void (*shm_free_security)(struct kern_ipc_perm*);
   int (*shm_associate)(struct kern_ipc_perm*, int);
@@ -126186,15 +125973,14 @@ union security_list_options {
   void (*xfrm_state_free_security)(struct xfrm_state*);
   int (*xfrm_state_delete_security)(struct xfrm_state*);
   int (*xfrm_policy_lookup)(struct xfrm_sec_ctx*, u32);
-  int (*xfrm_state_pol_flow_match)(struct xfrm_state*,
-                                   struct xfrm_policy*,
-                                   const struct flowi_common*);
+  int (*xfrm_state_pol_flow_match)(
+   struct xfrm_state*, struct xfrm_policy*, const struct flowi_common*);
   int (*xfrm_decode_session)(struct sk_buff*, u32*, int);
   int (*key_alloc)(struct key*, const struct cred*, long unsigned int);
   int (*key_permission)(key_ref_t, const struct cred*, enum key_need_perm);
   int (*key_getsecurity)(struct key*, char**);
   void (*key_post_create_or_update)(
-      struct key*, struct key*, const void*, size_t, long unsigned int, bool);
+   struct key*, struct key*, const void*, size_t, long unsigned int, bool);
   int (*audit_rule_init)(u32, u32, char*, void**, gfp_t);
   int (*audit_rule_known)(struct audit_krule*);
   int (*audit_rule_match)(struct lsm_prop*, u32, u32, void*);
@@ -127223,9 +127009,8 @@ struct sfp_socket_ops {
   void (*set_signal_rate)(struct sfp*, unsigned int);
   int (*module_info)(struct sfp*, struct ethtool_modinfo*);
   int (*module_eeprom)(struct sfp*, struct ethtool_eeprom*, u8*);
-  int (*module_eeprom_by_page)(struct sfp*,
-                               const struct ethtool_module_eeprom*,
-                               struct netlink_ext_ack*);
+  int (*module_eeprom_by_page)(
+   struct sfp*, const struct ethtool_module_eeprom*, struct netlink_ext_ack*);
 };
 
 struct sfp_upstream_ops {
@@ -129502,12 +129287,12 @@ struct spi_controller_mem_ops {
   ssize_t (*dirmap_read)(struct spi_mem_dirmap_desc*, u64, size_t, void*);
   ssize_t (*dirmap_write)(struct spi_mem_dirmap_desc*, u64, size_t, const void*);
   int (*poll_status)(struct spi_mem*,
-                     const struct spi_mem_op*,
-                     u16,
-                     u16,
-                     long unsigned int,
-                     long unsigned int,
-                     long unsigned int);
+   const struct spi_mem_op*,
+   u16,
+   u16,
+   long unsigned int,
+   long unsigned int,
+   long unsigned int);
 };
 
 struct spi_device {
@@ -129610,9 +129395,8 @@ struct spi_mem_driver {
 
 struct spi_replaced_transfers;
 
-typedef void (*spi_replaced_release_t)(struct spi_controller*,
-                                       struct spi_message*,
-                                       struct spi_replaced_transfers*);
+typedef void (*spi_replaced_release_t)(
+ struct spi_controller*, struct spi_message*, struct spi_replaced_transfers*);
 
 struct spi_replaced_transfers {
   spi_replaced_release_t release;
@@ -129720,7 +129504,7 @@ struct squashfs_decompressor {
   void* (*comp_opts)(struct squashfs_sb_info*, void*, int);
   void (*free)(void*);
   int (*decompress)(
-      struct squashfs_sb_info*, void*, struct bio*, int, int, struct squashfs_page_actor*);
+   struct squashfs_sb_info*, void*, struct bio*, int, int, struct squashfs_page_actor*);
   int id;
   char* name;
   int alloc_buffer;
@@ -130899,7 +130683,7 @@ struct svc_program {
   enum svc_auth_status (*pg_authenticate)(struct svc_rqst*);
   __be32 (*pg_init_request)(struct svc_rqst*, const struct svc_program*, struct svc_process_info*);
   int (*pg_rpcbind_set)(
-      struct net*, const struct svc_program*, u32, int, short unsigned int, short unsigned int);
+   struct net*, const struct svc_program*, u32, int, short unsigned int, short unsigned int);
 };
 
 struct xdr_stream {
@@ -132335,19 +132119,15 @@ typedef void (*dm_dtr_fn)(struct dm_target*);
 
 typedef int (*dm_map_fn)(struct dm_target*, struct bio*);
 
-typedef int (*dm_clone_and_map_request_fn)(struct dm_target*,
-                                           struct request*,
-                                           union map_info*,
-                                           struct request**);
+typedef int (*dm_clone_and_map_request_fn)(
+ struct dm_target*, struct request*, union map_info*, struct request**);
 
 typedef void (*dm_release_clone_request_fn)(struct request*, union map_info*);
 
 typedef int (*dm_endio_fn)(struct dm_target*, struct bio*, blk_status_t*);
 
-typedef int (*dm_request_endio_fn)(struct dm_target*,
-                                   struct request*,
-                                   blk_status_t,
-                                   union map_info*);
+typedef int (*dm_request_endio_fn)(
+ struct dm_target*, struct request*, blk_status_t, union map_info*);
 
 typedef void (*dm_presuspend_fn)(struct dm_target*);
 
@@ -132370,19 +132150,19 @@ typedef int (*dm_report_zones_fn)(struct dm_target*, struct dm_report_zones_args
 typedef int (*dm_busy_fn)(struct dm_target*);
 
 typedef int (*iterate_devices_callout_fn)(
-    struct dm_target*, struct dm_dev*, sector_t, sector_t, void*);
+ struct dm_target*, struct dm_dev*, sector_t, sector_t, void*);
 
 typedef int (*dm_iterate_devices_fn)(struct dm_target*, iterate_devices_callout_fn, void*);
 
 typedef void (*dm_io_hints_fn)(struct dm_target*, struct queue_limits*);
 
 typedef long int (*dm_dax_direct_access_fn)(
-    struct dm_target*, long unsigned int, long int, enum dax_access_mode, void**, pfn_t*);
+ struct dm_target*, long unsigned int, long int, enum dax_access_mode, void**, pfn_t*);
 
 typedef int (*dm_dax_zero_page_range_fn)(struct dm_target*, long unsigned int, size_t);
 
 typedef size_t (*dm_dax_recovery_write_fn)(
-    struct dm_target*, long unsigned int, void*, size_t, struct iov_iter*);
+ struct dm_target*, long unsigned int, void*, size_t, struct iov_iter*);
 
 struct target_type {
   uint64_t features;
@@ -133071,18 +132851,18 @@ struct tc_action_ops {
   void (*cleanup)(struct tc_action*);
   int (*lookup)(struct net*, struct tc_action**, u32);
   int (*init)(struct net*,
-              struct nlattr*,
-              struct nlattr*,
-              struct tc_action**,
-              struct tcf_proto*,
-              u32,
-              struct netlink_ext_ack*);
+   struct nlattr*,
+   struct nlattr*,
+   struct tc_action**,
+   struct tcf_proto*,
+   u32,
+   struct netlink_ext_ack*);
   int (*walk)(struct net*,
-              struct sk_buff*,
-              struct netlink_callback*,
-              int,
-              const struct tc_action_ops*,
-              struct netlink_ext_ack*);
+   struct sk_buff*,
+   struct netlink_callback*,
+   int,
+   const struct tc_action_ops*,
+   struct netlink_ext_ack*);
   void (*stats_update)(struct tc_action*, u64, u64, u64, u64, bool);
   size_t (*get_fill_size)(const struct tc_action*);
   struct net_device* (*get_dev)(const struct tc_action*, tc_action_priv_destructor*);
@@ -133423,14 +133203,14 @@ struct tcf_proto_ops {
   void* (*get)(struct tcf_proto*, u32);
   void (*put)(struct tcf_proto*, void*);
   int (*change)(struct net*,
-                struct sk_buff*,
-                struct tcf_proto*,
-                long unsigned int,
-                u32,
-                struct nlattr**,
-                void**,
-                u32,
-                struct netlink_ext_ack*);
+   struct sk_buff*,
+   struct tcf_proto*,
+   long unsigned int,
+   u32,
+   struct nlattr**,
+   void**,
+   u32,
+   struct netlink_ext_ack*);
   int (*delete)(struct tcf_proto*, void*, bool*, bool, struct netlink_ext_ack*);
   bool (*delete_empty)(struct tcf_proto*);
   void (*walk)(struct tcf_proto*, struct tcf_walker*, bool);
@@ -134124,26 +133904,24 @@ struct tcp_repair_window {
 struct tcp_request_sock_ops {
   u16 mss_clamp;
   struct tcp_md5sig_key* (*req_md5_lookup)(const struct sock*, const struct sock*);
-  int (*calc_md5_hash)(char*,
-                       const struct tcp_md5sig_key*,
-                       const struct sock*,
-                       const struct sk_buff*);
+  int (*calc_md5_hash)(
+   char*, const struct tcp_md5sig_key*, const struct sock*, const struct sk_buff*);
   struct tcp_ao_key* (*ao_lookup)(const struct sock*, struct request_sock*, int, int);
   int (*ao_calc_key)(struct tcp_ao_key*, u8*, struct request_sock*);
   int (*ao_synack_hash)(
-      char*, struct tcp_ao_key*, struct request_sock*, const struct sk_buff*, int, u32);
+   char*, struct tcp_ao_key*, struct request_sock*, const struct sk_buff*, int, u32);
   __u32 (*cookie_init_seq)(const struct sk_buff*, __u16*);
   struct dst_entry* (*route_req)(
-      const struct sock*, struct sk_buff*, struct flowi*, struct request_sock*, u32);
+   const struct sock*, struct sk_buff*, struct flowi*, struct request_sock*, u32);
   u32 (*init_seq)(const struct sk_buff*);
   u32 (*init_ts_off)(const struct net*, const struct sk_buff*);
   int (*send_synack)(const struct sock*,
-                     struct dst_entry*,
-                     struct flowi*,
-                     struct request_sock*,
-                     struct tcp_fastopen_cookie*,
-                     enum tcp_synack_type,
-                     struct sk_buff*);
+   struct dst_entry*,
+   struct flowi*,
+   struct request_sock*,
+   struct tcp_fastopen_cookie*,
+   enum tcp_synack_type,
+   struct sk_buff*);
 };
 
 struct tcp_sack_block_wire {
@@ -134205,16 +133983,14 @@ struct tcp_skb_cb {
 
 struct tcp_sock_af_ops {
   struct tcp_md5sig_key* (*md5_lookup)(const struct sock*, const struct sock*);
-  int (*calc_md5_hash)(char*,
-                       const struct tcp_md5sig_key*,
-                       const struct sock*,
-                       const struct sk_buff*);
+  int (*calc_md5_hash)(
+   char*, const struct tcp_md5sig_key*, const struct sock*, const struct sk_buff*);
   int (*md5_parse)(struct sock*, int, sockptr_t, int);
   int (*ao_parse)(struct sock*, int, sockptr_t, int);
   struct tcp_ao_key* (*ao_lookup)(const struct sock*, struct sock*, int, int);
   int (*ao_calc_key_sk)(struct tcp_ao_key*, u8*, const struct sock*, __be32, __be32, bool);
   int (*calc_ao_hash)(
-      char*, struct tcp_ao_key*, const struct sock*, const struct sk_buff*, const u8*, int, u32);
+   char*, struct tcp_ao_key*, const struct sock*, const struct sk_buff*, const u8*, int, u32);
 };
 
 struct tcp_splice_state {
@@ -134531,9 +134307,9 @@ typedef struct thermal_zone_device* class_thermal_zone_t;
 
 struct thermal_zone_device_ops {
   bool (*should_bind)(struct thermal_zone_device*,
-                      const struct thermal_trip*,
-                      struct thermal_cooling_device*,
-                      struct cooling_spec*);
+   const struct thermal_trip*,
+   struct thermal_cooling_device*,
+   struct cooling_spec*);
   int (*get_temp)(struct thermal_zone_device*, int*);
   int (*set_trips)(struct thermal_zone_device*, int, int);
   int (*change_mode)(struct thermal_zone_device*, enum thermal_device_mode);
@@ -135133,7 +134909,7 @@ struct tls_sw_context_tx {
 
 struct tlsdev_ops {
   int (*tls_dev_add)(
-      struct net_device*, struct sock*, enum tls_offload_ctx_dir, struct tls_crypto_info*, u32);
+   struct net_device*, struct sock*, enum tls_offload_ctx_dir, struct tls_crypto_info*, u32);
   void (*tls_dev_del)(struct net_device*, struct tls_context*, enum tls_offload_ctx_dir);
   int (*tls_dev_resync)(struct net_device*, struct sock*, u32, u8*, enum tls_offload_ctx_dir);
 };
@@ -145012,7 +144788,7 @@ struct tracer {
   void (*pipe_close)(struct trace_iterator*);
   ssize_t (*read)(struct trace_iterator*, struct file*, char*, size_t, loff_t*);
   ssize_t (*splice_read)(
-      struct trace_iterator*, struct file*, loff_t*, struct pipe_inode_info*, size_t, unsigned int);
+   struct trace_iterator*, struct file*, loff_t*, struct pipe_inode_info*, size_t, unsigned int);
   void (*print_header)(struct seq_file*);
   enum print_line_t (*print_line)(struct trace_iterator*);
   int (*set_flag)(struct trace_array*, u32, u32, int);
@@ -147411,9 +147187,8 @@ struct usb_gadget_ops {
   void (*udc_set_speed)(struct usb_gadget*, enum usb_device_speed);
   void (*udc_set_ssp_rate)(struct usb_gadget*, enum usb_ssp_rate);
   void (*udc_async_callbacks)(struct usb_gadget*, bool);
-  struct usb_ep* (*match_ep)(struct usb_gadget*,
-                             struct usb_endpoint_descriptor*,
-                             struct usb_ss_ep_comp_descriptor*);
+  struct usb_ep* (*match_ep)(
+   struct usb_gadget*, struct usb_endpoint_descriptor*, struct usb_ss_ep_comp_descriptor*);
   int (*check_config)(struct usb_gadget*);
 };
 
@@ -148196,11 +147971,11 @@ struct user_regset;
 typedef int user_regset_get2_fn(struct task_struct*, const struct user_regset*, struct membuf);
 
 typedef int user_regset_set_fn(struct task_struct*,
-                               const struct user_regset*,
-                               unsigned int,
-                               unsigned int,
-                               const void*,
-                               const void*);
+ const struct user_regset*,
+ unsigned int,
+ unsigned int,
+ const void*,
+ const void*);
 
 typedef int user_regset_active_fn(struct task_struct*, const struct user_regset*);
 
@@ -149615,14 +149390,14 @@ struct vcap_output_print;
 
 struct vcap_operations {
   enum vcap_keyfield_set (*validate_keyset)(
-      struct net_device*, struct vcap_admin*, struct vcap_rule*, struct vcap_keyset_list*, u16);
+   struct net_device*, struct vcap_admin*, struct vcap_rule*, struct vcap_keyset_list*, u16);
   void (*add_default_fields)(struct net_device*, struct vcap_admin*, struct vcap_rule*);
   void (*cache_erase)(struct vcap_admin*);
   void (*cache_write)(struct net_device*, struct vcap_admin*, enum vcap_selection, u32, u32);
   void (*cache_read)(struct net_device*, struct vcap_admin*, enum vcap_selection, u32, u32);
   void (*init)(struct net_device*, struct vcap_admin*, u32, u32);
   void (*update)(
-      struct net_device*, struct vcap_admin*, enum vcap_command, enum vcap_selection, u32);
+   struct net_device*, struct vcap_admin*, enum vcap_command, enum vcap_selection, u32);
   void (*move)(struct net_device*, struct vcap_admin*, u32, int, int);
   int (*port_info)(struct net_device*, struct vcap_admin*, struct vcap_output_print*);
 };
@@ -150435,10 +150210,10 @@ struct virtio_config_ops {
   void (*set_status)(struct virtio_device*, u8);
   void (*reset)(struct virtio_device*);
   int (*find_vqs)(struct virtio_device*,
-                  unsigned int,
-                  struct virtqueue**,
-                  struct virtqueue_info*,
-                  struct irq_affinity*);
+   unsigned int,
+   struct virtqueue**,
+   struct virtqueue_info*,
+   struct irq_affinity*);
   void (*del_vqs)(struct virtio_device*);
   void (*synchronize_cbs)(struct virtio_device*);
   u64 (*get_features)(struct virtio_device*);
@@ -150802,12 +150577,12 @@ struct virtio_pci_device {
   unsigned int msix_used_vectors;
   bool per_vq_vectors;
   struct virtqueue* (*setup_vq)(struct virtio_pci_device*,
-                                struct virtio_pci_vq_info*,
-                                unsigned int,
-                                void (*)(struct virtqueue*),
-                                const char*,
-                                bool,
-                                u16);
+   struct virtio_pci_vq_info*,
+   unsigned int,
+   void (*)(struct virtqueue*),
+   const char*,
+   bool,
+   u16);
   void (*del_vq)(struct virtio_pci_vq_info*);
   u16 (*config_vector)(struct virtio_pci_device*, u16);
   int (*avq_index)(struct virtio_device*, u16*, u16*);
@@ -151424,37 +151199,32 @@ struct vme_bridge {
   struct vme_irq irq[7];
   struct mutex irq_mtx;
   int (*slave_get)(struct vme_slave_resource*,
-                   int*,
-                   long long unsigned int*,
-                   long long unsigned int*,
-                   dma_addr_t*,
-                   u32*,
-                   u32*);
+   int*,
+   long long unsigned int*,
+   long long unsigned int*,
+   dma_addr_t*,
+   u32*,
+   u32*);
   int (*slave_set)(struct vme_slave_resource*,
-                   int,
-                   long long unsigned int,
-                   long long unsigned int,
-                   dma_addr_t,
-                   u32,
-                   u32);
+   int,
+   long long unsigned int,
+   long long unsigned int,
+   dma_addr_t,
+   u32,
+   u32);
   int (*master_get)(struct vme_master_resource*,
-                    int*,
-                    long long unsigned int*,
-                    long long unsigned int*,
-                    u32*,
-                    u32*,
-                    u32*);
-  int (*master_set)(struct vme_master_resource*,
-                    int,
-                    long long unsigned int,
-                    long long unsigned int,
-                    u32,
-                    u32,
-                    u32);
+   int*,
+   long long unsigned int*,
+   long long unsigned int*,
+   u32*,
+   u32*,
+   u32*);
+  int (*master_set)(
+   struct vme_master_resource*, int, long long unsigned int, long long unsigned int, u32, u32, u32);
   ssize_t (*master_read)(struct vme_master_resource*, void*, size_t, loff_t);
   ssize_t (*master_write)(struct vme_master_resource*, void*, size_t, loff_t);
   unsigned int (*master_rmw)(
-      struct vme_master_resource*, unsigned int, unsigned int, unsigned int, loff_t);
+   struct vme_master_resource*, unsigned int, unsigned int, unsigned int, loff_t);
   int (*dma_list_add)(struct vme_dma_list*, struct vme_dma_attr*, struct vme_dma_attr*, size_t);
   int (*dma_list_exec)(struct vme_dma_list*);
   int (*dma_list_empty)(struct vme_dma_list*);
@@ -152242,7 +152012,7 @@ struct wiphy_vendor_command {
   u32 flags;
   int (*doit)(struct wiphy*, struct wireless_dev*, const void*, int);
   int (*dumpit)(
-      struct wiphy*, struct wireless_dev*, struct sk_buff*, const void*, int, long unsigned int*);
+   struct wiphy*, struct wireless_dev*, struct sk_buff*, const void*, int, long unsigned int*);
   const struct nla_policy* policy;
   unsigned int maxattr;
 };
@@ -152813,10 +152583,10 @@ struct wpan_dev {
 
 struct wpan_dev_header_ops {
   int (*create)(struct sk_buff*,
-                struct net_device*,
-                const struct ieee802154_addr*,
-                const struct ieee802154_addr*,
-                unsigned int);
+   struct net_device*,
+   const struct ieee802154_addr*,
+   const struct ieee802154_addr*,
+   unsigned int);
 };
 
 struct wpan_phy_supported {
@@ -153483,15 +153253,15 @@ struct xattr_handler {
   int flags;
   bool (*list)(struct dentry*);
   int (*get)(
-      const struct xattr_handler*, struct dentry*, struct inode*, const char*, void*, size_t);
+   const struct xattr_handler*, struct dentry*, struct inode*, const char*, void*, size_t);
   int (*set)(const struct xattr_handler*,
-             struct mnt_idmap*,
-             struct dentry*,
-             struct inode*,
-             const char*,
-             const void*,
-             size_t,
-             int);
+   struct mnt_idmap*,
+   struct dentry*,
+   struct inode*,
+   const char*,
+   const void*,
+   size_t,
+   int);
 };
 
 struct xattr_list {
@@ -154893,9 +154663,8 @@ struct xfrm_id {
 struct xfrm_if_decode_session_result;
 
 struct xfrm_if_cb {
-  bool (*decode_session)(struct sk_buff*,
-                         short unsigned int,
-                         struct xfrm_if_decode_session_result*);
+  bool (*decode_session)(
+   struct sk_buff*, short unsigned int, struct xfrm_if_decode_session_result*);
 };
 
 struct xfrm_if_decode_session_result {
@@ -154954,12 +154723,12 @@ struct xfrm_mgr {
   int (*notify_policy)(struct xfrm_policy*, int, const struct km_event*);
   int (*report)(struct net*, u8, struct xfrm_selector*, xfrm_address_t*);
   int (*migrate)(const struct xfrm_selector*,
-                 u8,
-                 u8,
-                 const struct xfrm_migrate*,
-                 int,
-                 const struct xfrm_kmaddress*,
-                 const struct xfrm_encap_tmpl*);
+   u8,
+   u8,
+   const struct xfrm_migrate*,
+   int,
+   const struct xfrm_kmaddress*,
+   const struct xfrm_encap_tmpl*);
   bool (*is_alive)(const struct km_event*);
 };
 
@@ -155318,10 +155087,8 @@ struct xfrm_trans_tasklet {
 
 struct xfrm_translator {
   int (*alloc_compat)(struct sk_buff*, const struct nlmsghdr*);
-  struct nlmsghdr* (*rcv_msg_compat)(const struct nlmsghdr*,
-                                     int,
-                                     const struct nla_policy*,
-                                     struct netlink_ext_ack*);
+  struct nlmsghdr* (*rcv_msg_compat)(
+   const struct nlmsghdr*, int, const struct nla_policy*, struct netlink_ext_ack*);
   int (*xlate_user_policy_sockptr)(u8**, int);
   struct module* owner;
 };
@@ -156300,16 +156067,16 @@ struct zswap_pool {
 typedef size_t (*ZSTD_blockCompressor)(ZSTD_matchState_t*, seqStore_t*, U32*, const void*, size_t);
 
 typedef U32 (*ZSTD_getAllMatchesFn)(ZSTD_match_t*,
-                                    ZSTD_matchState_t*,
-                                    U32*,
-                                    const BYTE*,
-                                    const BYTE*,
-                                    const U32*,
-                                    const U32,
-                                    const U32);
+ ZSTD_matchState_t*,
+ U32*,
+ const BYTE*,
+ const BYTE*,
+ const U32*,
+ const U32,
+ const U32);
 
 typedef size_t (*ZSTD_sequenceCopier)(
-    ZSTD_CCtx*, ZSTD_sequencePosition*, const ZSTD_Sequence* const, size_t, const void*, size_t);
+ ZSTD_CCtx*, ZSTD_sequencePosition*, const ZSTD_Sequence* const, size_t, const void*, size_t);
 
 typedef acpi_status (*acpi_exception_handler)(acpi_status, acpi_name, u16, u32, void*);
 
@@ -156317,9 +156084,8 @@ typedef acpi_status (*acpi_execute_op)(struct acpi_walk_state*);
 
 typedef void (*acpi_gbl_event_handler)(u32, acpi_handle, u32, void*);
 
-typedef acpi_status (*acpi_gpe_callback)(struct acpi_gpe_xrupt_info*,
-                                         struct acpi_gpe_block_info*,
-                                         void*);
+typedef acpi_status (*acpi_gpe_callback)(
+ struct acpi_gpe_xrupt_info*, struct acpi_gpe_block_info*, void*);
 
 typedef acpi_status (*acpi_init_handler)(acpi_handle, u32);
 
@@ -156327,10 +156093,8 @@ typedef u32 (*acpi_interface_handler)(acpi_string, u32);
 
 typedef u32 (*acpi_osd_handler)(void*);
 
-typedef acpi_status (*acpi_pkg_callback)(u8,
-                                         union acpi_operand_object*,
-                                         union acpi_generic_state*,
-                                         void*);
+typedef acpi_status (*acpi_pkg_callback)(
+ u8, union acpi_operand_object*, union acpi_generic_state*, void*);
 
 typedef acpi_status (*acpi_table_handler)(u32, void*, void*);
 
@@ -156353,16 +156117,13 @@ typedef void blk_log_action_t(struct trace_iterator*, const char*, bool);
 typedef int (*bpf_aux_classic_check_t)(struct sock_filter*, unsigned int);
 
 typedef u32 (*bpf_convert_ctx_access_t)(
-    enum bpf_access_type, const struct bpf_insn*, struct bpf_insn*, struct bpf_prog*, u32*);
+ enum bpf_access_type, const struct bpf_insn*, struct bpf_insn*, struct bpf_prog*, u32*);
 
-typedef long unsigned int (*bpf_ctx_copy_t)(void*,
-                                            const void*,
-                                            long unsigned int,
-                                            long unsigned int);
+typedef long unsigned int (*bpf_ctx_copy_t)(
+ void*, const void*, long unsigned int, long unsigned int);
 
-typedef unsigned int (*bpf_dispatcher_fn)(const void*,
-                                          const struct bpf_insn*,
-                                          unsigned int (*)(const void*, const struct bpf_insn*));
+typedef unsigned int (*bpf_dispatcher_fn)(
+ const void*, const struct bpf_insn*, unsigned int (*)(const void*, const struct bpf_insn*));
 
 typedef unsigned int (*bpf_func_t)(const void*, const struct bpf_insn*);
 
@@ -156595,20 +156356,17 @@ typedef u64 (*btf_bpf_per_cpu_ptr)(const void*, u32);
 typedef u64 (*btf_bpf_perf_event_output)(struct pt_regs*, struct bpf_map*, u64, void*, u64);
 
 typedef u64 (*btf_bpf_perf_event_output_raw_tp)(
-    struct bpf_raw_tracepoint_args*, struct bpf_map*, u64, void*, u64);
+ struct bpf_raw_tracepoint_args*, struct bpf_map*, u64, void*, u64);
 
 typedef u64 (*btf_bpf_perf_event_output_tp)(void*, struct bpf_map*, u64, void*, u64);
 
 typedef u64 (*btf_bpf_perf_event_read)(struct bpf_map*, u64);
 
-typedef u64 (*btf_bpf_perf_event_read_value)(struct bpf_map*,
-                                             u64,
-                                             struct bpf_perf_event_value*,
-                                             u32);
+typedef u64 (*btf_bpf_perf_event_read_value)(
+ struct bpf_map*, u64, struct bpf_perf_event_value*, u32);
 
-typedef u64 (*btf_bpf_perf_prog_read_value)(struct bpf_perf_event_data_kern*,
-                                            struct bpf_perf_event_value*,
-                                            u32);
+typedef u64 (*btf_bpf_perf_prog_read_value)(
+ struct bpf_perf_event_data_kern*, struct bpf_perf_event_value*, u32);
 
 typedef u64 (*btf_bpf_probe_read_compat)(void*, u32, const void*);
 
@@ -156789,13 +156547,13 @@ typedef u64 (*btf_bpf_sock_addr_getsockopt)(struct bpf_sock_addr_kern*, int, int
 typedef u64 (*btf_bpf_sock_addr_setsockopt)(struct bpf_sock_addr_kern*, int, int, char*, int);
 
 typedef u64 (*btf_bpf_sock_addr_sk_lookup_tcp)(
-    struct bpf_sock_addr_kern*, struct bpf_sock_tuple*, u32, u64, u64);
+ struct bpf_sock_addr_kern*, struct bpf_sock_tuple*, u32, u64, u64);
 
 typedef u64 (*btf_bpf_sock_addr_sk_lookup_udp)(
-    struct bpf_sock_addr_kern*, struct bpf_sock_tuple*, u32, u64, u64);
+ struct bpf_sock_addr_kern*, struct bpf_sock_tuple*, u32, u64, u64);
 
 typedef u64 (*btf_bpf_sock_addr_skc_lookup_tcp)(
-    struct bpf_sock_addr_kern*, struct bpf_sock_tuple*, u32, u64, u64);
+ struct bpf_sock_addr_kern*, struct bpf_sock_tuple*, u32, u64, u64);
 
 typedef u64 (*btf_bpf_sock_from_file)(struct file*);
 
@@ -156846,7 +156604,7 @@ typedef u64 (*btf_bpf_task_storage_delete_recur)(struct bpf_map*, struct task_st
 typedef u64 (*btf_bpf_task_storage_get)(struct bpf_map*, struct task_struct*, void*, u64, gfp_t);
 
 typedef u64 (*btf_bpf_task_storage_get_recur)(
-    struct bpf_map*, struct task_struct*, void*, u64, gfp_t);
+ struct bpf_map*, struct task_struct*, void*, u64, gfp_t);
 
 typedef u64 (*btf_bpf_tc_sk_lookup_tcp)(struct sk_buff*, struct bpf_sock_tuple*, u32, u64, u64);
 
@@ -156929,7 +156687,7 @@ typedef u64 (*btf_get_func_ret)(void*, u64*);
 typedef u64 (*btf_sk_reuseport_load_bytes)(const struct sk_reuseport_kern*, u32, void*, u32);
 
 typedef u64 (*btf_sk_reuseport_load_bytes_relative)(
-    const struct sk_reuseport_kern*, u32, void*, u32, u32);
+ const struct sk_reuseport_kern*, u32, void*, u32, u32);
 
 typedef u64 (*btf_sk_select_reuseport)(struct sk_reuseport_kern*, struct bpf_map*, void*, u32);
 
@@ -156946,7 +156704,7 @@ typedef void (*btf_trace_ack_update_msk)(void*, u64, u64, u64, u64, u64);
 typedef void (*btf_trace_add_device_to_group)(void*, int, struct device*);
 
 typedef void (*btf_trace_aer_event)(
-    void*, const char*, const u32, const u8, const u8, struct pcie_tlp_log*);
+ void*, const char*, const u32, const u8, const u8, struct pcie_tlp_log*);
 
 typedef void (*btf_trace_alarmtimer_cancel)(void*, struct alarm*, ktime_t);
 
@@ -156957,66 +156715,52 @@ typedef void (*btf_trace_alarmtimer_start)(void*, struct alarm*, ktime_t);
 typedef void (*btf_trace_alarmtimer_suspend)(void*, ktime_t, int);
 
 typedef void (*btf_trace_alloc_vmap_area)(void*,
-                                          long unsigned int,
-                                          long unsigned int,
-                                          long unsigned int,
-                                          long unsigned int,
-                                          long unsigned int,
-                                          int);
+ long unsigned int,
+ long unsigned int,
+ long unsigned int,
+ long unsigned int,
+ long unsigned int,
+ int);
 
 typedef void (*btf_trace_amd_pstate_epp_perf)(void*, unsigned int, u8, u8, u8, u8, bool);
 
 typedef void (*btf_trace_amd_pstate_perf)(
-    void*, u8, u8, u8, u64, u64, u64, u64, unsigned int, bool);
+ void*, u8, u8, u8, u64, u64, u64, u64, unsigned int, bool);
 
 typedef void (*btf_trace_arm_event)(void*, const struct cper_sec_proc_arm*);
 
-typedef void (*btf_trace_ata_bmdma_setup)(void*,
-                                          struct ata_port*,
-                                          const struct ata_taskfile*,
-                                          unsigned int);
+typedef void (*btf_trace_ata_bmdma_setup)(
+ void*, struct ata_port*, const struct ata_taskfile*, unsigned int);
 
-typedef void (*btf_trace_ata_bmdma_start)(void*,
-                                          struct ata_port*,
-                                          const struct ata_taskfile*,
-                                          unsigned int);
+typedef void (*btf_trace_ata_bmdma_start)(
+ void*, struct ata_port*, const struct ata_taskfile*, unsigned int);
 
 typedef void (*btf_trace_ata_bmdma_status)(void*, struct ata_port*, unsigned int);
 
-typedef void (*btf_trace_ata_bmdma_stop)(void*,
-                                         struct ata_port*,
-                                         const struct ata_taskfile*,
-                                         unsigned int);
+typedef void (*btf_trace_ata_bmdma_stop)(
+ void*, struct ata_port*, const struct ata_taskfile*, unsigned int);
 
 typedef void (*btf_trace_ata_eh_about_to_do)(void*, struct ata_link*, unsigned int, unsigned int);
 
 typedef void (*btf_trace_ata_eh_done)(void*, struct ata_link*, unsigned int, unsigned int);
 
-typedef void (*btf_trace_ata_eh_link_autopsy)(void*,
-                                              struct ata_device*,
-                                              unsigned int,
-                                              unsigned int);
+typedef void (*btf_trace_ata_eh_link_autopsy)(
+ void*, struct ata_device*, unsigned int, unsigned int);
 
 typedef void (*btf_trace_ata_eh_link_autopsy_qc)(void*, struct ata_queued_cmd*);
 
-typedef void (*btf_trace_ata_exec_command)(void*,
-                                           struct ata_port*,
-                                           const struct ata_taskfile*,
-                                           unsigned int);
+typedef void (*btf_trace_ata_exec_command)(
+ void*, struct ata_port*, const struct ata_taskfile*, unsigned int);
 
-typedef void (*btf_trace_ata_link_hardreset_begin)(void*,
-                                                   struct ata_link*,
-                                                   unsigned int*,
-                                                   long unsigned int);
+typedef void (*btf_trace_ata_link_hardreset_begin)(
+ void*, struct ata_link*, unsigned int*, long unsigned int);
 
 typedef void (*btf_trace_ata_link_hardreset_end)(void*, struct ata_link*, unsigned int*, int);
 
 typedef void (*btf_trace_ata_link_postreset)(void*, struct ata_link*, unsigned int*, int);
 
-typedef void (*btf_trace_ata_link_softreset_begin)(void*,
-                                                   struct ata_link*,
-                                                   unsigned int*,
-                                                   long unsigned int);
+typedef void (*btf_trace_ata_link_softreset_begin)(
+ void*, struct ata_link*, unsigned int*, long unsigned int);
 
 typedef void (*btf_trace_ata_link_softreset_end)(void*, struct ata_link*, unsigned int*, int);
 
@@ -157036,23 +156780,18 @@ typedef void (*btf_trace_ata_qc_prep)(void*, struct ata_queued_cmd*);
 
 typedef void (*btf_trace_ata_sff_flush_pio_task)(void*, struct ata_port*);
 
-typedef void (*btf_trace_ata_sff_hsm_command_complete)(void*,
-                                                       struct ata_queued_cmd*,
-                                                       unsigned char);
+typedef void (*btf_trace_ata_sff_hsm_command_complete)(
+ void*, struct ata_queued_cmd*, unsigned char);
 
 typedef void (*btf_trace_ata_sff_hsm_state)(void*, struct ata_queued_cmd*, unsigned char);
 
-typedef void (*btf_trace_ata_sff_pio_transfer_data)(void*,
-                                                    struct ata_queued_cmd*,
-                                                    unsigned int,
-                                                    unsigned int);
+typedef void (*btf_trace_ata_sff_pio_transfer_data)(
+ void*, struct ata_queued_cmd*, unsigned int, unsigned int);
 
 typedef void (*btf_trace_ata_sff_port_intr)(void*, struct ata_queued_cmd*, unsigned char);
 
-typedef void (*btf_trace_ata_slave_hardreset_begin)(void*,
-                                                    struct ata_link*,
-                                                    unsigned int*,
-                                                    long unsigned int);
+typedef void (*btf_trace_ata_slave_hardreset_begin)(
+ void*, struct ata_link*, unsigned int*, long unsigned int);
 
 typedef void (*btf_trace_ata_slave_hardreset_end)(void*, struct ata_link*, unsigned int*, int);
 
@@ -157062,29 +156801,25 @@ typedef void (*btf_trace_ata_std_sched_eh)(void*, struct ata_port*);
 
 typedef void (*btf_trace_ata_tf_load)(void*, struct ata_port*, const struct ata_taskfile*);
 
-typedef void (*btf_trace_atapi_pio_transfer_data)(void*,
-                                                  struct ata_queued_cmd*,
-                                                  unsigned int,
-                                                  unsigned int);
+typedef void (*btf_trace_atapi_pio_transfer_data)(
+ void*, struct ata_queued_cmd*, unsigned int, unsigned int);
 
 typedef void (*btf_trace_atapi_send_cdb)(void*, struct ata_queued_cmd*, unsigned int, unsigned int);
 
 typedef void (*btf_trace_attach_device_to_domain)(void*, struct device*);
 
 typedef void (*btf_trace_balance_dirty_pages)(void*,
-                                              struct bdi_writeback*,
-                                              struct dirty_throttle_control*,
-                                              long unsigned int,
-                                              long unsigned int,
-                                              long unsigned int,
-                                              long unsigned int,
-                                              long int,
-                                              long unsigned int);
+ struct bdi_writeback*,
+ struct dirty_throttle_control*,
+ long unsigned int,
+ long unsigned int,
+ long unsigned int,
+ long unsigned int,
+ long int,
+ long unsigned int);
 
-typedef void (*btf_trace_bdi_dirty_ratelimit)(void*,
-                                              struct bdi_writeback*,
-                                              long unsigned int,
-                                              long unsigned int);
+typedef void (*btf_trace_bdi_dirty_ratelimit)(
+ void*, struct bdi_writeback*, long unsigned int, long unsigned int);
 
 typedef void (*btf_trace_block_bio_backmerge)(void*, struct bio*);
 
@@ -157137,17 +156872,13 @@ typedef void (*btf_trace_bpf_trigger_tp)(void*, int);
 typedef void (*btf_trace_bpf_xdp_link_attach_failed)(void*, const char*);
 
 typedef void (*btf_trace_br_fdb_add)(
-    void*, struct ndmsg*, struct net_device*, const unsigned char*, u16, u16);
+ void*, struct ndmsg*, struct net_device*, const unsigned char*, u16, u16);
 
 typedef void (*btf_trace_br_fdb_external_learn_add)(
-    void*, struct net_bridge*, struct net_bridge_port*, const unsigned char*, u16);
+ void*, struct net_bridge*, struct net_bridge_port*, const unsigned char*, u16);
 
-typedef void (*btf_trace_br_fdb_update)(void*,
-                                        struct net_bridge*,
-                                        struct net_bridge_port*,
-                                        const unsigned char*,
-                                        u16,
-                                        long unsigned int);
+typedef void (*btf_trace_br_fdb_update)(
+ void*, struct net_bridge*, struct net_bridge_port*, const unsigned char*, u16, long unsigned int);
 
 typedef void (*btf_trace_br_mdb_full)(void*, const struct net_device*, const struct br_ip*);
 
@@ -157162,20 +156893,20 @@ typedef void (*btf_trace_cache_tag_assign)(void*, struct cache_tag*);
 typedef void (*btf_trace_cache_tag_flush_all)(void*, struct cache_tag*);
 
 typedef void (*btf_trace_cache_tag_flush_range)(void*,
-                                                struct cache_tag*,
-                                                long unsigned int,
-                                                long unsigned int,
-                                                long unsigned int,
-                                                long unsigned int,
-                                                long unsigned int);
+ struct cache_tag*,
+ long unsigned int,
+ long unsigned int,
+ long unsigned int,
+ long unsigned int,
+ long unsigned int);
 
 typedef void (*btf_trace_cache_tag_flush_range_np)(void*,
-                                                   struct cache_tag*,
-                                                   long unsigned int,
-                                                   long unsigned int,
-                                                   long unsigned int,
-                                                   long unsigned int,
-                                                   long unsigned int);
+ struct cache_tag*,
+ long unsigned int,
+ long unsigned int,
+ long unsigned int,
+ long unsigned int,
+ long unsigned int);
 
 typedef void (*btf_trace_cache_tag_unassign)(void*, struct cache_tag*);
 
@@ -157188,12 +156919,12 @@ typedef void (*btf_trace_call_function_single_entry)(void*, int);
 typedef void (*btf_trace_call_function_single_exit)(void*, int);
 
 typedef void (*btf_trace_cap_capable)(
-    void*, const struct cred*, struct user_namespace*, const struct user_namespace*, int, int);
+ void*, const struct cred*, struct user_namespace*, const struct user_namespace*, int, int);
 
 typedef void (*btf_trace_cdev_update)(void*, struct thermal_cooling_device*, long unsigned int);
 
 typedef void (*btf_trace_cgroup_attach_task)(
-    void*, struct cgroup*, const char*, struct task_struct*, bool);
+ void*, struct cgroup*, const char*, struct task_struct*, bool);
 
 typedef void (*btf_trace_cgroup_destroy_root)(void*, struct cgroup_root*);
 
@@ -157215,10 +156946,8 @@ typedef void (*btf_trace_cgroup_rmdir)(void*, struct cgroup*, const char*);
 
 typedef void (*btf_trace_cgroup_rstat_cpu_lock_contended)(void*, struct cgroup*, int, bool);
 
-typedef void (*btf_trace_cgroup_rstat_cpu_lock_contended_fastpath)(void*,
-                                                                   struct cgroup*,
-                                                                   int,
-                                                                   bool);
+typedef void (*btf_trace_cgroup_rstat_cpu_lock_contended_fastpath)(
+ void*, struct cgroup*, int, bool);
 
 typedef void (*btf_trace_cgroup_rstat_cpu_locked)(void*, struct cgroup*, int, bool);
 
@@ -157237,7 +156966,7 @@ typedef void (*btf_trace_cgroup_rstat_unlock)(void*, struct cgroup*, int, bool);
 typedef void (*btf_trace_cgroup_setup_root)(void*, struct cgroup_root*);
 
 typedef void (*btf_trace_cgroup_transfer_tasks)(
-    void*, struct cgroup*, const char*, struct task_struct*, bool);
+ void*, struct cgroup*, const char*, struct task_struct*, bool);
 
 typedef void (*btf_trace_cgroup_unfreeze)(void*, struct cgroup*, const char*);
 
@@ -157277,10 +157006,8 @@ typedef void (*btf_trace_clk_set_rate)(void*, struct clk_core*, long unsigned in
 
 typedef void (*btf_trace_clk_set_rate_complete)(void*, struct clk_core*, long unsigned int);
 
-typedef void (*btf_trace_clk_set_rate_range)(void*,
-                                             struct clk_core*,
-                                             long unsigned int,
-                                             long unsigned int);
+typedef void (*btf_trace_clk_set_rate_range)(
+ void*, struct clk_core*, long unsigned int, long unsigned int);
 
 typedef void (*btf_trace_clk_unprepare)(void*, struct clk_core*);
 
@@ -157293,7 +157020,7 @@ typedef void (*btf_trace_clock_enable)(void*, const char*, unsigned int, unsigne
 typedef void (*btf_trace_clock_set_rate)(void*, const char*, unsigned int, unsigned int);
 
 typedef void (*btf_trace_compact_retry)(
-    void*, int, enum compact_priority, enum compact_result, int, int, bool);
+ void*, int, enum compact_priority, enum compact_result, int, int, bool);
 
 typedef void (*btf_trace_console)(void*, const char*, size_t);
 
@@ -157318,7 +157045,7 @@ typedef void (*btf_trace_cpuhp_enter)(void*, unsigned int, int, int, int (*)(uns
 typedef void (*btf_trace_cpuhp_exit)(void*, unsigned int, int, int, int);
 
 typedef void (*btf_trace_cpuhp_multi_enter)(
-    void*, unsigned int, int, int, int (*)(unsigned int, struct hlist_node*), struct hlist_node*);
+ void*, unsigned int, int, int, int (*)(unsigned int, struct hlist_node*), struct hlist_node*);
 
 typedef void (*btf_trace_cros_ec_request_done)(void*, struct cros_ec_command*, int);
 
@@ -157329,7 +157056,7 @@ typedef void (*btf_trace_csd_function_entry)(void*, smp_call_func_t, call_single
 typedef void (*btf_trace_csd_function_exit)(void*, smp_call_func_t, call_single_data_t*);
 
 typedef void (*btf_trace_csd_queue_cpu)(
-    void*, const unsigned int, long unsigned int, smp_call_func_t, call_single_data_t*);
+ void*, const unsigned int, long unsigned int, smp_call_func_t, call_single_data_t*);
 
 typedef void (*btf_trace_ctime_ns_xchg)(void*, struct inode*, u32, u32, u32);
 
@@ -157339,46 +157066,38 @@ typedef void (*btf_trace_dax_insert_mapping)(void*, struct inode*, struct vm_fau
 
 typedef void (*btf_trace_dax_insert_pfn_mkwrite)(void*, struct inode*, struct vm_fault*, int);
 
-typedef void (*btf_trace_dax_insert_pfn_mkwrite_no_entry)(void*,
-                                                          struct inode*,
-                                                          struct vm_fault*,
-                                                          int);
+typedef void (*btf_trace_dax_insert_pfn_mkwrite_no_entry)(
+ void*, struct inode*, struct vm_fault*, int);
 
 typedef void (*btf_trace_dax_load_hole)(void*, struct inode*, struct vm_fault*, int);
 
 typedef void (*btf_trace_dax_pmd_fault)(
-    void*, struct inode*, struct vm_fault*, long unsigned int, int);
+ void*, struct inode*, struct vm_fault*, long unsigned int, int);
 
 typedef void (*btf_trace_dax_pmd_fault_done)(
-    void*, struct inode*, struct vm_fault*, long unsigned int, int);
+ void*, struct inode*, struct vm_fault*, long unsigned int, int);
 
 typedef void (*btf_trace_dax_pmd_insert_mapping)(
-    void*, struct inode*, struct vm_fault*, long int, pfn_t, void*);
+ void*, struct inode*, struct vm_fault*, long int, pfn_t, void*);
 
 typedef void (*btf_trace_dax_pmd_load_hole)(
-    void*, struct inode*, struct vm_fault*, struct folio*, void*);
+ void*, struct inode*, struct vm_fault*, struct folio*, void*);
 
 typedef void (*btf_trace_dax_pmd_load_hole_fallback)(
-    void*, struct inode*, struct vm_fault*, struct folio*, void*);
+ void*, struct inode*, struct vm_fault*, struct folio*, void*);
 
 typedef void (*btf_trace_dax_pte_fault)(void*, struct inode*, struct vm_fault*, int);
 
 typedef void (*btf_trace_dax_pte_fault_done)(void*, struct inode*, struct vm_fault*, int);
 
-typedef void (*btf_trace_dax_writeback_one)(void*,
-                                            struct inode*,
-                                            long unsigned int,
-                                            long unsigned int);
+typedef void (*btf_trace_dax_writeback_one)(
+ void*, struct inode*, long unsigned int, long unsigned int);
 
-typedef void (*btf_trace_dax_writeback_range)(void*,
-                                              struct inode*,
-                                              long unsigned int,
-                                              long unsigned int);
+typedef void (*btf_trace_dax_writeback_range)(
+ void*, struct inode*, long unsigned int, long unsigned int);
 
-typedef void (*btf_trace_dax_writeback_range_done)(void*,
-                                                   struct inode*,
-                                                   long unsigned int,
-                                                   long unsigned int);
+typedef void (*btf_trace_dax_writeback_range_done)(
+ void*, struct inode*, long unsigned int, long unsigned int);
 
 typedef void (*btf_trace_deferred_error_apic_entry)(void*, int);
 
@@ -157386,20 +157105,14 @@ typedef void (*btf_trace_deferred_error_apic_exit)(void*, int);
 
 typedef void (*btf_trace_dev_pm_qos_add_request)(void*, const char*, enum dev_pm_qos_req_type, s32);
 
-typedef void (*btf_trace_dev_pm_qos_remove_request)(void*,
-                                                    const char*,
-                                                    enum dev_pm_qos_req_type,
-                                                    s32);
+typedef void (*btf_trace_dev_pm_qos_remove_request)(
+ void*, const char*, enum dev_pm_qos_req_type, s32);
 
-typedef void (*btf_trace_dev_pm_qos_update_request)(void*,
-                                                    const char*,
-                                                    enum dev_pm_qos_req_type,
-                                                    s32);
+typedef void (*btf_trace_dev_pm_qos_update_request)(
+ void*, const char*, enum dev_pm_qos_req_type, s32);
 
-typedef void (*btf_trace_devfreq_frequency)(void*,
-                                            struct devfreq*,
-                                            long unsigned int,
-                                            long unsigned int);
+typedef void (*btf_trace_devfreq_frequency)(
+ void*, struct devfreq*, long unsigned int, long unsigned int);
 
 typedef void (*btf_trace_devfreq_monitor)(void*, struct devfreq*);
 
@@ -157408,65 +157121,59 @@ typedef void (*btf_trace_device_pm_callback_end)(void*, struct device*, int);
 typedef void (*btf_trace_device_pm_callback_start)(void*, struct device*, const char*, int);
 
 typedef void (*btf_trace_devlink_health_recover_aborted)(
-    void*, const struct devlink*, const char*, bool, u64);
+ void*, const struct devlink*, const char*, bool, u64);
 
-typedef void (*btf_trace_devlink_health_report)(void*,
-                                                const struct devlink*,
-                                                const char*,
-                                                const char*);
+typedef void (*btf_trace_devlink_health_report)(
+ void*, const struct devlink*, const char*, const char*);
 
-typedef void (*btf_trace_devlink_health_reporter_state_update)(void*,
-                                                               const struct devlink*,
-                                                               const char*,
-                                                               bool);
+typedef void (*btf_trace_devlink_health_reporter_state_update)(
+ void*, const struct devlink*, const char*, bool);
 
 typedef void (*btf_trace_devlink_hwerr)(void*, const struct devlink*, int, const char*);
 
 typedef void (*btf_trace_devlink_hwmsg)(
-    void*, const struct devlink*, bool, long unsigned int, const u8*, size_t);
+ void*, const struct devlink*, bool, long unsigned int, const u8*, size_t);
 
-typedef void (*btf_trace_devlink_trap_report)(void*,
-                                              const struct devlink*,
-                                              struct sk_buff*,
-                                              const struct devlink_trap_metadata*);
+typedef void (*btf_trace_devlink_trap_report)(
+ void*, const struct devlink*, struct sk_buff*, const struct devlink_trap_metadata*);
 
 typedef void (*btf_trace_devres_log)(
-    void*, struct device*, const char*, void*, const char*, size_t);
+ void*, struct device*, const char*, void*, const char*, size_t);
 
 typedef void (*btf_trace_dma_alloc)(void*,
-                                    struct device*,
-                                    void*,
-                                    dma_addr_t,
-                                    size_t,
-                                    enum dma_data_direction,
-                                    gfp_t,
-                                    long unsigned int);
+ struct device*,
+ void*,
+ dma_addr_t,
+ size_t,
+ enum dma_data_direction,
+ gfp_t,
+ long unsigned int);
 
 typedef void (*btf_trace_dma_alloc_pages)(void*,
-                                          struct device*,
-                                          void*,
-                                          dma_addr_t,
-                                          size_t,
-                                          enum dma_data_direction,
-                                          gfp_t,
-                                          long unsigned int);
+ struct device*,
+ void*,
+ dma_addr_t,
+ size_t,
+ enum dma_data_direction,
+ gfp_t,
+ long unsigned int);
 
 typedef void (*btf_trace_dma_alloc_sgt)(void*,
-                                        struct device*,
-                                        struct sg_table*,
-                                        size_t,
-                                        enum dma_data_direction,
-                                        gfp_t,
-                                        long unsigned int);
+ struct device*,
+ struct sg_table*,
+ size_t,
+ enum dma_data_direction,
+ gfp_t,
+ long unsigned int);
 
 typedef void (*btf_trace_dma_alloc_sgt_err)(void*,
-                                            struct device*,
-                                            void*,
-                                            dma_addr_t,
-                                            size_t,
-                                            enum dma_data_direction,
-                                            gfp_t,
-                                            long unsigned int);
+ struct device*,
+ void*,
+ dma_addr_t,
+ size_t,
+ enum dma_data_direction,
+ gfp_t,
+ long unsigned int);
 
 typedef void (*btf_trace_dma_fence_destroy)(void*, struct dma_fence*);
 
@@ -157483,74 +157190,64 @@ typedef void (*btf_trace_dma_fence_wait_end)(void*, struct dma_fence*);
 typedef void (*btf_trace_dma_fence_wait_start)(void*, struct dma_fence*);
 
 typedef void (*btf_trace_dma_free)(
-    void*, struct device*, void*, dma_addr_t, size_t, enum dma_data_direction, long unsigned int);
+ void*, struct device*, void*, dma_addr_t, size_t, enum dma_data_direction, long unsigned int);
 
 typedef void (*btf_trace_dma_free_pages)(
-    void*, struct device*, void*, dma_addr_t, size_t, enum dma_data_direction, long unsigned int);
+ void*, struct device*, void*, dma_addr_t, size_t, enum dma_data_direction, long unsigned int);
 
 typedef void (*btf_trace_dma_free_sgt)(
-    void*, struct device*, struct sg_table*, size_t, enum dma_data_direction);
+ void*, struct device*, struct sg_table*, size_t, enum dma_data_direction);
 
 typedef void (*btf_trace_dma_map_page)(void*,
-                                       struct device*,
-                                       phys_addr_t,
-                                       dma_addr_t,
-                                       size_t,
-                                       enum dma_data_direction,
-                                       long unsigned int);
+ struct device*,
+ phys_addr_t,
+ dma_addr_t,
+ size_t,
+ enum dma_data_direction,
+ long unsigned int);
 
 typedef void (*btf_trace_dma_map_resource)(void*,
-                                           struct device*,
-                                           phys_addr_t,
-                                           dma_addr_t,
-                                           size_t,
-                                           enum dma_data_direction,
-                                           long unsigned int);
+ struct device*,
+ phys_addr_t,
+ dma_addr_t,
+ size_t,
+ enum dma_data_direction,
+ long unsigned int);
 
-typedef void (*btf_trace_dma_map_sg)(void*,
-                                     struct device*,
-                                     struct scatterlist*,
-                                     int,
-                                     int,
-                                     enum dma_data_direction,
-                                     long unsigned int);
+typedef void (*btf_trace_dma_map_sg)(
+ void*, struct device*, struct scatterlist*, int, int, enum dma_data_direction, long unsigned int);
 
-typedef void (*btf_trace_dma_map_sg_err)(void*,
-                                         struct device*,
-                                         struct scatterlist*,
-                                         int,
-                                         int,
-                                         enum dma_data_direction,
-                                         long unsigned int);
+typedef void (*btf_trace_dma_map_sg_err)(
+ void*, struct device*, struct scatterlist*, int, int, enum dma_data_direction, long unsigned int);
 
 typedef void (*btf_trace_dma_sync_sg_for_cpu)(
-    void*, struct device*, struct scatterlist*, int, enum dma_data_direction);
+ void*, struct device*, struct scatterlist*, int, enum dma_data_direction);
 
 typedef void (*btf_trace_dma_sync_sg_for_device)(
-    void*, struct device*, struct scatterlist*, int, enum dma_data_direction);
+ void*, struct device*, struct scatterlist*, int, enum dma_data_direction);
 
 typedef void (*btf_trace_dma_sync_single_for_cpu)(
-    void*, struct device*, dma_addr_t, size_t, enum dma_data_direction);
+ void*, struct device*, dma_addr_t, size_t, enum dma_data_direction);
 
 typedef void (*btf_trace_dma_sync_single_for_device)(
-    void*, struct device*, dma_addr_t, size_t, enum dma_data_direction);
+ void*, struct device*, dma_addr_t, size_t, enum dma_data_direction);
 
 typedef void (*btf_trace_dma_unmap_page)(
-    void*, struct device*, dma_addr_t, size_t, enum dma_data_direction, long unsigned int);
+ void*, struct device*, dma_addr_t, size_t, enum dma_data_direction, long unsigned int);
 
 typedef void (*btf_trace_dma_unmap_resource)(
-    void*, struct device*, dma_addr_t, size_t, enum dma_data_direction, long unsigned int);
+ void*, struct device*, dma_addr_t, size_t, enum dma_data_direction, long unsigned int);
 
 typedef void (*btf_trace_dma_unmap_sg)(
-    void*, struct device*, struct scatterlist*, int, enum dma_data_direction, long unsigned int);
+ void*, struct device*, struct scatterlist*, int, enum dma_data_direction, long unsigned int);
 
 typedef void (*btf_trace_dql_stall_detected)(void*,
-                                             short unsigned int,
-                                             unsigned int,
-                                             long unsigned int,
-                                             long unsigned int,
-                                             long unsigned int,
-                                             long unsigned int*);
+ short unsigned int,
+ unsigned int,
+ long unsigned int,
+ long unsigned int,
+ long unsigned int,
+ long unsigned int*);
 
 typedef void (*btf_trace_drm_vblank_event)(void*, int, unsigned int, ktime_t, bool);
 
@@ -157574,9 +157271,8 @@ typedef void (*btf_trace_exit_mmap)(void*, struct mm_struct*);
 
 typedef void (*btf_trace_ext4_alloc_da_blocks)(void*, struct inode*);
 
-typedef void (*btf_trace_ext4_allocate_blocks)(void*,
-                                               struct ext4_allocation_request*,
-                                               long long unsigned int);
+typedef void (*btf_trace_ext4_allocate_blocks)(
+ void*, struct ext4_allocation_request*, long long unsigned int);
 
 typedef void (*btf_trace_ext4_allocate_inode)(void*, struct inode*, struct inode*, int);
 
@@ -157593,19 +157289,15 @@ typedef void (*btf_trace_ext4_da_update_reserve_space)(void*, struct inode*, int
 typedef void (*btf_trace_ext4_da_write_begin)(void*, struct inode*, loff_t, unsigned int);
 
 typedef void (*btf_trace_ext4_da_write_end)(
-    void*, struct inode*, loff_t, unsigned int, unsigned int);
+ void*, struct inode*, loff_t, unsigned int, unsigned int);
 
-typedef void (*btf_trace_ext4_da_write_pages)(void*,
-                                              struct inode*,
-                                              long unsigned int,
-                                              struct writeback_control*);
+typedef void (*btf_trace_ext4_da_write_pages)(
+ void*, struct inode*, long unsigned int, struct writeback_control*);
 
 typedef void (*btf_trace_ext4_da_write_pages_extent)(void*, struct inode*, struct ext4_map_blocks*);
 
-typedef void (*btf_trace_ext4_discard_blocks)(void*,
-                                              struct super_block*,
-                                              long long unsigned int,
-                                              long long unsigned int);
+typedef void (*btf_trace_ext4_discard_blocks)(
+ void*, struct super_block*, long long unsigned int, long long unsigned int);
 
 typedef void (*btf_trace_ext4_discard_preallocations)(void*, struct inode*, unsigned int);
 
@@ -157617,21 +157309,18 @@ typedef void (*btf_trace_ext4_es_cache_extent)(void*, struct inode*, struct exte
 
 typedef void (*btf_trace_ext4_es_find_extent_range_enter)(void*, struct inode*, ext4_lblk_t);
 
-typedef void (*btf_trace_ext4_es_find_extent_range_exit)(void*,
-                                                         struct inode*,
-                                                         struct extent_status*);
+typedef void (*btf_trace_ext4_es_find_extent_range_exit)(
+ void*, struct inode*, struct extent_status*);
 
 typedef void (*btf_trace_ext4_es_insert_delayed_extent)(
-    void*, struct inode*, struct extent_status*, bool, bool);
+ void*, struct inode*, struct extent_status*, bool, bool);
 
 typedef void (*btf_trace_ext4_es_insert_extent)(void*, struct inode*, struct extent_status*);
 
 typedef void (*btf_trace_ext4_es_lookup_extent_enter)(void*, struct inode*, ext4_lblk_t);
 
-typedef void (*btf_trace_ext4_es_lookup_extent_exit)(void*,
-                                                     struct inode*,
-                                                     struct extent_status*,
-                                                     int);
+typedef void (*btf_trace_ext4_es_lookup_extent_exit)(
+ void*, struct inode*, struct extent_status*, int);
 
 typedef void (*btf_trace_ext4_es_remove_extent)(void*, struct inode*, ext4_lblk_t, ext4_lblk_t);
 
@@ -157645,38 +157334,36 @@ typedef void (*btf_trace_ext4_es_shrink_scan_exit)(void*, struct super_block*, i
 
 typedef void (*btf_trace_ext4_evict_inode)(void*, struct inode*);
 
-typedef void (*btf_trace_ext4_ext_convert_to_initialized_enter)(void*,
-                                                                struct inode*,
-                                                                struct ext4_map_blocks*,
-                                                                struct ext4_extent*);
+typedef void (*btf_trace_ext4_ext_convert_to_initialized_enter)(
+ void*, struct inode*, struct ext4_map_blocks*, struct ext4_extent*);
 
 typedef void (*btf_trace_ext4_ext_convert_to_initialized_fastpath)(
-    void*, struct inode*, struct ext4_map_blocks*, struct ext4_extent*, struct ext4_extent*);
+ void*, struct inode*, struct ext4_map_blocks*, struct ext4_extent*, struct ext4_extent*);
 
 typedef void (*btf_trace_ext4_ext_handle_unwritten_extents)(
-    void*, struct inode*, struct ext4_map_blocks*, int, unsigned int, ext4_fsblk_t);
+ void*, struct inode*, struct ext4_map_blocks*, int, unsigned int, ext4_fsblk_t);
 
 typedef void (*btf_trace_ext4_ext_load_extent)(void*, struct inode*, ext4_lblk_t, ext4_fsblk_t);
 
 typedef void (*btf_trace_ext4_ext_map_blocks_enter)(
-    void*, struct inode*, ext4_lblk_t, unsigned int, unsigned int);
+ void*, struct inode*, ext4_lblk_t, unsigned int, unsigned int);
 
 typedef void (*btf_trace_ext4_ext_map_blocks_exit)(
-    void*, struct inode*, unsigned int, struct ext4_map_blocks*, int);
+ void*, struct inode*, unsigned int, struct ext4_map_blocks*, int);
 
 typedef void (*btf_trace_ext4_ext_remove_space)(
-    void*, struct inode*, ext4_lblk_t, ext4_lblk_t, int);
+ void*, struct inode*, ext4_lblk_t, ext4_lblk_t, int);
 
 typedef void (*btf_trace_ext4_ext_remove_space_done)(
-    void*, struct inode*, ext4_lblk_t, ext4_lblk_t, int, struct partial_cluster*, __le16);
+ void*, struct inode*, ext4_lblk_t, ext4_lblk_t, int, struct partial_cluster*, __le16);
 
 typedef void (*btf_trace_ext4_ext_rm_idx)(void*, struct inode*, ext4_fsblk_t);
 
 typedef void (*btf_trace_ext4_ext_rm_leaf)(
-    void*, struct inode*, ext4_lblk_t, struct ext4_extent*, struct partial_cluster*);
+ void*, struct inode*, ext4_lblk_t, struct ext4_extent*, struct partial_cluster*);
 
 typedef void (*btf_trace_ext4_ext_show_extent)(
-    void*, struct inode*, ext4_lblk_t, ext4_fsblk_t, short unsigned int);
+ void*, struct inode*, ext4_lblk_t, ext4_fsblk_t, short unsigned int);
 
 typedef void (*btf_trace_ext4_fallocate_enter)(void*, struct inode*, loff_t, loff_t, int);
 
@@ -157695,17 +157382,17 @@ typedef void (*btf_trace_ext4_fc_replay_scan)(void*, struct super_block*, int, i
 typedef void (*btf_trace_ext4_fc_stats)(void*, struct super_block*);
 
 typedef void (*btf_trace_ext4_fc_track_create)(
-    void*, handle_t*, struct inode*, struct dentry*, int);
+ void*, handle_t*, struct inode*, struct dentry*, int);
 
 typedef void (*btf_trace_ext4_fc_track_inode)(void*, handle_t*, struct inode*, int);
 
 typedef void (*btf_trace_ext4_fc_track_link)(void*, handle_t*, struct inode*, struct dentry*, int);
 
 typedef void (*btf_trace_ext4_fc_track_range)(
-    void*, handle_t*, struct inode*, long int, long int, int);
+ void*, handle_t*, struct inode*, long int, long int, int);
 
 typedef void (*btf_trace_ext4_fc_track_unlink)(
-    void*, handle_t*, struct inode*, struct dentry*, int);
+ void*, handle_t*, struct inode*, struct dentry*, int);
 
 typedef void (*btf_trace_ext4_forget)(void*, struct inode*, int, __u64);
 
@@ -157719,10 +157406,8 @@ typedef void (*btf_trace_ext4_fsmap_low_key)(void*, struct super_block*, u32, u3
 
 typedef void (*btf_trace_ext4_fsmap_mapping)(void*, struct super_block*, u32, u32, u64, u64, u64);
 
-typedef void (*btf_trace_ext4_get_implied_cluster_alloc_exit)(void*,
-                                                              struct super_block*,
-                                                              struct ext4_map_blocks*,
-                                                              int);
+typedef void (*btf_trace_ext4_get_implied_cluster_alloc_exit)(
+ void*, struct super_block*, struct ext4_map_blocks*, int);
 
 typedef void (*btf_trace_ext4_getfsmap_high_key)(void*, struct super_block*, struct ext4_fsmap*);
 
@@ -157731,30 +157416,28 @@ typedef void (*btf_trace_ext4_getfsmap_low_key)(void*, struct super_block*, stru
 typedef void (*btf_trace_ext4_getfsmap_mapping)(void*, struct super_block*, struct ext4_fsmap*);
 
 typedef void (*btf_trace_ext4_ind_map_blocks_enter)(
-    void*, struct inode*, ext4_lblk_t, unsigned int, unsigned int);
+ void*, struct inode*, ext4_lblk_t, unsigned int, unsigned int);
 
 typedef void (*btf_trace_ext4_ind_map_blocks_exit)(
-    void*, struct inode*, unsigned int, struct ext4_map_blocks*, int);
+ void*, struct inode*, unsigned int, struct ext4_map_blocks*, int);
 
 typedef void (*btf_trace_ext4_insert_range)(void*, struct inode*, loff_t, loff_t);
 
 typedef void (*btf_trace_ext4_invalidate_folio)(void*, struct folio*, size_t, size_t);
 
 typedef void (*btf_trace_ext4_journal_start_inode)(
-    void*, struct inode*, int, int, int, int, long unsigned int);
+ void*, struct inode*, int, int, int, int, long unsigned int);
 
-typedef void (*btf_trace_ext4_journal_start_reserved)(void*,
-                                                      struct super_block*,
-                                                      int,
-                                                      long unsigned int);
+typedef void (*btf_trace_ext4_journal_start_reserved)(
+ void*, struct super_block*, int, long unsigned int);
 
 typedef void (*btf_trace_ext4_journal_start_sb)(
-    void*, struct super_block*, int, int, int, int, long unsigned int);
+ void*, struct super_block*, int, int, int, int, long unsigned int);
 
 typedef void (*btf_trace_ext4_journalled_invalidate_folio)(void*, struct folio*, size_t, size_t);
 
 typedef void (*btf_trace_ext4_journalled_write_end)(
-    void*, struct inode*, loff_t, unsigned int, unsigned int);
+ void*, struct inode*, loff_t, unsigned int, unsigned int);
 
 typedef void (*btf_trace_ext4_lazy_itable_init)(void*, struct super_block*, ext4_group_t);
 
@@ -157770,30 +157453,25 @@ typedef void (*btf_trace_ext4_mb_buddy_bitmap_load)(void*, struct super_block*, 
 
 typedef void (*btf_trace_ext4_mb_discard_preallocations)(void*, struct super_block*, int);
 
-typedef void (*btf_trace_ext4_mb_new_group_pa)(void*,
-                                               struct ext4_allocation_context*,
-                                               struct ext4_prealloc_space*);
+typedef void (*btf_trace_ext4_mb_new_group_pa)(
+ void*, struct ext4_allocation_context*, struct ext4_prealloc_space*);
 
-typedef void (*btf_trace_ext4_mb_new_inode_pa)(void*,
-                                               struct ext4_allocation_context*,
-                                               struct ext4_prealloc_space*);
+typedef void (*btf_trace_ext4_mb_new_inode_pa)(
+ void*, struct ext4_allocation_context*, struct ext4_prealloc_space*);
 
-typedef void (*btf_trace_ext4_mb_release_group_pa)(void*,
-                                                   struct super_block*,
-                                                   struct ext4_prealloc_space*);
+typedef void (*btf_trace_ext4_mb_release_group_pa)(
+ void*, struct super_block*, struct ext4_prealloc_space*);
 
-typedef void (*btf_trace_ext4_mb_release_inode_pa)(void*,
-                                                   struct ext4_prealloc_space*,
-                                                   long long unsigned int,
-                                                   unsigned int);
+typedef void (*btf_trace_ext4_mb_release_inode_pa)(
+ void*, struct ext4_prealloc_space*, long long unsigned int, unsigned int);
 
 typedef void (*btf_trace_ext4_mballoc_alloc)(void*, struct ext4_allocation_context*);
 
 typedef void (*btf_trace_ext4_mballoc_discard)(
-    void*, struct super_block*, struct inode*, ext4_group_t, ext4_grpblk_t, ext4_grpblk_t);
+ void*, struct super_block*, struct inode*, ext4_group_t, ext4_grpblk_t, ext4_grpblk_t);
 
 typedef void (*btf_trace_ext4_mballoc_free)(
-    void*, struct super_block*, struct inode*, ext4_group_t, ext4_grpblk_t, ext4_grpblk_t);
+ void*, struct super_block*, struct inode*, ext4_group_t, ext4_grpblk_t, ext4_grpblk_t);
 
 typedef void (*btf_trace_ext4_mballoc_prealloc)(void*, struct ext4_allocation_context*);
 
@@ -157802,21 +157480,19 @@ typedef void (*btf_trace_ext4_nfs_commit_metadata)(void*, struct inode*);
 typedef void (*btf_trace_ext4_other_inode_update_time)(void*, struct inode*, ino_t);
 
 typedef void (*btf_trace_ext4_prefetch_bitmaps)(
-    void*, struct super_block*, ext4_group_t, ext4_group_t, unsigned int);
+ void*, struct super_block*, ext4_group_t, ext4_group_t, unsigned int);
 
 typedef void (*btf_trace_ext4_punch_hole)(void*, struct inode*, loff_t, loff_t, int);
 
-typedef void (*btf_trace_ext4_read_block_bitmap_load)(void*,
-                                                      struct super_block*,
-                                                      long unsigned int,
-                                                      bool);
+typedef void (*btf_trace_ext4_read_block_bitmap_load)(
+ void*, struct super_block*, long unsigned int, bool);
 
 typedef void (*btf_trace_ext4_read_folio)(void*, struct inode*, struct folio*);
 
 typedef void (*btf_trace_ext4_release_folio)(void*, struct inode*, struct folio*);
 
 typedef void (*btf_trace_ext4_remove_blocks)(
-    void*, struct inode*, struct ext4_extent*, ext4_lblk_t, ext4_fsblk_t, struct partial_cluster*);
+ void*, struct inode*, struct ext4_extent*, ext4_lblk_t, ext4_fsblk_t, struct partial_cluster*);
 
 typedef void (*btf_trace_ext4_request_blocks)(void*, struct ext4_allocation_request*);
 
@@ -157831,10 +157507,10 @@ typedef void (*btf_trace_ext4_sync_file_exit)(void*, struct inode*, int);
 typedef void (*btf_trace_ext4_sync_fs)(void*, struct super_block*, int);
 
 typedef void (*btf_trace_ext4_trim_all_free)(
-    void*, struct super_block*, ext4_group_t, ext4_grpblk_t, ext4_grpblk_t);
+ void*, struct super_block*, ext4_group_t, ext4_grpblk_t, ext4_grpblk_t);
 
 typedef void (*btf_trace_ext4_trim_extent)(
-    void*, struct super_block*, ext4_group_t, ext4_grpblk_t, ext4_grpblk_t);
+ void*, struct super_block*, ext4_group_t, ext4_grpblk_t, ext4_grpblk_t);
 
 typedef void (*btf_trace_ext4_truncate_enter)(void*, struct inode*);
 
@@ -157853,31 +157529,29 @@ typedef void (*btf_trace_ext4_write_end)(void*, struct inode*, loff_t, unsigned 
 typedef void (*btf_trace_ext4_writepages)(void*, struct inode*, struct writeback_control*);
 
 typedef void (*btf_trace_ext4_writepages_result)(
-    void*, struct inode*, struct writeback_control*, int, int);
+ void*, struct inode*, struct writeback_control*, int, int);
 
 typedef void (*btf_trace_ext4_zero_range)(void*, struct inode*, loff_t, loff_t, int);
 
 typedef void (*btf_trace_extlog_mem_event)(
-    void*, struct cper_sec_mem_err*, u32, const guid_t*, const char*, u8);
+ void*, struct cper_sec_mem_err*, u32, const guid_t*, const char*, u8);
 
 typedef void (*btf_trace_fcntl_setlk)(void*, struct inode*, struct file_lock*, int);
 
 typedef void (*btf_trace_fdb_delete)(void*, struct net_bridge*, struct net_bridge_fdb_entry*);
 
 typedef void (*btf_trace_fib6_table_lookup)(
-    void*, const struct net*, const struct fib6_result*, struct fib6_table*, const struct flowi6*);
+ void*, const struct net*, const struct fib6_result*, struct fib6_table*, const struct flowi6*);
 
 typedef void (*btf_trace_fib_table_lookup)(
-    void*, u32, const struct flowi4*, const struct fib_nh_common*, int);
+ void*, u32, const struct flowi4*, const struct fib_nh_common*, int);
 
 typedef void (*btf_trace_file_check_and_advance_wb_err)(void*, struct file*, errseq_t);
 
 typedef void (*btf_trace_filemap_set_wb_err)(void*, struct address_space*, errseq_t);
 
-typedef void (*btf_trace_fill_mg_cmtime)(void*,
-                                         struct inode*,
-                                         struct timespec64*,
-                                         struct timespec64*);
+typedef void (*btf_trace_fill_mg_cmtime)(
+ void*, struct inode*, struct timespec64*, struct timespec64*);
 
 typedef void (*btf_trace_finish_task_reaping)(void*, int);
 
@@ -157887,10 +157561,8 @@ typedef void (*btf_trace_flush_foreign)(void*, struct bdi_writeback*, unsigned i
 
 typedef void (*btf_trace_folio_wait_writeback)(void*, struct folio*, struct address_space*);
 
-typedef void (*btf_trace_free_vmap_area_noflush)(void*,
-                                                 long unsigned int,
-                                                 long unsigned int,
-                                                 long unsigned int);
+typedef void (*btf_trace_free_vmap_area_noflush)(
+ void*, long unsigned int, long unsigned int, long unsigned int);
 
 typedef void (*btf_trace_fuse_request_end)(void*, const struct fuse_req*);
 
@@ -157910,51 +157582,41 @@ typedef void (*btf_trace_gpio_value)(void*, unsigned int, int, int);
 
 typedef void (*btf_trace_guest_halt_poll_ns)(void*, bool, unsigned int, unsigned int);
 
-typedef void (*btf_trace_handshake_cancel)(void*,
-                                           const struct net*,
-                                           const struct handshake_req*,
-                                           const struct sock*);
+typedef void (*btf_trace_handshake_cancel)(
+ void*, const struct net*, const struct handshake_req*, const struct sock*);
 
-typedef void (*btf_trace_handshake_cancel_busy)(void*,
-                                                const struct net*,
-                                                const struct handshake_req*,
-                                                const struct sock*);
+typedef void (*btf_trace_handshake_cancel_busy)(
+ void*, const struct net*, const struct handshake_req*, const struct sock*);
 
-typedef void (*btf_trace_handshake_cancel_none)(void*,
-                                                const struct net*,
-                                                const struct handshake_req*,
-                                                const struct sock*);
+typedef void (*btf_trace_handshake_cancel_none)(
+ void*, const struct net*, const struct handshake_req*, const struct sock*);
 
 typedef void (*btf_trace_handshake_cmd_accept)(
-    void*, const struct net*, const struct handshake_req*, const struct sock*, int);
+ void*, const struct net*, const struct handshake_req*, const struct sock*, int);
 
 typedef void (*btf_trace_handshake_cmd_accept_err)(
-    void*, const struct net*, const struct handshake_req*, const struct sock*, int);
+ void*, const struct net*, const struct handshake_req*, const struct sock*, int);
 
 typedef void (*btf_trace_handshake_cmd_done)(
-    void*, const struct net*, const struct handshake_req*, const struct sock*, int);
+ void*, const struct net*, const struct handshake_req*, const struct sock*, int);
 
 typedef void (*btf_trace_handshake_cmd_done_err)(
-    void*, const struct net*, const struct handshake_req*, const struct sock*, int);
+ void*, const struct net*, const struct handshake_req*, const struct sock*, int);
 
 typedef void (*btf_trace_handshake_complete)(
-    void*, const struct net*, const struct handshake_req*, const struct sock*, int);
+ void*, const struct net*, const struct handshake_req*, const struct sock*, int);
 
-typedef void (*btf_trace_handshake_destruct)(void*,
-                                             const struct net*,
-                                             const struct handshake_req*,
-                                             const struct sock*);
+typedef void (*btf_trace_handshake_destruct)(
+ void*, const struct net*, const struct handshake_req*, const struct sock*);
 
 typedef void (*btf_trace_handshake_notify_err)(
-    void*, const struct net*, const struct handshake_req*, const struct sock*, int);
+ void*, const struct net*, const struct handshake_req*, const struct sock*, int);
 
-typedef void (*btf_trace_handshake_submit)(void*,
-                                           const struct net*,
-                                           const struct handshake_req*,
-                                           const struct sock*);
+typedef void (*btf_trace_handshake_submit)(
+ void*, const struct net*, const struct handshake_req*, const struct sock*);
 
 typedef void (*btf_trace_handshake_submit_err)(
-    void*, const struct net*, const struct handshake_req*, const struct sock*, int);
+ void*, const struct net*, const struct handshake_req*, const struct sock*, int);
 
 typedef void (*btf_trace_hrtimer_cancel)(void*, struct hrtimer*);
 
@@ -157971,10 +157633,10 @@ typedef void (*btf_trace_hugepage_set_pmd)(void*, long unsigned int, long unsign
 typedef void (*btf_trace_hugepage_set_pud)(void*, long unsigned int, long unsigned int);
 
 typedef void (*btf_trace_hugepage_update_pmd)(
-    void*, long unsigned int, long unsigned int, long unsigned int, long unsigned int);
+ void*, long unsigned int, long unsigned int, long unsigned int, long unsigned int);
 
 typedef void (*btf_trace_hugepage_update_pud)(
-    void*, long unsigned int, long unsigned int, long unsigned int, long unsigned int);
+ void*, long unsigned int, long unsigned int, long unsigned int, long unsigned int);
 
 typedef void (*btf_trace_hugetlbfs_alloc_inode)(void*, struct inode*, struct inode*, int);
 
@@ -157992,9 +157654,8 @@ typedef void (*btf_trace_hwmon_attr_show_string)(void*, int, const char*, const 
 
 typedef void (*btf_trace_hwmon_attr_store)(void*, int, const char*, long int);
 
-typedef void (*btf_trace_hyperv_mmu_flush_tlb_multi)(void*,
-                                                     const struct cpumask*,
-                                                     const struct flush_tlb_info*);
+typedef void (*btf_trace_hyperv_mmu_flush_tlb_multi)(
+ void*, const struct cpumask*, const struct flush_tlb_info*);
 
 typedef void (*btf_trace_hyperv_nested_flush_guest_mapping)(void*, u64, int);
 
@@ -158011,7 +157672,7 @@ typedef void (*btf_trace_i2c_reply)(void*, const struct i2c_adapter*, const stru
 typedef void (*btf_trace_i2c_result)(void*, const struct i2c_adapter*, int, int);
 
 typedef void (*btf_trace_i2c_slave)(
-    void*, const struct i2c_client*, enum i2c_slave_event, __u8*, int);
+ void*, const struct i2c_client*, enum i2c_slave_event, __u8*, int);
 
 typedef void (*btf_trace_i2c_write)(void*, const struct i2c_adapter*, const struct i2c_msg*, int);
 
@@ -158031,27 +157692,21 @@ typedef void (*btf_trace_initcall_level)(void*, const char*);
 
 typedef void (*btf_trace_initcall_start)(void*, initcall_t);
 
-typedef void (*btf_trace_inode_foreign_history)(void*,
-                                                struct inode*,
-                                                struct writeback_control*,
-                                                unsigned int);
+typedef void (*btf_trace_inode_foreign_history)(
+ void*, struct inode*, struct writeback_control*, unsigned int);
 
 typedef void (*btf_trace_inode_set_ctime_to_ts)(void*, struct inode*, struct timespec64*);
 
-typedef void (*btf_trace_inode_switch_wbs)(void*,
-                                           struct inode*,
-                                           struct bdi_writeback*,
-                                           struct bdi_writeback*);
+typedef void (*btf_trace_inode_switch_wbs)(
+ void*, struct inode*, struct bdi_writeback*, struct bdi_writeback*);
 
 typedef void (*btf_trace_io_page_fault)(void*, struct device*, long unsigned int, int);
 
-typedef void (*btf_trace_io_uring_complete)(void*,
-                                            struct io_ring_ctx*,
-                                            void*,
-                                            struct io_uring_cqe*);
+typedef void (*btf_trace_io_uring_complete)(
+ void*, struct io_ring_ctx*, void*, struct io_uring_cqe*);
 
 typedef void (*btf_trace_io_uring_cqe_overflow)(
-    void*, void*, long long unsigned int, s32, u32, void*);
+ void*, void*, long long unsigned int, s32, u32, void*);
 
 typedef void (*btf_trace_io_uring_cqring_wait)(void*, void*, int);
 
@@ -158072,12 +157727,10 @@ typedef void (*btf_trace_io_uring_poll_arm)(void*, struct io_kiocb*, int, int);
 typedef void (*btf_trace_io_uring_queue_async_work)(void*, struct io_kiocb*, int);
 
 typedef void (*btf_trace_io_uring_register)(
-    void*, void*, unsigned int, unsigned int, unsigned int, long int);
+ void*, void*, unsigned int, unsigned int, unsigned int, long int);
 
-typedef void (*btf_trace_io_uring_req_failed)(void*,
-                                              const struct io_uring_sqe*,
-                                              struct io_kiocb*,
-                                              int);
+typedef void (*btf_trace_io_uring_req_failed)(
+ void*, const struct io_uring_sqe*, struct io_kiocb*, int);
 
 typedef void (*btf_trace_io_uring_short_write)(void*, void*, u64, u64, u64);
 
@@ -158088,31 +157741,31 @@ typedef void (*btf_trace_io_uring_task_add)(void*, struct io_kiocb*, int);
 typedef void (*btf_trace_io_uring_task_work_run)(void*, void*, unsigned int);
 
 typedef void (*btf_trace_iocost_inuse_adjust)(
-    void*, struct ioc_gq*, const char*, struct ioc_now*, u32, u32, u64, u64);
+ void*, struct ioc_gq*, const char*, struct ioc_now*, u32, u32, u64, u64);
 
 typedef void (*btf_trace_iocost_inuse_shortage)(
-    void*, struct ioc_gq*, const char*, struct ioc_now*, u32, u32, u64, u64);
+ void*, struct ioc_gq*, const char*, struct ioc_now*, u32, u32, u64, u64);
 
 typedef void (*btf_trace_iocost_inuse_transfer)(
-    void*, struct ioc_gq*, const char*, struct ioc_now*, u32, u32, u64, u64);
+ void*, struct ioc_gq*, const char*, struct ioc_now*, u32, u32, u64, u64);
 
 typedef void (*btf_trace_iocost_ioc_vrate_adj)(void*, struct ioc*, u64, u32*, u32, int, int);
 
 typedef void (*btf_trace_iocost_iocg_activate)(
-    void*, struct ioc_gq*, const char*, struct ioc_now*, u64, u64, u64);
+ void*, struct ioc_gq*, const char*, struct ioc_now*, u64, u64, u64);
 
 typedef void (*btf_trace_iocost_iocg_forgive_debt)(
-    void*, struct ioc_gq*, const char*, struct ioc_now*, u32, u64, u64, u64, u64);
+ void*, struct ioc_gq*, const char*, struct ioc_now*, u32, u64, u64, u64, u64);
 
 typedef void (*btf_trace_iocost_iocg_idle)(
-    void*, struct ioc_gq*, const char*, struct ioc_now*, u64, u64, u64);
+ void*, struct ioc_gq*, const char*, struct ioc_now*, u64, u64, u64);
 
 typedef void (*btf_trace_iomap_dio_complete)(void*, struct kiocb*, int, ssize_t);
 
 typedef void (*btf_trace_iomap_dio_invalidate_fail)(void*, struct inode*, loff_t, u64);
 
 typedef void (*btf_trace_iomap_dio_rw_begin)(
-    void*, struct kiocb*, struct iov_iter*, unsigned int, size_t);
+ void*, struct kiocb*, struct iov_iter*, unsigned int, size_t);
 
 typedef void (*btf_trace_iomap_dio_rw_queued)(void*, struct inode*, loff_t, u64);
 
@@ -158133,7 +157786,7 @@ typedef void (*btf_trace_iomap_release_folio)(void*, struct inode*, loff_t, u64)
 typedef void (*btf_trace_iomap_writepage)(void*, struct inode*, loff_t, u64);
 
 typedef void (*btf_trace_iomap_writepage_map)(
-    void*, struct inode*, u64, unsigned int, struct iomap*);
+ void*, struct inode*, u64, unsigned int, struct iomap*);
 
 typedef void (*btf_trace_ipi_entry)(void*, const char*);
 
@@ -158150,35 +157803,35 @@ typedef void (*btf_trace_irq_handler_entry)(void*, int, struct irqaction*);
 typedef void (*btf_trace_irq_handler_exit)(void*, int, struct irqaction*, int);
 
 typedef void (*btf_trace_irq_matrix_alloc)(
-    void*, int, unsigned int, struct irq_matrix*, struct cpumap*);
+ void*, int, unsigned int, struct irq_matrix*, struct cpumap*);
 
 typedef void (*btf_trace_irq_matrix_alloc_managed)(
-    void*, int, unsigned int, struct irq_matrix*, struct cpumap*);
+ void*, int, unsigned int, struct irq_matrix*, struct cpumap*);
 
 typedef void (*btf_trace_irq_matrix_alloc_reserved)(
-    void*, int, unsigned int, struct irq_matrix*, struct cpumap*);
+ void*, int, unsigned int, struct irq_matrix*, struct cpumap*);
 
 typedef void (*btf_trace_irq_matrix_assign)(
-    void*, int, unsigned int, struct irq_matrix*, struct cpumap*);
+ void*, int, unsigned int, struct irq_matrix*, struct cpumap*);
 
 typedef void (*btf_trace_irq_matrix_assign_system)(void*, int, struct irq_matrix*);
 
 typedef void (*btf_trace_irq_matrix_free)(
-    void*, int, unsigned int, struct irq_matrix*, struct cpumap*);
+ void*, int, unsigned int, struct irq_matrix*, struct cpumap*);
 
 typedef void (*btf_trace_irq_matrix_offline)(void*, struct irq_matrix*);
 
 typedef void (*btf_trace_irq_matrix_online)(void*, struct irq_matrix*);
 
 typedef void (*btf_trace_irq_matrix_remove_managed)(
-    void*, int, unsigned int, struct irq_matrix*, struct cpumap*);
+ void*, int, unsigned int, struct irq_matrix*, struct cpumap*);
 
 typedef void (*btf_trace_irq_matrix_remove_reserved)(void*, struct irq_matrix*);
 
 typedef void (*btf_trace_irq_matrix_reserve)(void*, struct irq_matrix*);
 
 typedef void (*btf_trace_irq_matrix_reserve_managed)(
-    void*, int, unsigned int, struct irq_matrix*, struct cpumap*);
+ void*, int, unsigned int, struct irq_matrix*, struct cpumap*);
 
 typedef void (*btf_trace_irq_noise)(void*, int, const char*, u64, u64);
 
@@ -158188,17 +157841,13 @@ typedef void (*btf_trace_irq_work_exit)(void*, int);
 
 typedef void (*btf_trace_itimer_expire)(void*, int, struct pid*, long long unsigned int);
 
-typedef void (*btf_trace_itimer_state)(void*,
-                                       int,
-                                       const struct itimerspec64* const,
-                                       long long unsigned int);
+typedef void (*btf_trace_itimer_state)(
+ void*, int, const struct itimerspec64* const, long long unsigned int);
 
 typedef void (*btf_trace_jbd2_checkpoint)(void*, journal_t*, int);
 
-typedef void (*btf_trace_jbd2_checkpoint_stats)(void*,
-                                                dev_t,
-                                                tid_t,
-                                                struct transaction_chp_stats_s*);
+typedef void (*btf_trace_jbd2_checkpoint_stats)(
+ void*, dev_t, tid_t, struct transaction_chp_stats_s*);
 
 typedef void (*btf_trace_jbd2_commit_flushing)(void*, journal_t*, transaction_t*);
 
@@ -158211,59 +157860,53 @@ typedef void (*btf_trace_jbd2_drop_transaction)(void*, journal_t*, transaction_t
 typedef void (*btf_trace_jbd2_end_commit)(void*, journal_t*, transaction_t*);
 
 typedef void (*btf_trace_jbd2_handle_extend)(
-    void*, dev_t, tid_t, unsigned int, unsigned int, int, int);
+ void*, dev_t, tid_t, unsigned int, unsigned int, int, int);
 
 typedef void (*btf_trace_jbd2_handle_restart)(void*, dev_t, tid_t, unsigned int, unsigned int, int);
 
 typedef void (*btf_trace_jbd2_handle_start)(void*, dev_t, tid_t, unsigned int, unsigned int, int);
 
 typedef void (*btf_trace_jbd2_handle_stats)(
-    void*, dev_t, tid_t, unsigned int, unsigned int, int, int, int, int);
+ void*, dev_t, tid_t, unsigned int, unsigned int, int, int, int, int);
 
 typedef void (*btf_trace_jbd2_lock_buffer_stall)(void*, dev_t, long unsigned int);
 
 typedef void (*btf_trace_jbd2_run_stats)(void*, dev_t, tid_t, struct transaction_run_stats_s*);
 
 typedef void (*btf_trace_jbd2_shrink_checkpoint_list)(
-    void*, journal_t*, tid_t, tid_t, tid_t, long unsigned int, tid_t);
+ void*, journal_t*, tid_t, tid_t, tid_t, long unsigned int, tid_t);
 
-typedef void (*btf_trace_jbd2_shrink_count)(void*,
-                                            journal_t*,
-                                            long unsigned int,
-                                            long unsigned int);
+typedef void (*btf_trace_jbd2_shrink_count)(
+ void*, journal_t*, long unsigned int, long unsigned int);
 
-typedef void (*btf_trace_jbd2_shrink_scan_enter)(void*,
-                                                 journal_t*,
-                                                 long unsigned int,
-                                                 long unsigned int);
+typedef void (*btf_trace_jbd2_shrink_scan_enter)(
+ void*, journal_t*, long unsigned int, long unsigned int);
 
 typedef void (*btf_trace_jbd2_shrink_scan_exit)(
-    void*, journal_t*, long unsigned int, long unsigned int, long unsigned int);
+ void*, journal_t*, long unsigned int, long unsigned int, long unsigned int);
 
 typedef void (*btf_trace_jbd2_start_commit)(void*, journal_t*, transaction_t*);
 
 typedef void (*btf_trace_jbd2_submit_inode_data)(void*, struct inode*);
 
 typedef void (*btf_trace_jbd2_update_log_tail)(
-    void*, journal_t*, tid_t, long unsigned int, long unsigned int);
+ void*, journal_t*, tid_t, long unsigned int, long unsigned int);
 
 typedef void (*btf_trace_jbd2_write_superblock)(void*, journal_t*, blk_opf_t);
 
 typedef void (*btf_trace_kfree)(void*, long unsigned int, const void*);
 
 typedef void (*btf_trace_kfree_skb)(
-    void*, struct sk_buff*, void*, enum skb_drop_reason, struct sock*);
+ void*, struct sk_buff*, void*, enum skb_drop_reason, struct sock*);
 
 typedef void (*btf_trace_kmalloc)(
-    void*, long unsigned int, const void*, size_t, size_t, gfp_t, int);
+ void*, long unsigned int, const void*, size_t, size_t, gfp_t, int);
 
 typedef void (*btf_trace_kmem_cache_alloc)(
-    void*, long unsigned int, const void*, struct kmem_cache*, gfp_t, int);
+ void*, long unsigned int, const void*, struct kmem_cache*, gfp_t, int);
 
-typedef void (*btf_trace_kmem_cache_free)(void*,
-                                          long unsigned int,
-                                          const void*,
-                                          const struct kmem_cache*);
+typedef void (*btf_trace_kmem_cache_free)(
+ void*, long unsigned int, const void*, const struct kmem_cache*);
 
 typedef void (*btf_trace_ksm_advisor)(void*, s64, long unsigned int, unsigned int);
 
@@ -158274,7 +157917,7 @@ typedef void (*btf_trace_ksm_exit)(void*, void*);
 typedef void (*btf_trace_ksm_merge_one_page)(void*, long unsigned int, void*, void*, int);
 
 typedef void (*btf_trace_ksm_merge_with_ksm_page)(
-    void*, void*, long unsigned int, void*, void*, int);
+ void*, void*, long unsigned int, void*, void*, int);
 
 typedef void (*btf_trace_ksm_remove_ksm_page)(void*, long unsigned int);
 
@@ -158290,10 +157933,8 @@ typedef void (*btf_trace_local_timer_entry)(void*, int);
 
 typedef void (*btf_trace_local_timer_exit)(void*, int);
 
-typedef void (*btf_trace_locks_get_lock_context)(void*,
-                                                 struct inode*,
-                                                 int,
-                                                 struct file_lock_context*);
+typedef void (*btf_trace_locks_get_lock_context)(
+ void*, struct inode*, int, struct file_lock_context*);
 
 typedef void (*btf_trace_locks_remove_posix)(void*, struct inode*, struct file_lock*, int);
 
@@ -158308,18 +157949,18 @@ typedef void (*btf_trace_map)(void*, long unsigned int, phys_addr_t, size_t);
 typedef void (*btf_trace_mark_victim)(void*, struct task_struct*, uid_t);
 
 typedef void (*btf_trace_mc_event)(void*,
-                                   const unsigned int,
-                                   const char*,
-                                   const char*,
-                                   const int,
-                                   const u8,
-                                   const s8,
-                                   const s8,
-                                   const s8,
-                                   long unsigned int,
-                                   const u8,
-                                   long unsigned int,
-                                   const char*);
+ const unsigned int,
+ const char*,
+ const char*,
+ const int,
+ const u8,
+ const s8,
+ const s8,
+ const s8,
+ long unsigned int,
+ const u8,
+ long unsigned int,
+ const char*);
 
 typedef void (*btf_trace_mce_record)(void*, struct mce_hw_err*);
 
@@ -158329,9 +157970,8 @@ typedef void (*btf_trace_mctp_key_release)(void*, const struct mctp_sk_key*, int
 
 typedef void (*btf_trace_mdio_access)(void*, struct mii_bus*, char, u8, unsigned int, u16, int);
 
-typedef void (*btf_trace_mem_connect)(void*,
-                                      const struct xdp_mem_allocator*,
-                                      const struct xdp_rxq_info*);
+typedef void (*btf_trace_mem_connect)(
+ void*, const struct xdp_mem_allocator*, const struct xdp_rxq_info*);
 
 typedef void (*btf_trace_mem_disconnect)(void*, const struct xdp_mem_allocator*);
 
@@ -158342,12 +157982,12 @@ typedef void (*btf_trace_memcg_flush_stats)(void*, struct mem_cgroup*, s64, bool
 typedef void (*btf_trace_memory_failure_event)(void*, long unsigned int, int, int);
 
 typedef void (*btf_trace_mm_alloc_contig_migrate_range_info)(void*,
-                                                             long unsigned int,
-                                                             long unsigned int,
-                                                             long unsigned int,
-                                                             long unsigned int,
-                                                             long unsigned int,
-                                                             int);
+ long unsigned int,
+ long unsigned int,
+ long unsigned int,
+ long unsigned int,
+ long unsigned int,
+ int);
 
 typedef void (*btf_trace_mm_collapse_huge_page)(void*, struct mm_struct*, int, int);
 
@@ -158356,7 +157996,7 @@ typedef void (*btf_trace_mm_collapse_huge_page_isolate)(void*, struct page*, int
 typedef void (*btf_trace_mm_collapse_huge_page_swapin)(void*, struct mm_struct*, int, int, int);
 
 typedef void (*btf_trace_mm_compaction_begin)(
-    void*, struct compact_control*, long unsigned int, long unsigned int, bool);
+ void*, struct compact_control*, long unsigned int, long unsigned int, bool);
 
 typedef void (*btf_trace_mm_compaction_defer_compaction)(void*, struct zone*, int);
 
@@ -158365,18 +158005,18 @@ typedef void (*btf_trace_mm_compaction_defer_reset)(void*, struct zone*, int);
 typedef void (*btf_trace_mm_compaction_deferred)(void*, struct zone*, int);
 
 typedef void (*btf_trace_mm_compaction_end)(
-    void*, struct compact_control*, long unsigned int, long unsigned int, bool, int);
+ void*, struct compact_control*, long unsigned int, long unsigned int, bool, int);
 
 typedef void (*btf_trace_mm_compaction_fast_isolate_freepages)(
-    void*, long unsigned int, long unsigned int, long unsigned int, long unsigned int);
+ void*, long unsigned int, long unsigned int, long unsigned int, long unsigned int);
 
 typedef void (*btf_trace_mm_compaction_finished)(void*, struct zone*, int, int);
 
 typedef void (*btf_trace_mm_compaction_isolate_freepages)(
-    void*, long unsigned int, long unsigned int, long unsigned int, long unsigned int);
+ void*, long unsigned int, long unsigned int, long unsigned int, long unsigned int);
 
 typedef void (*btf_trace_mm_compaction_isolate_migratepages)(
-    void*, long unsigned int, long unsigned int, long unsigned int, long unsigned int);
+ void*, long unsigned int, long unsigned int, long unsigned int, long unsigned int);
 
 typedef void (*btf_trace_mm_compaction_kcompactd_sleep)(void*, int);
 
@@ -158396,45 +158036,41 @@ typedef void (*btf_trace_mm_filemap_delete_from_page_cache)(void*, struct folio*
 
 typedef void (*btf_trace_mm_filemap_fault)(void*, struct address_space*, long unsigned int);
 
-typedef void (*btf_trace_mm_filemap_get_pages)(void*,
-                                               struct address_space*,
-                                               long unsigned int,
-                                               long unsigned int);
+typedef void (*btf_trace_mm_filemap_get_pages)(
+ void*, struct address_space*, long unsigned int, long unsigned int);
 
-typedef void (*btf_trace_mm_filemap_map_pages)(void*,
-                                               struct address_space*,
-                                               long unsigned int,
-                                               long unsigned int);
+typedef void (*btf_trace_mm_filemap_map_pages)(
+ void*, struct address_space*, long unsigned int, long unsigned int);
 
 typedef void (*btf_trace_mm_khugepaged_collapse_file)(void*,
-                                                      struct mm_struct*,
-                                                      struct folio*,
-                                                      long unsigned int,
-                                                      long unsigned int,
-                                                      bool,
-                                                      struct file*,
-                                                      int,
-                                                      int);
+ struct mm_struct*,
+ struct folio*,
+ long unsigned int,
+ long unsigned int,
+ bool,
+ struct file*,
+ int,
+ int);
 
 typedef void (*btf_trace_mm_khugepaged_scan_file)(
-    void*, struct mm_struct*, struct folio*, struct file*, int, int, int);
+ void*, struct mm_struct*, struct folio*, struct file*, int, int, int);
 
 typedef void (*btf_trace_mm_khugepaged_scan_pmd)(
-    void*, struct mm_struct*, struct page*, bool, int, int, int, int);
+ void*, struct mm_struct*, struct page*, bool, int, int, int, int);
 
 typedef void (*btf_trace_mm_lru_activate)(void*, struct folio*);
 
 typedef void (*btf_trace_mm_lru_insertion)(void*, struct folio*);
 
 typedef void (*btf_trace_mm_migrate_pages)(void*,
-                                           long unsigned int,
-                                           long unsigned int,
-                                           long unsigned int,
-                                           long unsigned int,
-                                           long unsigned int,
-                                           long unsigned int,
-                                           enum migrate_mode,
-                                           int);
+ long unsigned int,
+ long unsigned int,
+ long unsigned int,
+ long unsigned int,
+ long unsigned int,
+ long unsigned int,
+ enum migrate_mode,
+ int);
 
 typedef void (*btf_trace_mm_migrate_pages_start)(void*, enum migrate_mode, int);
 
@@ -158451,16 +158087,16 @@ typedef void (*btf_trace_mm_page_free_batched)(void*, struct page*);
 typedef void (*btf_trace_mm_page_pcpu_drain)(void*, struct page*, unsigned int, int);
 
 typedef void (*btf_trace_mm_shrink_slab_end)(
-    void*, struct shrinker*, int, int, long int, long int, long int);
+ void*, struct shrinker*, int, int, long int, long int, long int);
 
 typedef void (*btf_trace_mm_shrink_slab_start)(void*,
-                                               struct shrinker*,
-                                               struct shrink_control*,
-                                               long int,
-                                               long unsigned int,
-                                               long long unsigned int,
-                                               long unsigned int,
-                                               int);
+ struct shrinker*,
+ struct shrink_control*,
+ long int,
+ long unsigned int,
+ long long unsigned int,
+ long unsigned int,
+ int);
 
 typedef void (*btf_trace_mm_vmscan_direct_reclaim_begin)(void*, int, gfp_t);
 
@@ -158470,26 +158106,14 @@ typedef void (*btf_trace_mm_vmscan_kswapd_sleep)(void*, int);
 
 typedef void (*btf_trace_mm_vmscan_kswapd_wake)(void*, int, int, int);
 
-typedef void (*btf_trace_mm_vmscan_lru_isolate)(void*,
-                                                int,
-                                                int,
-                                                long unsigned int,
-                                                long unsigned int,
-                                                long unsigned int,
-                                                long unsigned int,
-                                                int);
+typedef void (*btf_trace_mm_vmscan_lru_isolate)(
+ void*, int, int, long unsigned int, long unsigned int, long unsigned int, long unsigned int, int);
 
-typedef void (*btf_trace_mm_vmscan_lru_shrink_active)(void*,
-                                                      int,
-                                                      long unsigned int,
-                                                      long unsigned int,
-                                                      long unsigned int,
-                                                      long unsigned int,
-                                                      int,
-                                                      int);
+typedef void (*btf_trace_mm_vmscan_lru_shrink_active)(
+ void*, int, long unsigned int, long unsigned int, long unsigned int, long unsigned int, int, int);
 
 typedef void (*btf_trace_mm_vmscan_lru_shrink_inactive)(
-    void*, int, long unsigned int, long unsigned int, struct reclaim_stat*, int, int);
+ void*, int, long unsigned int, long unsigned int, struct reclaim_stat*, int, int);
 
 typedef void (*btf_trace_mm_vmscan_memcg_reclaim_begin)(void*, int, gfp_t);
 
@@ -158504,7 +158128,7 @@ typedef void (*btf_trace_mm_vmscan_node_reclaim_begin)(void*, int, int, gfp_t);
 typedef void (*btf_trace_mm_vmscan_node_reclaim_end)(void*, long unsigned int);
 
 typedef void (*btf_trace_mm_vmscan_reclaim_pages)(
-    void*, int, long unsigned int, long unsigned int, struct reclaim_stat*);
+ void*, int, long unsigned int, long unsigned int, struct reclaim_stat*);
 
 typedef void (*btf_trace_mm_vmscan_throttled)(void*, int, int, int, int);
 
@@ -158555,7 +158179,7 @@ typedef void (*btf_trace_napi_poll)(void*, struct napi_struct*, int, int);
 typedef void (*btf_trace_neigh_cleanup_and_release)(void*, struct neighbour*, int);
 
 typedef void (*btf_trace_neigh_create)(
-    void*, struct neigh_table*, struct net_device*, const void*, const struct neighbour*, bool);
+ void*, struct neigh_table*, struct net_device*, const void*, const struct neighbour*, bool);
 
 typedef void (*btf_trace_neigh_event_send_dead)(void*, struct neighbour*, int);
 
@@ -158569,12 +158193,11 @@ typedef void (*btf_trace_neigh_update_done)(void*, struct neighbour*, int);
 
 typedef void (*btf_trace_net_dev_queue)(void*, struct sk_buff*);
 
-typedef void (*btf_trace_net_dev_start_xmit)(void*,
-                                             const struct sk_buff*,
-                                             const struct net_device*);
+typedef void (*btf_trace_net_dev_start_xmit)(
+ void*, const struct sk_buff*, const struct net_device*);
 
 typedef void (*btf_trace_net_dev_xmit)(
-    void*, struct sk_buff*, int, struct net_device*, unsigned int);
+ void*, struct sk_buff*, int, struct net_device*, unsigned int);
 
 typedef void (*btf_trace_net_dev_xmit_timeout)(void*, struct net_device*, int);
 
@@ -158601,7 +158224,7 @@ typedef void (*btf_trace_nmi_handler)(void*, void*, s64, int);
 typedef void (*btf_trace_nmi_noise)(void*, u64, u64);
 
 typedef void (*btf_trace_non_standard_event)(
-    void*, const guid_t*, const guid_t*, const char*, const u8, const u8*, const u32);
+ void*, const guid_t*, const guid_t*, const char*, const u8, const u8*, const u32);
 
 typedef void (*btf_trace_notifier_register)(void*, void*);
 
@@ -158611,15 +158234,11 @@ typedef void (*btf_trace_notifier_unregister)(void*, void*);
 
 typedef void (*btf_trace_oom_score_adj_update)(void*, struct task_struct*);
 
-typedef void (*btf_trace_page_fault_kernel)(void*,
-                                            long unsigned int,
-                                            struct pt_regs*,
-                                            long unsigned int);
+typedef void (*btf_trace_page_fault_kernel)(
+ void*, long unsigned int, struct pt_regs*, long unsigned int);
 
-typedef void (*btf_trace_page_fault_user)(void*,
-                                          long unsigned int,
-                                          struct pt_regs*,
-                                          long unsigned int);
+typedef void (*btf_trace_page_fault_user)(
+ void*, long unsigned int, struct pt_regs*, long unsigned int);
 
 typedef void (*btf_trace_page_pool_release)(void*, const struct page_pool*, s32, u32, u32);
 
@@ -158642,7 +158261,7 @@ typedef void (*btf_trace_pelt_rt_tp)(void*, struct rq*);
 typedef void (*btf_trace_pelt_se_tp)(void*, struct sched_entity*);
 
 typedef void (*btf_trace_percpu_alloc_percpu)(
-    void*, long unsigned int, bool, bool, size_t, size_t, void*, int, void*, size_t, gfp_t);
+ void*, long unsigned int, bool, bool, size_t, size_t, void*, int, void*, size_t, gfp_t);
 
 typedef void (*btf_trace_percpu_alloc_percpu_fail)(void*, bool, bool, size_t, size_t);
 
@@ -158669,7 +158288,7 @@ typedef void (*btf_trace_power_domain_target)(void*, const char*, unsigned int, 
 typedef void (*btf_trace_powernv_throttle)(void*, int, const char*, int);
 
 typedef void (*btf_trace_prq_report)(
-    void*, struct intel_iommu*, struct device*, u64, u64, u64, u64, long unsigned int);
+ void*, struct intel_iommu*, struct device*, u64, u64, u64, u64, long unsigned int);
 
 typedef void (*btf_trace_pseudo_lock_l2)(void*, u64, u64);
 
@@ -158679,10 +158298,8 @@ typedef void (*btf_trace_pseudo_lock_mem_latency)(void*, u32);
 
 typedef void (*btf_trace_pstate_sample)(void*, u32, u32, u32, u32, u64, u64, u64, u32, u32);
 
-typedef void (*btf_trace_purge_vmap_area_lazy)(void*,
-                                               long unsigned int,
-                                               long unsigned int,
-                                               unsigned int);
+typedef void (*btf_trace_purge_vmap_area_lazy)(
+ void*, long unsigned int, long unsigned int, unsigned int);
 
 typedef void (*btf_trace_pwm_apply)(void*, struct pwm_device*, const struct pwm_state*, int);
 
@@ -158691,24 +158308,22 @@ typedef void (*btf_trace_pwm_get)(void*, struct pwm_device*, const struct pwm_st
 typedef void (*btf_trace_pwm_read_waveform)(void*, struct pwm_device*, void*, int);
 
 typedef void (*btf_trace_pwm_round_waveform_fromhw)(
-    void*, struct pwm_device*, const void*, struct pwm_waveform*, int);
+ void*, struct pwm_device*, const void*, struct pwm_waveform*, int);
 
 typedef void (*btf_trace_pwm_round_waveform_tohw)(
-    void*, struct pwm_device*, const struct pwm_waveform*, void*, int);
+ void*, struct pwm_device*, const struct pwm_waveform*, void*, int);
 
 typedef void (*btf_trace_pwm_write_waveform)(void*, struct pwm_device*, const void*, int);
 
 typedef void (*btf_trace_qdisc_create)(void*, const struct Qdisc_ops*, struct net_device*, u32);
 
 typedef void (*btf_trace_qdisc_dequeue)(
-    void*, struct Qdisc*, const struct netdev_queue*, int, struct sk_buff*);
+ void*, struct Qdisc*, const struct netdev_queue*, int, struct sk_buff*);
 
 typedef void (*btf_trace_qdisc_destroy)(void*, struct Qdisc*);
 
-typedef void (*btf_trace_qdisc_enqueue)(void*,
-                                        struct Qdisc*,
-                                        const struct netdev_queue*,
-                                        struct sk_buff*);
+typedef void (*btf_trace_qdisc_enqueue)(
+ void*, struct Qdisc*, const struct netdev_queue*, struct sk_buff*);
 
 typedef void (*btf_trace_qdisc_reset)(void*, struct Qdisc*);
 
@@ -158722,14 +158337,8 @@ typedef void (*btf_trace_rdpmc)(void*, unsigned int, u64, int);
 
 typedef void (*btf_trace_read_msr)(void*, unsigned int, u64, int);
 
-typedef void (*btf_trace_reclaim_retry_zone)(void*,
-                                             struct zoneref*,
-                                             int,
-                                             long unsigned int,
-                                             long unsigned int,
-                                             long unsigned int,
-                                             int,
-                                             bool);
+typedef void (*btf_trace_reclaim_retry_zone)(
+ void*, struct zoneref*, int, long unsigned int, long unsigned int, long unsigned int, int, bool);
 
 typedef void (*btf_trace_regcache_drop_region)(void*, struct regmap*, unsigned int, unsigned int);
 
@@ -158810,7 +158419,7 @@ typedef void (*btf_trace_rpm_suspend)(void*, struct device*, int);
 typedef void (*btf_trace_rpm_usage)(void*, struct device*, int);
 
 typedef void (*btf_trace_rseq_ip_fixup)(
-    void*, long unsigned int, long unsigned int, long unsigned int, long unsigned int);
+ void*, long unsigned int, long unsigned int, long unsigned int, long unsigned int);
 
 typedef void (*btf_trace_rseq_update)(void*, struct task_struct*);
 
@@ -158847,7 +158456,7 @@ typedef void (*btf_trace_sb_clear_inode_writeback)(void*, struct inode*);
 typedef void (*btf_trace_sb_mark_inode_writeback)(void*, struct inode*);
 
 typedef void (*btf_trace_sched_compute_energy_tp)(
-    void*, struct task_struct*, int, long unsigned int, long unsigned int, long unsigned int);
+ void*, struct task_struct*, int, long unsigned int, long unsigned int, long unsigned int);
 
 typedef void (*btf_trace_sched_cpu_capacity_tp)(void*, struct rq*);
 
@@ -158857,15 +158466,13 @@ typedef void (*btf_trace_sched_kthread_stop)(void*, struct task_struct*);
 
 typedef void (*btf_trace_sched_kthread_stop_ret)(void*, int);
 
-typedef void (*btf_trace_sched_kthread_work_execute_end)(void*,
-                                                         struct kthread_work*,
-                                                         kthread_work_func_t);
+typedef void (*btf_trace_sched_kthread_work_execute_end)(
+ void*, struct kthread_work*, kthread_work_func_t);
 
 typedef void (*btf_trace_sched_kthread_work_execute_start)(void*, struct kthread_work*);
 
-typedef void (*btf_trace_sched_kthread_work_queue_work)(void*,
-                                                        struct kthread_worker*,
-                                                        struct kthread_work*);
+typedef void (*btf_trace_sched_kthread_work_queue_work)(
+ void*, struct kthread_worker*, struct kthread_work*);
 
 typedef void (*btf_trace_sched_migrate_task)(void*, struct task_struct*, int);
 
@@ -158877,10 +158484,8 @@ typedef void (*btf_trace_sched_pi_setprio)(void*, struct task_struct*, struct ta
 
 typedef void (*btf_trace_sched_prepare_exec)(void*, struct task_struct*, struct linux_binprm*);
 
-typedef void (*btf_trace_sched_process_exec)(void*,
-                                             struct task_struct*,
-                                             pid_t,
-                                             struct linux_binprm*);
+typedef void (*btf_trace_sched_process_exec)(
+ void*, struct task_struct*, pid_t, struct linux_binprm*);
 
 typedef void (*btf_trace_sched_process_exit)(void*, struct task_struct*);
 
@@ -158892,10 +158497,8 @@ typedef void (*btf_trace_sched_process_hang)(void*, struct task_struct*);
 
 typedef void (*btf_trace_sched_process_wait)(void*, struct pid*);
 
-typedef void (*btf_trace_sched_skip_vma_numa)(void*,
-                                              struct mm_struct*,
-                                              struct vm_area_struct*,
-                                              enum numa_vmaskip_reason);
+typedef void (*btf_trace_sched_skip_vma_numa)(
+ void*, struct mm_struct*, struct vm_area_struct*, enum numa_vmaskip_reason);
 
 typedef void (*btf_trace_sched_stat_blocked)(void*, struct task_struct*, u64);
 
@@ -158908,13 +158511,13 @@ typedef void (*btf_trace_sched_stat_sleep)(void*, struct task_struct*, u64);
 typedef void (*btf_trace_sched_stat_wait)(void*, struct task_struct*, u64);
 
 typedef void (*btf_trace_sched_stick_numa)(
-    void*, struct task_struct*, int, struct task_struct*, int);
+ void*, struct task_struct*, int, struct task_struct*, int);
 
 typedef void (*btf_trace_sched_swap_numa)(
-    void*, struct task_struct*, int, struct task_struct*, int);
+ void*, struct task_struct*, int, struct task_struct*, int);
 
 typedef void (*btf_trace_sched_switch)(
-    void*, bool, struct task_struct*, struct task_struct*, unsigned int);
+ void*, bool, struct task_struct*, struct task_struct*, unsigned int);
 
 typedef void (*btf_trace_sched_update_nr_running_tp)(void*, struct rq*, int);
 
@@ -158942,16 +158545,14 @@ typedef void (*btf_trace_scsi_dispatch_cmd_timeout)(void*, struct scsi_cmnd*);
 
 typedef void (*btf_trace_scsi_eh_wakeup)(void*, struct Scsi_Host*);
 
-typedef void (*btf_trace_scsi_prepare_zone_append)(void*,
-                                                   struct scsi_cmnd*,
-                                                   sector_t,
-                                                   unsigned int);
+typedef void (*btf_trace_scsi_prepare_zone_append)(
+ void*, struct scsi_cmnd*, sector_t, unsigned int);
 
 typedef void (*btf_trace_scsi_zone_wp_update)(
-    void*, struct scsi_cmnd*, sector_t, unsigned int, unsigned int);
+ void*, struct scsi_cmnd*, sector_t, unsigned int, unsigned int);
 
 typedef void (*btf_trace_selinux_audited)(
-    void*, struct selinux_audit_data*, char*, char*, const char*);
+ void*, struct selinux_audit_data*, char*, char*, const char*);
 
 typedef void (*btf_trace_set_migration_pmd)(void*, long unsigned int, long unsigned int);
 
@@ -158960,7 +158561,7 @@ typedef void (*btf_trace_set_migration_pte)(void*, long unsigned int, long unsig
 typedef void (*btf_trace_signal_deliver)(void*, int, struct kernel_siginfo*, struct k_sigaction*);
 
 typedef void (*btf_trace_signal_generate)(
-    void*, int, struct kernel_siginfo*, struct task_struct*, int, int);
+ void*, int, struct kernel_siginfo*, struct task_struct*, int, int);
 
 typedef void (*btf_trace_sk_data_ready)(void*, const struct sock*);
 
@@ -158969,29 +158570,29 @@ typedef void (*btf_trace_skb_copy_datagram_iovec)(void*, const struct sk_buff*, 
 typedef void (*btf_trace_skip_task_reaping)(void*, int);
 
 typedef void (*btf_trace_smbus_read)(
-    void*, const struct i2c_adapter*, u16, short unsigned int, char, u8, int);
+ void*, const struct i2c_adapter*, u16, short unsigned int, char, u8, int);
 
 typedef void (*btf_trace_smbus_reply)(void*,
-                                      const struct i2c_adapter*,
-                                      u16,
-                                      short unsigned int,
-                                      char,
-                                      u8,
-                                      int,
-                                      const union i2c_smbus_data*,
-                                      int);
+ const struct i2c_adapter*,
+ u16,
+ short unsigned int,
+ char,
+ u8,
+ int,
+ const union i2c_smbus_data*,
+ int);
 
 typedef void (*btf_trace_smbus_result)(
-    void*, const struct i2c_adapter*, u16, short unsigned int, char, u8, int, int);
+ void*, const struct i2c_adapter*, u16, short unsigned int, char, u8, int, int);
 
 typedef void (*btf_trace_smbus_write)(void*,
-                                      const struct i2c_adapter*,
-                                      u16,
-                                      short unsigned int,
-                                      char,
-                                      u8,
-                                      int,
-                                      const union i2c_smbus_data*);
+ const struct i2c_adapter*,
+ u16,
+ short unsigned int,
+ char,
+ u8,
+ int,
+ const union i2c_smbus_data*);
 
 typedef void (*btf_trace_sock_exceed_buf_limit)(void*, struct sock*, struct proto*, long int, int);
 
@@ -159048,7 +158649,7 @@ typedef void (*btf_trace_sys_exit)(void*, struct pt_regs*, long int);
 typedef void (*btf_trace_task_newtask)(void*, struct task_struct*, long unsigned int);
 
 typedef void (*btf_trace_task_prctl_unknown)(
-    void*, int, long unsigned int, long unsigned int, long unsigned int, long unsigned int);
+ void*, int, long unsigned int, long unsigned int, long unsigned int, long unsigned int);
 
 typedef void (*btf_trace_task_rename)(void*, struct task_struct*, const char*);
 
@@ -159057,25 +158658,25 @@ typedef void (*btf_trace_tasklet_entry)(void*, struct tasklet_struct*, void*);
 typedef void (*btf_trace_tasklet_exit)(void*, struct tasklet_struct*, void*);
 
 typedef void (*btf_trace_tcp_ao_handshake_failure)(
-    void*, const struct sock*, const struct sk_buff*, const __u8, const __u8, const __u8);
+ void*, const struct sock*, const struct sk_buff*, const __u8, const __u8, const __u8);
 
 typedef void (*btf_trace_tcp_ao_key_not_found)(
-    void*, const struct sock*, const struct sk_buff*, const __u8, const __u8, const __u8);
+ void*, const struct sock*, const struct sk_buff*, const __u8, const __u8, const __u8);
 
 typedef void (*btf_trace_tcp_ao_mismatch)(
-    void*, const struct sock*, const struct sk_buff*, const __u8, const __u8, const __u8);
+ void*, const struct sock*, const struct sk_buff*, const __u8, const __u8, const __u8);
 
 typedef void (*btf_trace_tcp_ao_rcv_sne_update)(void*, const struct sock*, __u32);
 
 typedef void (*btf_trace_tcp_ao_rnext_request)(
-    void*, const struct sock*, const struct sk_buff*, const __u8, const __u8, const __u8);
+ void*, const struct sock*, const struct sk_buff*, const __u8, const __u8, const __u8);
 
 typedef void (*btf_trace_tcp_ao_snd_sne_update)(void*, const struct sock*, __u32);
 
 typedef void (*btf_trace_tcp_ao_synack_no_key)(void*, const struct sock*, const __u8, const __u8);
 
 typedef void (*btf_trace_tcp_ao_wrong_maclen)(
-    void*, const struct sock*, const struct sk_buff*, const __u8, const __u8, const __u8);
+ void*, const struct sock*, const struct sk_buff*, const __u8, const __u8, const __u8);
 
 typedef void (*btf_trace_tcp_bad_csum)(void*, const struct sk_buff*);
 
@@ -159101,19 +158702,14 @@ typedef void (*btf_trace_tcp_receive_reset)(void*, struct sock*);
 
 typedef void (*btf_trace_tcp_retransmit_skb)(void*, const struct sock*, const struct sk_buff*);
 
-typedef void (*btf_trace_tcp_retransmit_synack)(void*,
-                                                const struct sock*,
-                                                const struct request_sock*);
+typedef void (*btf_trace_tcp_retransmit_synack)(
+ void*, const struct sock*, const struct request_sock*);
 
-typedef void (*btf_trace_tcp_send_reset)(void*,
-                                         const struct sock*,
-                                         const struct sk_buff*,
-                                         const enum sk_rst_reason);
+typedef void (*btf_trace_tcp_send_reset)(
+ void*, const struct sock*, const struct sk_buff*, const enum sk_rst_reason);
 
-typedef void (*btf_trace_test_pages_isolated)(void*,
-                                              long unsigned int,
-                                              long unsigned int,
-                                              long unsigned int);
+typedef void (*btf_trace_test_pages_isolated)(
+ void*, long unsigned int, long unsigned int, long unsigned int);
 
 typedef void (*btf_trace_thermal_apic_entry)(void*, int);
 
@@ -159122,23 +158718,21 @@ typedef void (*btf_trace_thermal_apic_exit)(void*, int);
 typedef void (*btf_trace_thermal_power_actor)(void*, struct thermal_zone_device*, int, u32, u32);
 
 typedef void (*btf_trace_thermal_power_allocator)(
-    void*, struct thermal_zone_device*, u32, u32, int, u32, u32, int, s32);
+ void*, struct thermal_zone_device*, u32, u32, int, u32, u32, int, s32);
 
 typedef void (*btf_trace_thermal_power_allocator_pid)(
-    void*, struct thermal_zone_device*, s32, s32, s64, s64, s64, s32);
+ void*, struct thermal_zone_device*, s32, s32, s64, s64, s64, s32);
 
 typedef void (*btf_trace_thermal_power_devfreq_get_power)(
-    void*, struct thermal_cooling_device*, struct devfreq_dev_status*, long unsigned int, u32);
+ void*, struct thermal_cooling_device*, struct devfreq_dev_status*, long unsigned int, u32);
 
 typedef void (*btf_trace_thermal_power_devfreq_limit)(
-    void*, struct thermal_cooling_device*, long unsigned int, long unsigned int, u32);
+ void*, struct thermal_cooling_device*, long unsigned int, long unsigned int, u32);
 
 typedef void (*btf_trace_thermal_temperature)(void*, struct thermal_zone_device*);
 
-typedef void (*btf_trace_thermal_zone_trip)(void*,
-                                            struct thermal_zone_device*,
-                                            int,
-                                            enum thermal_trip_type);
+typedef void (*btf_trace_thermal_zone_trip)(
+ void*, struct thermal_zone_device*, int, enum thermal_trip_type);
 
 typedef void (*btf_trace_thread_noise)(void*, struct task_struct*, u64, u64);
 
@@ -159188,22 +158782,18 @@ typedef void (*btf_trace_tmigr_cpu_online)(void*, struct tmigr_cpu*);
 
 typedef void (*btf_trace_tmigr_group_set)(void*, struct tmigr_group*);
 
-typedef void (*btf_trace_tmigr_group_set_cpu_active)(void*,
-                                                     struct tmigr_group*,
-                                                     union tmigr_state,
-                                                     u32);
+typedef void (*btf_trace_tmigr_group_set_cpu_active)(
+ void*, struct tmigr_group*, union tmigr_state, u32);
 
-typedef void (*btf_trace_tmigr_group_set_cpu_inactive)(void*,
-                                                       struct tmigr_group*,
-                                                       union tmigr_state,
-                                                       u32);
+typedef void (*btf_trace_tmigr_group_set_cpu_inactive)(
+ void*, struct tmigr_group*, union tmigr_state, u32);
 
 typedef void (*btf_trace_tmigr_handle_remote)(void*, struct tmigr_group*);
 
 typedef void (*btf_trace_tmigr_handle_remote_cpu)(void*, struct tmigr_cpu*);
 
 typedef void (*btf_trace_tmigr_update_events)(
-    void*, struct tmigr_group*, struct tmigr_group*, union tmigr_state, union tmigr_state, u64);
+ void*, struct tmigr_group*, struct tmigr_group*, union tmigr_state, union tmigr_state, u64);
 
 typedef void (*btf_trace_track_foreign_dirty)(void*, struct folio*, struct bdi_writeback*);
 
@@ -159222,10 +158812,10 @@ typedef void (*btf_trace_vector_alloc)(void*, unsigned int, unsigned int, bool, 
 typedef void (*btf_trace_vector_alloc_managed)(void*, unsigned int, unsigned int, int);
 
 typedef void (*btf_trace_vector_clear)(
-    void*, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int);
+ void*, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int);
 
 typedef void (*btf_trace_vector_config)(
-    void*, unsigned int, unsigned int, unsigned int, unsigned int);
+ void*, unsigned int, unsigned int, unsigned int, unsigned int);
 
 typedef void (*btf_trace_vector_deactivate)(void*, unsigned int, bool, bool, bool);
 
@@ -159240,14 +158830,12 @@ typedef void (*btf_trace_vector_setup)(void*, unsigned int, bool, int);
 typedef void (*btf_trace_vector_teardown)(void*, unsigned int, bool, bool);
 
 typedef void (*btf_trace_vector_update)(
-    void*, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int);
+ void*, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int);
 
 typedef void (*btf_trace_vm_unmapped_area)(void*, long unsigned int, struct vm_unmapped_area_info*);
 
-typedef void (*btf_trace_vma_mas_szero)(void*,
-                                        struct maple_tree*,
-                                        long unsigned int,
-                                        long unsigned int);
+typedef void (*btf_trace_vma_mas_szero)(
+ void*, struct maple_tree*, long unsigned int, long unsigned int);
 
 typedef void (*btf_trace_vma_store)(void*, struct maple_tree*, struct vm_area_struct*);
 
@@ -159272,16 +158860,16 @@ typedef void (*btf_trace_wbt_lat)(void*, struct backing_dev_info*, long unsigned
 typedef void (*btf_trace_wbt_stat)(void*, struct backing_dev_info*, struct blk_rq_stat*);
 
 typedef void (*btf_trace_wbt_step)(void*,
-                                   struct backing_dev_info*,
-                                   const char*,
-                                   int,
-                                   long unsigned int,
-                                   unsigned int,
-                                   unsigned int,
-                                   unsigned int);
+ struct backing_dev_info*,
+ const char*,
+ int,
+ long unsigned int,
+ unsigned int,
+ unsigned int,
+ unsigned int);
 
 typedef void (*btf_trace_wbt_timer)(
-    void*, struct backing_dev_info*, unsigned int, int, unsigned int);
+ void*, struct backing_dev_info*, unsigned int, int, unsigned int);
 
 typedef void (*btf_trace_workqueue_activate_work)(void*, struct work_struct*);
 
@@ -159289,10 +158877,8 @@ typedef void (*btf_trace_workqueue_execute_end)(void*, struct work_struct*, work
 
 typedef void (*btf_trace_workqueue_execute_start)(void*, struct work_struct*);
 
-typedef void (*btf_trace_workqueue_queue_work)(void*,
-                                               int,
-                                               struct pool_workqueue*,
-                                               struct work_struct*);
+typedef void (*btf_trace_workqueue_queue_work)(
+ void*, int, struct pool_workqueue*, struct work_struct*);
 
 typedef void (*btf_trace_write_msr)(void*, unsigned int, u64, int);
 
@@ -159319,19 +158905,15 @@ typedef void (*btf_trace_writeback_pages_written)(void*, long int);
 typedef void (*btf_trace_writeback_queue)(void*, struct bdi_writeback*, struct wb_writeback_work*);
 
 typedef void (*btf_trace_writeback_queue_io)(
-    void*, struct bdi_writeback*, struct wb_writeback_work*, long unsigned int, int);
+ void*, struct bdi_writeback*, struct wb_writeback_work*, long unsigned int, int);
 
 typedef void (*btf_trace_writeback_sb_inodes_requeue)(void*, struct inode*);
 
-typedef void (*btf_trace_writeback_single_inode)(void*,
-                                                 struct inode*,
-                                                 struct writeback_control*,
-                                                 long unsigned int);
+typedef void (*btf_trace_writeback_single_inode)(
+ void*, struct inode*, struct writeback_control*, long unsigned int);
 
-typedef void (*btf_trace_writeback_single_inode_start)(void*,
-                                                       struct inode*,
-                                                       struct writeback_control*,
-                                                       long unsigned int);
+typedef void (*btf_trace_writeback_single_inode_start)(
+ void*, struct inode*, struct writeback_control*, long unsigned int);
 
 typedef void (*btf_trace_writeback_start)(void*, struct bdi_writeback*, struct wb_writeback_work*);
 
@@ -159341,13 +158923,11 @@ typedef void (*btf_trace_writeback_wake_background)(void*, struct bdi_writeback*
 
 typedef void (*btf_trace_writeback_write_inode)(void*, struct inode*, struct writeback_control*);
 
-typedef void (*btf_trace_writeback_write_inode_start)(void*,
-                                                      struct inode*,
-                                                      struct writeback_control*);
+typedef void (*btf_trace_writeback_write_inode_start)(
+ void*, struct inode*, struct writeback_control*);
 
-typedef void (*btf_trace_writeback_written)(void*,
-                                            struct bdi_writeback*,
-                                            struct wb_writeback_work*);
+typedef void (*btf_trace_writeback_written)(
+ void*, struct bdi_writeback*, struct wb_writeback_work*);
 
 typedef void (*btf_trace_x86_fpu_after_restore)(void*, struct fpu*);
 
@@ -159380,58 +158960,56 @@ typedef void (*btf_trace_xdp_bulk_tx)(void*, const struct net_device*, int, int,
 typedef void (*btf_trace_xdp_cpumap_enqueue)(void*, int, unsigned int, unsigned int, int);
 
 typedef void (*btf_trace_xdp_cpumap_kthread)(
-    void*, int, unsigned int, unsigned int, int, struct xdp_cpumap_stats*);
+ void*, int, unsigned int, unsigned int, int, struct xdp_cpumap_stats*);
 
 typedef void (*btf_trace_xdp_devmap_xmit)(
-    void*, const struct net_device*, const struct net_device*, int, int, int);
+ void*, const struct net_device*, const struct net_device*, int, int, int);
 
-typedef void (*btf_trace_xdp_exception)(void*,
-                                        const struct net_device*,
-                                        const struct bpf_prog*,
-                                        u32);
+typedef void (*btf_trace_xdp_exception)(
+ void*, const struct net_device*, const struct bpf_prog*, u32);
 
 typedef void (*btf_trace_xdp_redirect)(void*,
-                                       const struct net_device*,
-                                       const struct bpf_prog*,
-                                       const void*,
-                                       int,
-                                       enum bpf_map_type,
-                                       u32,
-                                       u32);
+ const struct net_device*,
+ const struct bpf_prog*,
+ const void*,
+ int,
+ enum bpf_map_type,
+ u32,
+ u32);
 
 typedef void (*btf_trace_xdp_redirect_err)(void*,
-                                           const struct net_device*,
-                                           const struct bpf_prog*,
-                                           const void*,
-                                           int,
-                                           enum bpf_map_type,
-                                           u32,
-                                           u32);
+ const struct net_device*,
+ const struct bpf_prog*,
+ const void*,
+ int,
+ enum bpf_map_type,
+ u32,
+ u32);
 
 typedef void (*btf_trace_xdp_redirect_map)(void*,
-                                           const struct net_device*,
-                                           const struct bpf_prog*,
-                                           const void*,
-                                           int,
-                                           enum bpf_map_type,
-                                           u32,
-                                           u32);
+ const struct net_device*,
+ const struct bpf_prog*,
+ const void*,
+ int,
+ enum bpf_map_type,
+ u32,
+ u32);
 
 typedef void (*btf_trace_xdp_redirect_map_err)(void*,
-                                               const struct net_device*,
-                                               const struct bpf_prog*,
-                                               const void*,
-                                               int,
-                                               enum bpf_map_type,
-                                               u32,
-                                               u32);
+ const struct net_device*,
+ const struct bpf_prog*,
+ const void*,
+ int,
+ enum bpf_map_type,
+ u32,
+ u32);
 
 typedef void (*btf_trace_xen_cpu_load_idt)(void*, const struct desc_ptr*);
 
 typedef void (*btf_trace_xen_cpu_set_ldt)(void*, const void*, unsigned int);
 
 typedef void (*btf_trace_xen_cpu_write_gdt_entry)(
-    void*, struct desc_struct*, int, const void*, int);
+ void*, struct desc_struct*, int, const void*, int);
 
 typedef void (*btf_trace_xen_cpu_write_idt_entry)(void*, gate_desc*, int, const gate_desc*);
 
@@ -159445,10 +159023,8 @@ typedef void (*btf_trace_xen_mc_entry)(void*, struct multicall_entry*, unsigned 
 
 typedef void (*btf_trace_xen_mc_entry_alloc)(void*, size_t);
 
-typedef void (*btf_trace_xen_mc_extend_args)(void*,
-                                             long unsigned int,
-                                             size_t,
-                                             enum xen_mc_extend_args);
+typedef void (*btf_trace_xen_mc_extend_args)(
+ void*, long unsigned int, size_t, enum xen_mc_extend_args);
 
 typedef void (*btf_trace_xen_mc_flush)(void*, unsigned int, unsigned int, unsigned int);
 
@@ -159457,10 +159033,10 @@ typedef void (*btf_trace_xen_mc_flush_reason)(void*, enum xen_mc_flush_reason);
 typedef void (*btf_trace_xen_mc_issue)(void*, enum xen_lazy_mode);
 
 typedef void (*btf_trace_xen_mmu_alloc_ptpage)(
-    void*, struct mm_struct*, long unsigned int, unsigned int, bool);
+ void*, struct mm_struct*, long unsigned int, unsigned int, bool);
 
 typedef void (*btf_trace_xen_mmu_flush_tlb_multi)(
-    void*, const struct cpumask*, struct mm_struct*, long unsigned int, long unsigned int);
+ void*, const struct cpumask*, struct mm_struct*, long unsigned int, long unsigned int);
 
 typedef void (*btf_trace_xen_mmu_flush_tlb_one_user)(void*, long unsigned int);
 
@@ -159469,10 +159045,10 @@ typedef void (*btf_trace_xen_mmu_pgd_pin)(void*, struct mm_struct*, pgd_t*);
 typedef void (*btf_trace_xen_mmu_pgd_unpin)(void*, struct mm_struct*, pgd_t*);
 
 typedef void (*btf_trace_xen_mmu_ptep_modify_prot_commit)(
-    void*, struct mm_struct*, long unsigned int, pte_t*, pte_t);
+ void*, struct mm_struct*, long unsigned int, pte_t*, pte_t);
 
 typedef void (*btf_trace_xen_mmu_ptep_modify_prot_start)(
-    void*, struct mm_struct*, long unsigned int, pte_t*, pte_t);
+ void*, struct mm_struct*, long unsigned int, pte_t*, pte_t);
 
 typedef void (*btf_trace_xen_mmu_release_ptpage)(void*, long unsigned int, unsigned int, bool);
 
@@ -159490,10 +159066,8 @@ typedef void (*btf_trace_xhci_add_endpoint)(void*, struct xhci_ep_ctx*);
 
 typedef void (*btf_trace_xhci_address_ctrl_ctx)(void*, struct xhci_input_control_ctx*);
 
-typedef void (*btf_trace_xhci_address_ctx)(void*,
-                                           struct xhci_hcd*,
-                                           struct xhci_container_ctx*,
-                                           unsigned int);
+typedef void (*btf_trace_xhci_address_ctx)(
+ void*, struct xhci_hcd*, struct xhci_container_ctx*, unsigned int);
 
 typedef void (*btf_trace_xhci_alloc_dev)(void*, struct xhci_slot_ctx*);
 
@@ -159509,22 +159083,16 @@ typedef void (*btf_trace_xhci_dbc_alloc_request)(void*, struct dbc_request*);
 
 typedef void (*btf_trace_xhci_dbc_free_request)(void*, struct dbc_request*);
 
-typedef void (*btf_trace_xhci_dbc_gadget_ep_queue)(void*,
-                                                   struct xhci_ring*,
-                                                   struct xhci_generic_trb*,
-                                                   dma_addr_t);
+typedef void (*btf_trace_xhci_dbc_gadget_ep_queue)(
+ void*, struct xhci_ring*, struct xhci_generic_trb*, dma_addr_t);
 
 typedef void (*btf_trace_xhci_dbc_giveback_request)(void*, struct dbc_request*);
 
-typedef void (*btf_trace_xhci_dbc_handle_event)(void*,
-                                                struct xhci_ring*,
-                                                struct xhci_generic_trb*,
-                                                dma_addr_t);
+typedef void (*btf_trace_xhci_dbc_handle_event)(
+ void*, struct xhci_ring*, struct xhci_generic_trb*, dma_addr_t);
 
-typedef void (*btf_trace_xhci_dbc_handle_transfer)(void*,
-                                                   struct xhci_ring*,
-                                                   struct xhci_generic_trb*,
-                                                   dma_addr_t);
+typedef void (*btf_trace_xhci_dbc_handle_transfer)(
+ void*, struct xhci_ring*, struct xhci_generic_trb*, dma_addr_t);
 
 typedef void (*btf_trace_xhci_dbc_queue_request)(void*, struct dbc_request*);
 
@@ -159564,28 +159132,21 @@ typedef void (*btf_trace_xhci_handle_cmd_set_deq)(void*, struct xhci_slot_ctx*);
 
 typedef void (*btf_trace_xhci_handle_cmd_set_deq_ep)(void*, struct xhci_ep_ctx*);
 
-typedef void (*btf_trace_xhci_handle_cmd_set_deq_stream)(void*,
-                                                         struct xhci_stream_info*,
-                                                         unsigned int);
+typedef void (*btf_trace_xhci_handle_cmd_set_deq_stream)(
+ void*, struct xhci_stream_info*, unsigned int);
 
 typedef void (*btf_trace_xhci_handle_cmd_stop_ep)(void*, struct xhci_ep_ctx*);
 
-typedef void (*btf_trace_xhci_handle_command)(void*,
-                                              struct xhci_ring*,
-                                              struct xhci_generic_trb*,
-                                              dma_addr_t);
+typedef void (*btf_trace_xhci_handle_command)(
+ void*, struct xhci_ring*, struct xhci_generic_trb*, dma_addr_t);
 
-typedef void (*btf_trace_xhci_handle_event)(void*,
-                                            struct xhci_ring*,
-                                            struct xhci_generic_trb*,
-                                            dma_addr_t);
+typedef void (*btf_trace_xhci_handle_event)(
+ void*, struct xhci_ring*, struct xhci_generic_trb*, dma_addr_t);
 
 typedef void (*btf_trace_xhci_handle_port_status)(void*, struct xhci_port*, u32);
 
-typedef void (*btf_trace_xhci_handle_transfer)(void*,
-                                               struct xhci_ring*,
-                                               struct xhci_generic_trb*,
-                                               dma_addr_t);
+typedef void (*btf_trace_xhci_handle_transfer)(
+ void*, struct xhci_ring*, struct xhci_generic_trb*, dma_addr_t);
 
 typedef void (*btf_trace_xhci_hub_status_data)(void*, struct xhci_port*, u32);
 
@@ -159593,10 +159154,8 @@ typedef void (*btf_trace_xhci_inc_deq)(void*, struct xhci_ring*);
 
 typedef void (*btf_trace_xhci_inc_enq)(void*, struct xhci_ring*);
 
-typedef void (*btf_trace_xhci_queue_trb)(void*,
-                                         struct xhci_ring*,
-                                         struct xhci_generic_trb*,
-                                         dma_addr_t);
+typedef void (*btf_trace_xhci_queue_trb)(
+ void*, struct xhci_ring*, struct xhci_generic_trb*, dma_addr_t);
 
 typedef void (*btf_trace_xhci_ring_alloc)(void*, struct xhci_ring*);
 
@@ -159646,15 +159205,15 @@ typedef int (*device_match_t)(struct device*, const void*);
 
 typedef int devlink_chunk_fill_t(void*, u8*, u32, u64, struct netlink_ext_ack*);
 
-typedef int
-devlink_nl_dump_one_func_t(struct sk_buff*, struct devlink*, struct netlink_callback*, int);
+typedef int devlink_nl_dump_one_func_t(
+ struct sk_buff*, struct devlink*, struct netlink_callback*, int);
 
 typedef int (*dr_match_t)(struct device*, void*, void*);
 
 typedef int drm_ioctl_compat_t(struct file*, unsigned int, long unsigned int);
 
 typedef bool (*drm_vblank_get_scanout_position_func)(
-    struct drm_crtc*, bool, int*, int*, ktime_t*, ktime_t*, const struct drm_display_mode*);
+ struct drm_crtc*, bool, int*, int*, ktime_t*, ktime_t*, const struct drm_display_mode*);
 
 typedef int (*dummy_ops_test_ret_fn)(struct bpf_dummy_ops_state*, ...);
 
@@ -159669,7 +159228,7 @@ typedef void (*ethnl_notify_handler_t)(struct net_device*, unsigned int, const v
 typedef void (*exitcall_t)(void);
 
 typedef int (*ext4_mballoc_query_range_fn)(
-    struct super_block*, ext4_group_t, ext4_grpblk_t, ext4_grpblk_t, void*);
+ struct super_block*, ext4_group_t, ext4_grpblk_t, ext4_grpblk_t, void*);
 
 typedef void ext4_update_sb_callback(struct ext4_super_block*, const void*);
 
@@ -159700,10 +159259,10 @@ typedef bool (*i8042_filter_t)(unsigned char, unsigned char, struct serio*, void
 typedef void (*idtentry_t)(struct pt_regs*);
 
 typedef u32 inet6_ehashfn_t(
-    const struct net*, const struct in6_addr*, const u16, const struct in6_addr*, const __be16);
+ const struct net*, const struct in6_addr*, const u16, const struct in6_addr*, const __be16);
 
-typedef u32
-inet_ehashfn_t(const struct net*, const __be32, const __u16, const __be32, const __be16);
+typedef u32 inet_ehashfn_t(
+ const struct net*, const __be32, const __u16, const __be32, const __be16);
 
 typedef int (*initxattrs)(struct inode*, const struct xattr*, void*);
 
@@ -159720,7 +159279,7 @@ typedef size_t (*iov_ustep_f)(void*, size_t, size_t, void*, void*);
 typedef int (*iova_bitmap_fn_t)(struct iova_bitmap*, long unsigned int, size_t, void*);
 
 typedef void ip6_icmp_send_t(
-    struct sk_buff*, u8, u8, __u32, const struct in6_addr*, const struct inet6_skb_parm*);
+ struct sk_buff*, u8, u8, __u32, const struct in6_addr*, const struct inet6_skb_parm*);
 
 typedef void (*irq_write_msi_msg_t)(struct msi_desc*, struct msi_msg*);
 
@@ -159751,7 +159310,7 @@ typedef int (*objpool_init_obj_cb)(void*, void*);
 typedef void (*online_page_callback_t)(struct page*, unsigned int);
 
 typedef int (*parse_pred_fn)(
-    const char*, void*, int, struct filter_parse_error*, struct filter_pred**);
+ const char*, void*, int, struct filter_parse_error*, struct filter_pred**);
 
 typedef int (*parse_unknown_fn)(char*, char*, const char*, void*);
 
@@ -159772,7 +159331,7 @@ typedef int (*pm_callback_t)(struct device*);
 typedef int (*pm_cpu_match_t)(const struct x86_cpu_id*);
 
 typedef struct rt6_info* (*pol_lookup_t)(
-    struct net*, struct fib6_table*, struct flowi6*, const struct sk_buff*, int);
+ struct net*, struct fib6_table*, struct flowi6*, const struct sk_buff*, int);
 
 typedef int (*pp_nl_fill_cb)(struct sk_buff*, const struct page_pool*, const struct genl_info*);
 
@@ -159783,7 +159342,7 @@ typedef int (*pte_fn_t)(pte_t*, long unsigned int, void*);
 typedef int read_block_fn(void*, u8*, unsigned int, size_t);
 
 typedef long unsigned int relocate_kernel_fn(
-    long unsigned int, long unsigned int, long unsigned int, unsigned int, unsigned int);
+ long unsigned int, long unsigned int, long unsigned int, unsigned int, unsigned int);
 
 typedef void (*rethook_handler_t)(struct rethook_node*, void*, long unsigned int, struct pt_regs*);
 
@@ -159799,17 +159358,15 @@ typedef int (*sendmsg_func)(struct sock*, struct msghdr*);
 
 typedef void (*serial8250_isa_config_fn)(int, struct uart_port*, u32*);
 
-typedef int (*set_callee_state_fn)(struct bpf_verifier_env*,
-                                   struct bpf_func_state*,
-                                   struct bpf_func_state*,
-                                   int);
+typedef int (*set_callee_state_fn)(
+ struct bpf_verifier_env*, struct bpf_func_state*, struct bpf_func_state*, int);
 
 typedef void (*set_debug_port_t)(int);
 
 typedef void (*set_params_cb)(struct dwc2_hsotg*);
 
 typedef void (*setup_fn)(
-    struct perf_event*, struct pt_regs*, void*, struct perf_sample_data*, struct pt_regs*);
+ struct perf_event*, struct pt_regs*, void*, struct perf_sample_data*, struct pt_regs*);
 
 typedef struct scatterlist* sg_alloc_fn(unsigned int, gfp_t);
 
@@ -159864,7 +159421,7 @@ typedef int (*walk_hmem_fn)(struct device*, int, const struct resource*);
 typedef int (*walk_memory_groups_func_t)(struct memory_group*, void*);
 
 typedef int (*wext_ioctl_func)(
-    struct net_device*, struct iwreq*, unsigned int, struct iw_request_info*, iw_handler);
+ struct net_device*, struct iwreq*, unsigned int, struct iw_request_info*, iw_handler);
 
 typedef int (*writepage_t)(struct folio*, struct writeback_control*, void*);
 
