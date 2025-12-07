@@ -7,6 +7,9 @@
 #include <boost/json.hpp>
 #include <array>
 #include <list>
+#include <map>
+#include <set>
+#include <unordered_map>
 
 // =============================================================================
 // Type Aliases for Reduced Verbosity
@@ -16,6 +19,11 @@
  * @brief Byte vector type for binary data (commonly used with Base64 encoding)
  */
 using ByteVector = std::vector<std::byte>;
+
+/**
+ * @brief Byte buffer type for CBOR serialization (vector of unsigned char)
+ */
+using ByteBuffer = std::vector<unsigned char>;
 
 /**
  * @brief Byte array type alias (fixed-size array)
@@ -34,6 +42,8 @@ using Int64 = std::int64_t;
 using UInt64 = std::uint64_t;
 using Double = double;
 using Bool = bool;
+using UChar = unsigned char;
+using Byte = std::byte;
 
 /**
  * @brief Generic vector type alias
@@ -49,6 +59,11 @@ template <typename T, std::size_t N> using Array = std::array<T, N>;
  * @brief Generic list type alias (doubly-linked list)
  */
 template <typename T> using List = std::list<T>;
+
+/**
+ * @brief Generic set type alias (ordered set with unique elements)
+ */
+template <typename T> using Set = std::set<T>;
 
 /**
  * @brief Map type alias (ordered map with string keys)
@@ -169,6 +184,23 @@ template <typename T> struct opt<SharedPtr<T>> {
 template <typename T> struct opt<const T> : opt<T> {};
 
 template <typename T> using opt_t = typename opt<T>::type;
+
+// =============================================================================
+// Compile-time Utilities
+// =============================================================================
+
+/**
+ * @brief Compile-time for-each over integer sequence
+ * @tparam T Integer type
+ * @tparam S Sequence of integers
+ * @tparam F Function to call for each index
+ * @param seq Integer sequence
+ * @param f Function to execute
+ */
+template <typename T, T... S, typename F>
+constexpr void for_each(std::integer_sequence<T, S...>, F&& f) {
+  (static_cast<void>(f(std::integral_constant<T, S>{})), ...);
+}
 
 // =============================================================================
 // JSON Value Utilities

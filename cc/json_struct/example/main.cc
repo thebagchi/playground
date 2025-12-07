@@ -2,6 +2,7 @@
 #include <iostream>
 #include <tuple>
 
+#include "cbor.h"
 #include "json.h"
 #include "typing.h"
 
@@ -698,6 +699,103 @@ template <> struct json::STRUCT<ApiResponse> {
    json::prop(&ApiResponse::status_, "status"));
 };
 
+void encode_decode_cbor() {
+  try {
+    std::cout << "\n=== CBOR Serialization Examples ===" << std::endl;
+
+    // Test 1: Simple JSON object to CBOR
+    std::cout << "\n1. Simple JSON to CBOR:" << std::endl;
+    boost::json::value simple_json = { { "name", "Alice" }, { "age", 30 }, { "active", true } };
+    std::vector<unsigned char> cbor_data;
+
+    // Serialize to CBOR
+    cbor::serialize_cbor_value(simple_json, cbor_data);
+    std::cout << "CBOR bytes (" << cbor_data.size() << "): ";
+    for (auto byte : cbor_data) {
+      std::cout << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(byte) << " ";
+    }
+    std::cout << std::dec << std::endl;
+
+    // Parse back from CBOR
+    boost::json::value parsed_json;
+    const unsigned char* first = cbor_data.data();
+    const unsigned char* last = first + cbor_data.size();
+    cbor::parse_cbor_value(first, last, parsed_json);
+    std::cout << "Parsed JSON: " << parsed_json << std::endl;
+    std::cout << "Match: " << (simple_json == parsed_json ? "Yes" : "No") << std::endl;
+
+    // Test 2: Array of numbers
+    std::cout << "\n2. Array of numbers to CBOR:" << std::endl;
+    boost::json::value array_json = { 1, 2, 3, 4, 5 };
+    cbor_data.clear();
+
+    cbor::serialize_cbor_value(array_json, cbor_data);
+    std::cout << "CBOR bytes (" << cbor_data.size() << "): ";
+    for (auto byte : cbor_data) {
+      std::cout << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(byte) << " ";
+    }
+    std::cout << std::dec << std::endl;
+
+    parsed_json = nullptr;
+    first = cbor_data.data();
+    last = first + cbor_data.size();
+    cbor::parse_cbor_value(first, last, parsed_json);
+    std::cout << "Parsed JSON: " << parsed_json << std::endl;
+    std::cout << "Match: " << (array_json == parsed_json ? "Yes" : "No") << std::endl;
+
+    // Test 3: Nested object
+    std::cout << "\n3. Nested object to CBOR:" << std::endl;
+    boost::json::value nested_json = { { "user",
+                                        { { "name", "Bob" }, { "email", "bob@example.com" } } },
+      { "score", 95.5 },
+      { "tags", { "cpp", "json", "cbor" } } };
+    cbor_data.clear();
+
+    cbor::serialize_cbor_value(nested_json, cbor_data);
+    std::cout << "CBOR bytes (" << cbor_data.size() << "): ";
+    for (auto byte : cbor_data) {
+      std::cout << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(byte) << " ";
+    }
+    std::cout << std::dec << std::endl;
+
+    parsed_json = nullptr;
+    first = cbor_data.data();
+    last = first + cbor_data.size();
+    cbor::parse_cbor_value(first, last, parsed_json);
+    std::cout << "Parsed JSON: " << parsed_json << std::endl;
+    std::cout << "Match: " << (nested_json == parsed_json ? "Yes" : "No") << std::endl;
+
+    // Test 4: Various data types
+    std::cout << "\n4. Various data types to CBOR:" << std::endl;
+    boost::json::value types_json = { { "null", nullptr },
+      { "boolean", true },
+      { "integer", 42 },
+      { "negative", -100 },
+      { "double", 3.14159 },
+      { "string", "Hello CBOR!" },
+      { "empty_array", boost::json::array() },
+      { "empty_object", boost::json::object() } };
+    cbor_data.clear();
+
+    cbor::serialize_cbor_value(types_json, cbor_data);
+    std::cout << "CBOR bytes (" << cbor_data.size() << "): ";
+    for (auto byte : cbor_data) {
+      std::cout << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(byte) << " ";
+    }
+    std::cout << std::dec << std::endl;
+
+    parsed_json = nullptr;
+    first = cbor_data.data();
+    last = first + cbor_data.size();
+    cbor::parse_cbor_value(first, last, parsed_json);
+    std::cout << "Parsed JSON: " << parsed_json << std::endl;
+    std::cout << "Match: " << (types_json == parsed_json ? "Yes" : "No") << std::endl;
+
+  } catch (const std::exception& e) {
+    std::cout << "Error in encode_decode_cbor: " << e.what() << std::endl;
+  }
+}
+
 void encode_decode_enum() {
   try {
     std::cout << "\n=== Enum Serialization Examples ===" << std::endl;
@@ -786,6 +884,7 @@ int main(int argc, char* argv[]) {
     encode_decode_byte_array_fixed();
     encode_decode_arbitrary();
     encode_decode_enum();
+    encode_decode_cbor();
   } catch (const std::exception& e) {
     std::cerr << "Error in main: " << e.what() << std::endl;
     return 1;

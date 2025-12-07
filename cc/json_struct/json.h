@@ -89,12 +89,12 @@ namespace json {
    * @param member Pointer to member variable
    * @param name JSON field name
    */
-    constexpr Props(T C::*member, std::string_view name) : member_(member), name_(name) {
+    constexpr Props(T C::* member, std::string_view name) : member_(member), name_(name) {
       // Do Nothing ...
     }
 
     using Type = T;                             ///< The smart pointer type
-    T C::*member_;                              ///< Pointer to member variable
+    T C::* member_;                             ///< Pointer to member variable
     std::string_view name_;                     ///< JSON field name
     static constexpr bool nullable_ = Nullable; ///< Whether field can be null
     static constexpr bool required_ = Required; ///< Whether field is required
@@ -116,7 +116,7 @@ namespace json {
  * @return Props descriptor (optional field)
  */
   template <typename C, typename T>
-  constexpr Props<C, T, false, false> prop(T C::*member, std::string_view name) {
+  constexpr Props<C, T, false, false> prop(T C::* member, std::string_view name) {
     return Props<C, T, false, false>{ member, name };
   }
 
@@ -130,7 +130,7 @@ namespace json {
  * @return Props descriptor (nullable field)
  */
   template <typename C, typename T>
-  constexpr Props<C, T, true, false> prop(T C::*member, std::string_view name, nullable_tag) {
+  constexpr Props<C, T, true, false> prop(T C::* member, std::string_view name, nullable_tag) {
     return Props<C, T, true, false>{ member, name };
   }
 
@@ -144,7 +144,7 @@ namespace json {
  * @return Props descriptor (required field)
  */
   template <typename C, typename T>
-  constexpr Props<C, T, false, true> prop(T C::*member, std::string_view name, required_tag) {
+  constexpr Props<C, T, false, true> prop(T C::* member, std::string_view name, required_tag) {
     return Props<C, T, false, true>{ member, name };
   }
 
@@ -160,7 +160,7 @@ namespace json {
  */
   template <typename C, typename T>
   constexpr Props<C, T, true, true> prop(
-   T C::*member, std::string_view name, nullable_tag, required_tag) {
+   T C::* member, std::string_view name, nullable_tag, required_tag) {
     return Props<C, T, true, true>{ member, name };
   }
 
@@ -189,6 +189,12 @@ namespace json {
   template <typename T> struct STRUCT {
     // Default empty properties tuple - should be specialized
     static constexpr auto properties = std::make_tuple();
+
+    // This is a meta class, disallow object creation.
+    STRUCT() = delete;
+    STRUCT(STRUCT const&) = delete;
+    STRUCT(STRUCT&&) = delete;
+    ~STRUCT() = delete;
   };
 
   /**
@@ -226,6 +232,12 @@ namespace json {
     static constexpr EnumEncoding encoding = EnumEncoding::NUMBER;
     static constexpr bool case_insensitive = false;
     static constexpr std::array<std::string_view, 0> names{};
+
+    // This is a meta class, disallow object creation
+    ENUM() = delete;
+    ENUM(ENUM const&) = delete;
+    ENUM(ENUM&&) = delete;
+    ~ENUM() = delete;
   };
 
   // -----------------------------------------------------------------------------
@@ -245,22 +257,6 @@ namespace json {
   // Utility Functions
   // =============================================================================
 
-  /**
- * @brief Compile-time for-each over integer sequence
- * @tparam T Integer type
- * @tparam S Sequence of integers
- * @tparam F Function to call for each index
- * @param seq Integer sequence
- * @param f Function to execute
- */
-  template <typename T, T... S, typename F>
-  constexpr void for_each(std::integer_sequence<T, S...>, F&& f) {
-    (static_cast<void>(f(std::integral_constant<T, S>{})), ...);
-  }
-
-  /**
- * @brief Helper functions to throw field-related runtime errors
- */
   [[noreturn]] inline void throw_field_null_not_nullable(std::string_view field_name) {
     String msg;
     msg.reserve(30 + field_name.size()); // Pre-allocate exact space needed
@@ -324,6 +320,20 @@ namespace json {
 
   [[noreturn]] inline void throw_negative_value_for_uint64() {
     throw std::runtime_error("Negative value cannot be converted to uint64_t");
+  }
+
+  [[noreturn]] inline void throw_invalid_enum_value(std::string_view value) {
+    String msg;
+    msg.reserve(20 + value.size()); // Pre-allocate exact space needed
+    msg.append("Invalid enum value: ").append(value);
+    throw std::runtime_error(std::move(msg));
+  }
+
+  [[noreturn]] inline void throw_internal_error(std::string_view message) {
+    String msg;
+    msg.reserve(16 + message.size()); // Pre-allocate exact space needed
+    msg.append("Internal error: ").append(message);
+    throw std::runtime_error(std::move(msg));
   }
 
   [[noreturn]] inline void throw_array_null() {
@@ -560,6 +570,38 @@ namespace json {
   // =============================================================================
 
   // =============================================================================
+  // Specializations for Raw C Arrays
+  // =============================================================================
+
+  /**
+ * @brief Specialization for Raw C arrays T[N]
+ * @tparam T Element type (must be Int64, UInt64, Double, or Bool)
+ * @tparam N Array size (known at compile time)
+ * @note UChar[N] and Byte[N] have separate specializations for base64 encoding
+ */
+  template <typename T, std::size_t N> struct Write<T[N]> {
+    static_assert(std::is_same_v<T, Int64> || std::is_same_v<T, UInt64> ||
+                   std::is_same_v<T, Double> || std::is_same_v<T, Bool>,
+     "Raw C arrays only support Int64, UInt64, Double, and Bool types. For binary data, use "
+     "UChar[N] or Byte[N] which serialize as base64 strings.");
+
+    inline void operator()(const T (*array)[N], Value* out) const {
+      if (!array) {
+        *out = nullptr;
+        return;
+      }
+      boost::json::array arr(out->storage());
+      arr.reserve(N);
+      for (std::size_t i = 0; i < N; ++i) {
+        Value temp(out->storage());
+        Write<T>{}(&(*array)[i], &temp);
+        arr.emplace_back(std::move(temp));
+      }
+      *out = std::move(arr);
+    }
+  };
+
+  // =============================================================================
   // Specializations for Basic Types
   // =============================================================================
 
@@ -715,6 +757,318 @@ namespace json {
     }
   };
 
+  /**
+ * @brief Specialization for std::vector<T>
+ * @tparam T Element type
+ */
+  template <typename T> struct Write<Vector<T>> {
+    inline void operator()(const Vector<T>* object, Value* out) const {
+      if (!object) {
+        *out = nullptr;
+        return;
+      }
+      boost::json::array arr(out->storage());
+      arr.reserve(object->size());
+      for (const auto& item : *object) {
+        boost::json::value temp(out->storage());
+        Write<T>{}(&item, &temp);
+        arr.emplace_back(std::move(temp));
+      }
+      *out = std::move(arr);
+    }
+  };
+
+  /**
+ * @brief Specialization for std::unique_ptr<T>
+ * @tparam T Element type
+ */
+  template <typename T> struct Write<UniquePtr<T>> {
+    inline void operator()(const UniquePtr<T>* object, Value* out) const {
+      if (*object) [[likely]] {
+        Write<T>{}(object->get(), out);
+      } else {
+        *out = nullptr;
+      }
+    }
+  };
+
+  /**
+ * @brief Specialization for std::shared_ptr<T>
+ * @tparam T Element type
+ */
+  template <typename T> struct Write<SharedPtr<T>> {
+    inline void operator()(const SharedPtr<T>* object, Value* out) const {
+      if (*object) [[likely]] {
+        Write<T>{}(object->get(), out);
+      } else {
+        *out = nullptr;
+      }
+    }
+  };
+
+  /**
+ * @brief Specialization for std::optional<T>
+ * @tparam T Element type
+ */
+  template <typename T> struct Write<Optional<T>> {
+    inline void operator()(const Optional<T>* object, Value* out) const {
+      if (*object) [[likely]] {
+        Write<T>{}(&**object, out);
+      } else {
+        *out = nullptr;
+      }
+    }
+  };
+
+  /**
+ * @brief Specialization for std::map<std::string, T>
+ * @tparam T Value type
+ */
+  template <typename T> struct Write<Map<T>> {
+    inline void operator()(const Map<T>* object, Value* out) const {
+      if (!object) {
+        *out = nullptr;
+        return;
+      }
+      boost::json::object obj(out->storage());
+      obj.reserve(object->size());
+      for (const auto& kv : *object) {
+        boost::json::value temp(out->storage());
+        Write<T>{}(&kv.second, &temp);
+        obj.emplace(kv.first, std::move(temp));
+      }
+      *out = std::move(obj);
+    }
+  };
+
+  /**
+ * @brief Specialization for ByteVector - serialize to Base64 string
+ */
+  template <> struct Write<ByteVector> {
+    inline void operator()(const ByteVector* object, Value* out) const noexcept {
+      if (!object || object->empty()) {
+        *out = nullptr;
+        return;
+      }
+      const std::size_t n = base64::encoded_size(object->size());
+      auto& s = out->emplace_string();
+      s.reserve(n);
+      s.resize(n);
+      base64::encode(const_cast<char*>(s.data()), object->data(), object->size());
+    }
+  };
+
+  /**
+ * @brief Specialization for ByteBuffer - serialize to Base64 string
+ */
+  template <> struct Write<ByteBuffer> {
+    inline void operator()(const ByteBuffer* object, Value* out) const noexcept {
+      if (!object || object->empty()) {
+        *out = nullptr;
+        return;
+      }
+      const std::size_t n = base64::encoded_size(object->size());
+      auto& s = out->emplace_string();
+      s.reserve(n);
+      s.resize(n);
+      base64::encode(const_cast<char*>(s.data()), object->data(), object->size());
+    }
+  };
+
+  /**
+ * @brief Specialization for ByteArray<N> - serialize to Base64 string
+ * @tparam N Array size (known at compile time)
+ */
+  template <std::size_t N> struct Write<ByteArray<N>> {
+    inline void operator()(const ByteArray<N>* object, Value* out) const noexcept {
+      if (!object) {
+        *out = nullptr;
+        return;
+      }
+      const std::size_t n = base64::encoded_size(N);
+      auto& s = out->emplace_string();
+      s.reserve(n);
+      s.resize(n);
+      base64::encode(const_cast<char*>(s.data()), object->data(), N);
+    }
+  };
+
+  /**
+ * @brief Specialization for UChar[N] (unsigned char C-style array) - serialize to Base64 string
+ * @tparam N Array size (known at compile time)
+ */
+  template <std::size_t N> struct Write<UChar[N]> {
+    inline void operator()(const UChar (*array)[N], Value* out) const noexcept {
+      if (!array) {
+        *out = nullptr;
+        return;
+      }
+      const std::size_t n = base64::encoded_size(N);
+      auto& s = out->emplace_string();
+      s.reserve(n);
+      s.resize(n);
+      base64::encode(const_cast<char*>(s.data()), *array, N);
+    }
+  };
+
+  /**
+ * @brief Specialization for Byte[N] (std::byte C-style array) - serialize to Base64 string
+ * @tparam N Array size (known at compile time)
+ */
+  template <std::size_t N> struct Write<Byte[N]> {
+    inline void operator()(const Byte (*array)[N], Value* out) const noexcept {
+      if (!array) {
+        *out = nullptr;
+        return;
+      }
+      const std::size_t n = base64::encoded_size(N);
+      auto& s = out->emplace_string();
+      s.reserve(n);
+      s.resize(n);
+      base64::encode(const_cast<char*>(s.data()), *array, N);
+    }
+  };
+
+  /**
+ * @brief Specialization for std::list<T>
+ * @tparam T Element type
+ */
+  template <typename T> struct Write<List<T>> {
+    inline void operator()(const List<T>* object, Value* out) const {
+      if (!object) {
+        *out = nullptr;
+        return;
+      }
+      boost::json::array arr(out->storage());
+      arr.reserve(object->size());
+      for (const auto& item : *object) {
+        boost::json::value temp(out->storage());
+        Write<T>{}(&item, &temp);
+        arr.emplace_back(std::move(temp));
+      }
+      *out = std::move(arr);
+    }
+  };
+
+  /**
+ * @brief Specialization for std::set<T>
+ * @tparam T Element type
+ */
+  template <typename T> struct Write<Set<T>> {
+    inline void operator()(const Set<T>* object, Value* out) const {
+      if (!object) {
+        *out = nullptr;
+        return;
+      }
+      boost::json::array arr(out->storage());
+      arr.reserve(object->size());
+      for (const auto& item : *object) {
+        boost::json::value temp(out->storage());
+        Write<T>{}(&item, &temp);
+        arr.emplace_back(std::move(temp));
+      }
+      *out = std::move(arr);
+    }
+  };
+
+  /**
+ * @brief Specialization for std::array<T, N>
+ * @tparam T Element type
+ * @tparam N Array size
+ */
+  template <typename T, std::size_t N> struct Write<Array<T, N>> {
+    inline void operator()(const Array<T, N>* object, Value* out) const {
+      if (!object) {
+        *out = nullptr;
+        return;
+      }
+      boost::json::array arr(out->storage());
+      arr.reserve(N);
+      for (const auto& item : *object) {
+        boost::json::value temp(out->storage());
+        Write<T>{}(&item, &temp);
+        arr.emplace_back(std::move(temp));
+      }
+      *out = std::move(arr);
+    }
+  };
+
+  /**
+ * @brief Specialization for std::multimap<std::string, T>
+ * @tparam T Value type
+ */
+  template <typename T> struct Write<MultiMap<T>> {
+    inline void operator()(const MultiMap<T>* object, Value* out) const {
+      boost::json::array arr(out->storage());
+      arr.reserve(object->size());
+      for (const auto& kv : *object) {
+        boost::json::object elem(out->storage());
+        elem["key"] = kv.first;
+        boost::json::value temp(out->storage());
+        Write<T>{}(&kv.second, &temp);
+        elem["value"] = std::move(temp);
+        arr.push_back(std::move(elem));
+      }
+      *out = std::move(arr);
+    }
+  };
+
+  /**
+ * @brief Specialization for std::unordered_map<std::string, T>
+ * @tparam T Value type
+ */
+  template <typename T> struct Write<Dict<T>> {
+    inline void operator()(const Dict<T>* object, Value* out) const {
+      if (!object) {
+        *out = nullptr;
+        return;
+      }
+      boost::json::object obj(out->storage());
+      obj.reserve(object->size());
+      for (const auto& kv : *object) {
+        boost::json::value temp(out->storage());
+        Write<T>{}(&kv.second, &temp);
+        obj.emplace(kv.first, std::move(temp));
+      }
+      *out = std::move(obj);
+    }
+  };
+
+  /**
+ * @brief Specialization for std::unordered_multimap<std::string, T>
+ * @tparam T Value type
+ */
+  template <typename T> struct Write<MultiDict<T>> {
+    inline void operator()(const MultiDict<T>* object, Value* out) const {
+      boost::json::array arr(out->storage());
+      arr.reserve(object->size());
+      for (const auto& kv : *object) {
+        boost::json::object elem(out->storage());
+        elem["key"] = kv.first;
+        boost::json::value temp(out->storage());
+        Write<T>{}(&kv.second, &temp);
+        elem["value"] = std::move(temp);
+        arr.push_back(std::move(elem));
+      }
+      *out = std::move(arr);
+    }
+  };
+
+  /**
+ * @brief Specialization for std::pair<std::string, T>
+ * @tparam T Value type
+ */
+  template <typename T> struct Write<Pair<T>> {
+    inline void operator()(const Pair<T>* object, Value* out) const {
+      boost::json::object obj(out->storage());
+      obj["key"] = object->first;
+      boost::json::value temp(out->storage());
+      Write<T>{}(&object->second, &temp);
+      obj["value"] = std::move(temp);
+      *out = std::move(obj);
+    }
+  };
+
   // =============================================================================
   // Marshal Function (Wrapper for Write)
   // =============================================================================
@@ -805,7 +1159,7 @@ namespace json {
 
           if (it == sorted_names.end() ||
               (ENUM<T>::case_insensitive ? !detail::iequal(*it, input) : *it != input)) {
-            throw std::runtime_error(std::string("Invalid enum value: ") + std::string(input));
+            throw_invalid_enum_value(input);
           }
 
           // Find the original index in the unsorted names array
@@ -822,8 +1176,7 @@ namespace json {
           }
 
           // This should never happen if arrays are consistent
-          throw std::runtime_error(
-           std::string("Internal error: could not map enum name: ") + std::string(input));
+          throw_internal_error(std::string("could not map enum name: ") + std::string(input));
         }
       }
     };
@@ -940,6 +1293,39 @@ namespace json {
       } else {
         // Delegate to struct handler
         detail::ReadStruct<T>{}(value, object);
+      }
+    }
+  };
+
+  // =============================================================================
+  // Specializations for Raw C Arrays (Read)
+  // =============================================================================
+
+  /**
+ * @brief Specialization for Raw C arrays T[N]
+ * @tparam T Element type (must be Int64, UInt64, Double, or Bool)
+ * @tparam N Array size (known at compile time)
+ * @note UChar[N] and Byte[N] have separate specializations for base64 decoding
+ */
+  template <typename T, std::size_t N> struct Read<T[N]> {
+    static_assert(std::is_same_v<T, Int64> || std::is_same_v<T, UInt64> ||
+                   std::is_same_v<T, Double> || std::is_same_v<T, Bool>,
+     "Raw C arrays only support Int64, UInt64, Double, and Bool types. For binary data, use "
+     "UChar[N] or Byte[N] which deserialize from base64 strings.");
+
+    inline void operator()(const Value& value, T (*array)[N]) const {
+      if (value.is_null()) [[unlikely]] {
+        throw_array_null();
+      }
+      if (!value.is_array()) {
+        throw_type_mismatch("array", value);
+      }
+      const boost::json::array& arr = value.as_array();
+      if (arr.size() != N) {
+        throw_array_size_mismatch(arr.size(), N);
+      }
+      for (std::size_t i = 0; i < N; ++i) {
+        Read<T>{}(arr[i], &(*array)[i]);
       }
     }
   };
@@ -1113,7 +1499,31 @@ namespace json {
       const std::size_t max_decoded = base64::decoded_size(str.size());
       out->resize(max_decoded);
       auto [decoded, consumed] = base64::decode(out->data(), str.data(), str.size());
-      if (consumed != str.size() || (decoded == 0 && !str.empty())) {
+      if (decoded == 0 && !str.empty()) {
+        throw_invalid_base64();
+      }
+      out->resize(decoded);
+    }
+  };
+
+  /**
+ * @brief Specialization for ByteBuffer - deserialize from Base64 string
+ */
+  template <> struct Read<ByteBuffer> {
+    inline void operator()(const Value& value, ByteBuffer* out) const {
+      if (value.is_null()) {
+        out->clear();
+        return;
+      }
+      if (!value.is_string()) {
+        throw_type_mismatch("base64 string", value);
+      }
+      const auto& str = value.as_string();
+      const std::size_t max_decoded = base64::decoded_size(str.size());
+      out->resize(max_decoded);
+      auto [decoded, consumed] =
+       base64::decode(static_cast<void*>(out->data()), str.data(), str.size());
+      if (decoded == 0 && !str.empty()) {
         throw_invalid_base64();
       }
       out->resize(decoded);
@@ -1133,14 +1543,56 @@ namespace json {
         throw_type_mismatch("base64 string", value);
       }
       const auto& str = value.as_string();
-
-      // Decode the base64 string directly into the array
       auto [decoded, consumed] = base64::decode(out->data(), str.data(), str.size());
-      if (consumed != str.size() || (decoded == 0 && !str.empty())) {
+      if (decoded == 0 && !str.empty()) {
         throw_invalid_base64();
       }
+      if (decoded != N) {
+        throw_byte_array_size_mismatch(decoded, N);
+      }
+    }
+  };
 
-      // Verify that the decoded size matches the expected array size
+  /**
+ * @brief Specialization for UChar[N] (unsigned char C-style array) - deserialize from Base64 string
+ * @tparam N Array size (known at compile time)
+ */
+  template <std::size_t N> struct Read<UChar[N]> {
+    inline void operator()(const Value& value, UChar (*array)[N]) const {
+      if (value.is_null()) [[unlikely]] {
+        throw_byte_array_null();
+      }
+      if (!value.is_string()) {
+        throw_type_mismatch("base64 string", value);
+      }
+      const auto& str = value.as_string();
+      auto [decoded, consumed] = base64::decode(static_cast<void*>(*array), str.data(), str.size());
+      if (decoded == 0 && !str.empty()) {
+        throw_invalid_base64();
+      }
+      if (decoded != N) {
+        throw_byte_array_size_mismatch(decoded, N);
+      }
+    }
+  };
+
+  /**
+ * @brief Specialization for Byte[N] (std::byte C-style array) - deserialize from Base64 string
+ * @tparam N Array size (known at compile time)
+ */
+  template <std::size_t N> struct Read<Byte[N]> {
+    inline void operator()(const Value& value, Byte (*array)[N]) const {
+      if (value.is_null()) [[unlikely]] {
+        throw_byte_array_null();
+      }
+      if (!value.is_string()) {
+        throw_type_mismatch("base64 string", value);
+      }
+      const auto& str = value.as_string();
+      auto [decoded, consumed] = base64::decode(*array, str.data(), str.size());
+      if (decoded == 0 && !str.empty()) {
+        throw_invalid_base64();
+      }
       if (decoded != N) {
         throw_byte_array_size_mismatch(decoded, N);
       }
@@ -1197,6 +1649,33 @@ namespace json {
         for (const auto& item : arr) {
           object->emplace_back(); // Construct in-place for better performance
           Read<T>{}(item, &object->back());
+        }
+      } else {
+        throw_type_mismatch("array", value);
+      }
+    }
+  };
+
+  /**
+ * @brief Specialization for Set<T>
+ * @tparam T Element type
+ */
+  template <typename T> struct Read<Set<T>> {
+    static_assert(!std::is_pointer_v<T>,
+     "Raw pointers are not supported in Set for deserialization. "
+     "Use std::unique_ptr, std::shared_ptr, or std::optional instead.");
+
+    inline void operator()(const Value& value, Set<T>* object) const {
+      if (value.is_null()) [[unlikely]] {
+        object->clear();
+      } else if (value.is_array()) [[likely]] {
+        const boost::json::array& arr = value.as_array();
+        object->clear();
+
+        for (const auto& item : arr) {
+          T temp;
+          Read<T>{}(item, &temp);
+          object->insert(std::move(temp));
         }
       } else {
         throw_type_mismatch("array", value);

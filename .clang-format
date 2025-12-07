@@ -24,6 +24,9 @@ IndentWrappedFunctionNames: false
 # Indent case labels in switch statements
 IndentCaseLabels: false
 
+# Indent case blocks relative to case labels
+IndentCaseBlocks: true
+
 # Namespace indentation: All indents code inside namespaces
 NamespaceIndentation: All
 
