@@ -46,6 +46,16 @@
     - Added array parsing optimizations (fast paths for double[] and int[] arrays)
     - Added overlong encoding rejection for RFC 8949 compliance
     - Added indefinite length encoding support for strings, arrays, and objects
+    - Modernized API to use std::string_view instead of raw pointers and offsets
+    - Removed curr parameter from parsing functions for cleaner interfaces
+    - Used auto type deduction extensively for better readability
+    - Implemented storage reuse pattern (v.storage()) for efficient memory management
+    - Used emplace operations (emplace_back, emplace) for in-place construction
+    - Changed parse_number to return UInt64 instead of taking output parameter
+    - Used boost::json::string with storage instead of std::string in parse_string
+    - Merged array parsing loops with do-while(false) pattern for cleaner control flow
+    - Cached MAJOR_TYPE results to avoid redundant bit shift operations
+    - Removed duplicate array declarations and assignments for better performance
 */
 #include <boost/json.hpp>
 #include <boost/endian.hpp>
@@ -160,92 +170,74 @@ namespace cbor {
     // CBOR Parsing Functions
     // =============================================================================
     /**
-   * @brief Parse CBOR number with given major type
-   * @param first Start of input buffer
-   * @param last End of input buffer
-   * @param curr Current byte with major/minor type
-   * @param n Output number value
-   * @return Number of bytes consumed
+   * @brief Parse CBOR number
+   * @param sv String view containing the CBOR data (will be modified to remove consumed data)
+   * @return The parsed number value
    */
-    std::size_t parse_number(const UChar* first, const UChar* last, UChar curr, UInt64& n);
+    UInt64 parse_number(std::string_view& sv);
     /**
    * @brief Parse CBOR binary string
-   * @param first Start of input buffer
-   * @param last End of input buffer
-   * @param curr Current byte with major/minor type
+   * @param sv String view containing the CBOR data
    * @param v Output JSON value (will throw since binary not supported)
    * @return Number of bytes consumed
    */
-    std::size_t parse_binary(
-     const UChar* first, const UChar* last, UChar curr, boost::json::value& v);
+    std::size_t parse_binary(std::string_view sv, boost::json::value& v);
+    /**
+   * @brief Parse CBOR text string
+   * @param sv String view containing the CBOR data (will be modified to remove consumed data)
+   * @param v Output JSON value
+   * @return Number of bytes consumed
+   */
+    std::size_t parse_string(std::string_view& sv, boost::json::value& v);
     /**
    * @brief Parse CBOR array
-   * @param first Start of input buffer
-   * @param last End of input buffer
-   * @param curr Current byte with major/minor type
+   * @param sv String view containing the CBOR data (will be modified to remove consumed data)
    * @param v Output JSON value
    * @return Number of bytes consumed
    */
-    std::size_t parse_array(
-     const UChar* first, const UChar* last, UChar curr, boost::json::value& v);
+    std::size_t parse_array(std::string_view& sv, boost::json::value& v);
     /**
    * @brief Parse CBOR object
-   * @param first Start of input buffer
-   * @param last End of input buffer
-   * @param curr Current byte with major/minor type
+   * @param sv String view containing the CBOR data (will be modified to remove consumed data)
    * @param v Output JSON value
    * @return Number of bytes consumed
    */
-    std::size_t parse_object(
-     const UChar* first, const UChar* last, UChar curr, boost::json::value& v);
+    std::size_t parse_object(std::string_view& sv, boost::json::value& v);
     /**
    * @brief Parse CBOR unsigned integer
-   * @param first Start of input buffer
-   * @param last End of input buffer
-   * @param curr Current byte with major/minor type
+   * @param sv String view containing the CBOR data (will be modified to remove consumed data)
    * @param v Output JSON value
    * @return Number of bytes consumed
    */
-    std::size_t parse_unsigned(
-     const UChar* first, const UChar* last, UChar curr, boost::json::value& v);
+    std::size_t parse_unsigned(std::string_view& sv, boost::json::value& v);
     /**
    * @brief Parse CBOR signed integer (negative)
-   * @param first Start of input buffer
-   * @param last End of input buffer
-   * @param curr Current byte with major/minor type
+   * @param sv String view containing the CBOR data (will be modified to remove consumed data)
    * @param v Output JSON value
    * @return Number of bytes consumed
    */
-    std::size_t parse_signed(
-     const UChar* first, const UChar* last, UChar curr, boost::json::value& v);
+    std::size_t parse_signed(std::string_view& sv, boost::json::value& v);
     /**
    * @brief Parse CBOR semantic tag
-   * @param first Start of input buffer
-   * @param last End of input buffer
-   * @param curr Current byte with major/minor type
+   * @param sv String view containing the CBOR data (will be modified to remove consumed data)
    * @param v Output JSON value
    * @return Number of bytes consumed
    */
-    std::size_t parse_semantic_tag(
-     const UChar* first, const UChar* last, UChar curr, boost::json::value& v);
+    std::size_t parse_semantic_tag(std::string_view& sv, boost::json::value& v);
     /**
    * @brief Parse CBOR major type 7 (floats, bools, null)
-   * @param first Start of input buffer
-   * @param last End of input buffer
-   * @param curr Current byte with major/minor type
+   * @param sv String view containing the CBOR data (will be modified to remove consumed data)
    * @param v Output JSON value
    * @return Number of bytes consumed
    */
-    std::size_t parse_simple_value(
-     const UChar* first, const UChar* last, UChar curr, boost::json::value& v);
+    std::size_t parse_simple_value(std::string_view& sv, boost::json::value& v);
     /**
    * @brief Parse a CBOR value
-   * @param first Start of input buffer
-   * @param last End of input buffer
+   * @param sv String view containing the CBOR data (will be modified to remove consumed data)
    * @param v Output JSON value
    * @return Number of bytes consumed
    */
-    std::size_t parse_value(const UChar* first, const UChar* last, boost::json::value& v);
+    std::size_t parse_value(std::string_view& sv, boost::json::value& v);
     // =============================================================================
     // Error Handling Functions
     // =============================================================================
@@ -263,11 +255,10 @@ namespace cbor {
     /**
    * @brief Ensure at least n bytes are available in the input range
    * @param n Number of bytes required
-   * @param first Beginning of input range
-   * @param last End of input range
+   * @param sv String view containing the data
    * @throws std::runtime_error if insufficient bytes
    */
-    void ensure(std::size_t n, const UChar* first, const UChar* last);
+    void ensure(std::size_t n, std::string_view sv);
     // =============================================================================
     // Function Definitions
     // =============================================================================
@@ -308,7 +299,7 @@ namespace cbor {
     }
 
     inline void serialize_string(boost::json::string_view sv, ByteBuffer& out) {
-      std::size_t n = sv.size();
+      auto n = sv.size();
       serialize_number(MajorTypes::TEXT_STRING, n, out);
       out.insert(out.end(), sv.data(), sv.data() + n);
     }
@@ -323,7 +314,7 @@ namespace cbor {
         break;
       case boost::json::kind::int64:
         {
-          std::int64_t n = jv.get_int64();
+          auto n = jv.get_int64();
           if (n >= 0) {
             serialize_number(MajorTypes::UNSIGNED_INTEGER, n, out);
           } else {
@@ -380,24 +371,27 @@ namespace cbor {
       throw std::runtime_error(err);
     }
 
-    inline void ensure(std::size_t n, const UChar* first, const UChar* last) {
-      if (static_cast<std::size_t>(last - first) < n) {
+    inline void ensure(std::size_t n, std::string_view sv) {
+      if (sv.size() < n) {
         throw_eof_error();
       }
     }
 
-    inline std::size_t parse_number(const UChar* first, const UChar* last, UChar curr, UInt64& n) {
-      auto temp = first;
+    inline UInt64 parse_number(std::string_view& sv) {
+      ensure(1, sv);
+      auto curr = sv[0];
+      sv.remove_prefix(1);
       auto cv = MINOR_TYPE(curr);
+      UInt64 n;
       do {
         if (cv <= UC(MinorTypes::DIRECT_MAX)) {
           n = cv;
           break;
         }
         if (cv == UC(MinorTypes::ONE_BYTE)) {
-          ensure(1, first, last);
-          n = *first;
-          INCR_PTR(first, 1);
+          ensure(1, sv);
+          n = static_cast<UChar>(sv[0]);
+          sv.remove_prefix(1);
           // Reject overlong encodings (RFC 8949 Section 3.9)
           if (n < UC(MinorTypes::ONE_BYTE)) {
             throw_format_error("Overlong encoding: value should use shortest form");
@@ -405,9 +399,10 @@ namespace cbor {
           break;
         }
         if (cv == UC(MinorTypes::TWO_BYTES)) {
-          ensure(2, first, last);
-          n = boost::endian::load_big_u16(first);
-          INCR_PTR(first, 2);
+          ensure(2, sv);
+          auto data = reinterpret_cast<const UChar*>(sv.data());
+          n = boost::endian::load_big_u16(data);
+          sv.remove_prefix(2);
           // Reject overlong encodings
           if (n < CBOR_ONE_BYTE_MAX + 1) {
             throw_format_error("Overlong encoding: value should use shorter form");
@@ -415,9 +410,10 @@ namespace cbor {
           break;
         }
         if (cv == UC(MinorTypes::FOUR_BYTES)) {
-          ensure(4, first, last);
-          n = boost::endian::load_big_u32(first);
-          INCR_PTR(first, 4);
+          ensure(4, sv);
+          auto data = reinterpret_cast<const UChar*>(sv.data());
+          n = boost::endian::load_big_u32(data);
+          sv.remove_prefix(4);
           // Reject overlong encodings
           if (n < CBOR_TWO_BYTE_MAX + 1) {
             throw_format_error("Overlong encoding: value should use shorter form");
@@ -425,9 +421,10 @@ namespace cbor {
           break;
         }
         if (cv == UC(MinorTypes::EIGHT_BYTES)) {
-          ensure(8, first, last);
-          n = boost::endian::load_big_u64(first);
-          INCR_PTR(first, 8);
+          ensure(8, sv);
+          auto data = reinterpret_cast<const UChar*>(sv.data());
+          n = boost::endian::load_big_u64(data);
+          sv.remove_prefix(8);
           // Reject overlong encodings
           if (n <= CBOR_FOUR_BYTE_MAX) {
             throw_format_error("Overlong encoding: value should use shorter form");
@@ -442,222 +439,210 @@ namespace cbor {
         // else
         throw_format_error("Invalid minor type");
       } while (false);
-      return BYTES_CONSUMED(first, temp);
+      return n;
     }
 
-    inline std::size_t parse_binary(
-     const UChar* first, const UChar* last, UChar curr, boost::json::value& v) {
-      auto temp = first;
+    inline std::size_t parse_binary(std::string_view sv, boost::json::value& v) {
       // Binary strings are not supported in JSON-compatible CBOR subset
       // In a full CBOR implementation, this would parse and store binary data
       throw_format_error("Binary strings are not supported (not JSON-compatible)");
     }
 
-    inline std::size_t parse_string(
-     const UChar* first, const UChar* last, UChar curr, boost::json::value& v) {
-      auto temp = first;
-      std::string result;
+    inline std::size_t parse_string(std::string_view& sv, boost::json::value& v) {
+      auto original_size = sv.size();
+      boost::json::string result(v.storage());
+      ensure(1, sv);
+      auto curr = sv[0];
       if (MINOR_TYPE(curr) == UC(MinorTypes::INDEFINITE)) {
-        // Indefinite length array
+        sv.remove_prefix(1);
         while (true) {
-          ensure(1, first, last);
-          auto next = *first;
-          if (next == CBOR_BREAK_STOP_CODE) { // break stop code
-            INCR_PTR(first, 1);
+          ensure(1, sv);
+          auto next = sv[0];
+          if (next == CBOR_BREAK_STOP_CODE) {
+            sv.remove_prefix(1);
             break;
           }
-          if (MAJOR_TYPE(next) != MAJOR_TYPE(curr)) { // must be same major type
+          if (MAJOR_TYPE(next) != MAJOR_TYPE(curr)) {
             throw_format_error("Invalid chunk type in indefinite length string");
           }
-          UInt64 n;
-          INCR_PTR(first, 1);
-          parse_number(first, last, next, n);
-          ensure(n, first, last);
-          result.append(reinterpret_cast<char const*>(first), n);
-          INCR_PTR(first, n);
+          auto len = parse_number(sv);
+          ensure(len, sv);
+          result.append(sv.data(), sv.data() + len);
+          sv.remove_prefix(len);
         }
       } else {
         // Definite length string
-        UInt64 n;
-        parse_number(first, last, curr, n);
-        ensure(n, first, last);
-        result.assign(reinterpret_cast<char const*>(first), n);
-        INCR_PTR(first, n);
+        auto len = parse_number(sv);
+        ensure(len, sv);
+        result.assign(sv.data(), sv.data() + len);
+        sv.remove_prefix(len);
       }
       // boost::json validates UTF-8 when creating string values
-      v = result;
-      return BYTES_CONSUMED(first, temp);
+      v = std::move(result);
+      return original_size - sv.size();
     }
 
-    inline std::size_t parse_array(
-     const UChar* first, const UChar* last, UChar curr, boost::json::value& v) {
-      auto temp = first;
-      auto& a = v.emplace_array();
+    inline std::size_t parse_array(std::string_view& sv, boost::json::value& v) {
+      auto original_size = sv.size();
+      ensure(1, sv);
+      auto curr = sv[0];
+      boost::json::array a(v.storage());
       if (MINOR_TYPE(curr) == UC(MinorTypes::INDEFINITE)) {
-        // Indefinite length array
+        sv.remove_prefix(1);
         while (true) {
-          ensure(1, first, last);
-          auto next = *first;
+          ensure(1, sv);
+          auto next = static_cast<UChar>(sv[0]);
           if (next == CBOR_BREAK_STOP_CODE) { // break stop code
-            INCR_PTR(first, 1);
+            sv.remove_prefix(1);
             break;
           }
-          boost::json::value element;
-          parse_value(first, last, element);
-          a.push_back(std::move(element));
+          boost::json::value element(v.storage());
+          parse_value(sv, element);
+          a.emplace_back(std::move(element));
         }
       } else {
         // Definite length array
-        UInt64 n;
-        parse_number(first, last, curr, n);
-        a.resize(n);
+        auto len = parse_number(sv);
+        a.reserve(len);
         auto i = 0;
-        for (; i < n; ++i) // double[] fast path
-        {
-          ensure(1, first, last);
-          UChar next = *first;
-          if (next != CBOR_DOUBLE_MARKER) {
-            break;
-          }
-          INCR_PTR(first, 1);
-          ensure(8, first, last);
-          double w = boost::endian::endian_load<double, 8, boost::endian::order::big>(first);
-          INCR_PTR(first, 8);
-          a[i] = w;
-        }
-        for (; i < n; ++i) // int[] fast path
-        {
-          ensure(1, first, last);
-          auto next = *first;
-          if (next >= CBOR_NEGATIVE_INT_START) {
-            break;
-          }
-          INCR_PTR(first, 1);
-          UInt64 m;
-          parse_number(first, last, next, m);
-          if (next < UC(MinorTypes::ONE_BYTE)) {
-            a[i] = m;
-          } else {
-            a[i] = static_cast<std::int64_t>(~m);
-          }
-        }
-        for (; i < n; ++i) {
-          parse_value(first, last, a[i]);
+        while (i < len) {
+          ensure(1, sv);
+          auto next = static_cast<UChar>(sv[0]);
+          do {
+            if (next == CBOR_DOUBLE_MARKER) {
+              sv.remove_prefix(1);
+              ensure(8, sv);
+              auto data = reinterpret_cast<const UChar*>(sv.data());
+              auto w = boost::endian::endian_load<double, 8, boost::endian::order::big>(data);
+              sv.remove_prefix(8);
+              a.emplace_back(w);
+              break;
+            }
+            auto major_type = MAJOR_TYPE(next);
+            if (major_type == MajorTypes::UNSIGNED_INTEGER ||
+                major_type == MajorTypes::NEGATIVE_INTEGER) {
+              auto len_val = parse_number(sv);
+              if (major_type == MajorTypes::UNSIGNED_INTEGER) {
+                a.emplace_back(len_val);
+              } else {
+                a.emplace_back(static_cast<std::int64_t>(~len_val));
+              }
+              break;
+            }
+            {
+              boost::json::value temp(v.storage());
+              parse_value(sv, temp);
+              a.emplace_back(std::move(temp));
+            }
+          } while (false);
+          ++i;
         }
       }
-      return BYTES_CONSUMED(first, temp);
+      v = std::move(a);
+      return original_size - sv.size();
     }
 
-    inline std::size_t parse_object(
-     const UChar* first, const UChar* last, UChar curr, boost::json::value& v) {
-      auto temp = first;
-      auto& o = v.emplace_object();
+    inline std::size_t parse_object(std::string_view& sv, boost::json::value& v) {
+      auto original_size = sv.size();
+      ensure(1, sv);
+      auto curr = sv[0];
+      boost::json::object o(v.storage());
       if (MINOR_TYPE(curr) == UC(MinorTypes::INDEFINITE)) {
-        // Indefinite length object
+        sv.remove_prefix(1);
         while (true) {
-          ensure(1, first, last);
-          auto next = *first;
+          ensure(1, sv);
+          auto next = static_cast<UChar>(sv[0]);
           if (next == CBOR_BREAK_STOP_CODE) { // break stop code
-            INCR_PTR(first, 1);
+            sv.remove_prefix(1);
             break;
           }
-          // key string
           if (MAJOR_TYPE(next) != MajorTypes::TEXT_STRING) {
             throw_format_error("Object keys must be strings");
           }
-          UInt64 m;
-          parse_number(first, last, next, m);
-          ensure(m, first, last);
-          boost::json::string_view sv(reinterpret_cast<char const*>(first), m);
-          INCR_PTR(first, m);
-          // value
-          parse_value(first, last, o[sv]);
+          auto len = parse_number(sv);
+          ensure(len, sv);
+          v.emplace_string().assign(sv.data(), len);
+          sv.remove_prefix(len);
+          boost::json::value val(v.storage());
+          parse_value(sv, val);
+          o.emplace(v.as_string(), std::move(val));
         }
       } else {
         // Definite length object
-        UInt64 n;
-        parse_number(first, last, curr, n);
-        o.reserve(n);
-        for (auto i = 0; i < n; ++i) {
-          // key string
-          ensure(1, first, last);
-          auto next = *first;
+        auto len = parse_number(sv);
+        o.reserve(len);
+        for (auto i = 0; i < len; ++i) {
+          ensure(1, sv);
+          auto next = static_cast<UChar>(sv[0]);
           if (MAJOR_TYPE(next) != MajorTypes::TEXT_STRING) {
             throw_format_error("Object keys must be strings");
           }
-          UInt64 m;
-          INCR_PTR(first, 1);
-          parse_number(first, last, next, m);
-          ensure(m, first, last);
-          boost::json::string_view sv(reinterpret_cast<char const*>(first), m);
-          INCR_PTR(first, m);
-          // value
-          parse_value(first, last, o[sv]);
+          auto len = parse_number(sv);
+          ensure(len, sv);
+          v.emplace_string().assign(sv.data(), len);
+          sv.remove_prefix(len);
+          boost::json::value val(v.storage());
+          parse_value(sv, val);
+          o.emplace(v.as_string(), std::move(val));
         }
       }
-      return BYTES_CONSUMED(first, temp);
+      v = std::move(o);
+      return original_size - sv.size();
     }
 
-    inline std::size_t parse_unsigned(
-     const UChar* first, const UChar* last, UChar curr, boost::json::value& v) {
-      auto temp = first;
-      UInt64 n;
-      parse_number(first, last, curr, n);
-      v = n;
-      return BYTES_CONSUMED(first, temp);
+    inline std::size_t parse_unsigned(std::string_view& sv, boost::json::value& v) {
+      auto original_size = sv.size();
+      v = parse_number(sv);
+      return original_size - sv.size();
     }
 
-    inline std::size_t parse_signed(
-     const UChar* first, const UChar* last, UChar curr, boost::json::value& v) {
-      auto temp = first;
-      UInt64 n;
-      parse_number(first, last, curr, n);
+    inline std::size_t parse_signed(std::string_view& sv, boost::json::value& v) {
+      auto original_size = sv.size();
+      auto n = parse_number(sv);
       v = static_cast<std::int64_t>(~n);
-      return BYTES_CONSUMED(first, temp);
+      return original_size - sv.size();
     }
 
-    inline std::size_t parse_semantic_tag(
-     const UChar* first, const UChar* last, UChar curr, boost::json::value& v) {
-      auto temp = first;
-      UInt64 n;
-      parse_number(first, last, curr, n);
-      // ignore semantic tags
-      ensure(1, first, last);
-      const auto tag_curr = *first;
-      INCR_PTR(first, 1);
-      parse_value(first, last, v);
-      return BYTES_CONSUMED(first, temp);
+    inline std::size_t parse_semantic_tag(std::string_view& sv, boost::json::value& v) {
+      auto original_size = sv.size();
+      parse_number(sv); // ignore semantic tags
+      parse_value(sv, v);
+      return original_size - sv.size();
     }
 
-    inline std::size_t parse_simple_value(
-     const UChar* first, const UChar* last, UChar curr, boost::json::value& v) {
-      auto temp = first;
+    inline std::size_t parse_simple_value(std::string_view& sv, boost::json::value& v) {
+      auto original_size = sv.size();
+      ensure(1, sv);
+      auto curr = sv[0];
+      sv.remove_prefix(1);
       switch (MINOR_TYPE(curr)) {
       case UC(SimpleValueTypes::FALSE):
         v = false;
-        return BYTES_CONSUMED(first, temp);
+        return original_size - sv.size();
       case UC(SimpleValueTypes::TRUE):
         v = true;
-        return BYTES_CONSUMED(first, temp);
+        return original_size - sv.size();
       case UC(SimpleValueTypes::NULL_VALUE):
         v = nullptr;
-        return BYTES_CONSUMED(first, temp);
+        return original_size - sv.size();
       case UC(SimpleValueTypes::UNDEFINED): // undefined
         throw_format_error("Undefined value not supported");
       case UC(SimpleValueTypes::SIMPLE_VALUE): // simple value
-        ensure(1, first, last);
+        ensure(1, sv);
         {
-          auto simple_value = *first++;
+          auto simple_value = static_cast<UChar>(sv[0]);
+          sv.remove_prefix(1);
           // Only support simple values that are JSON-compatible
           // 0xFF (255) is not a valid simple value in this context
           throw_format_error("Simple value not supported");
         }
       case UC(SimpleValueTypes::FLOAT16): // half-precision float
         {
-          ensure(2, first, last);
+          ensure(2, sv);
+          auto data = reinterpret_cast<const UChar*>(sv.data());
           // Convert half-precision float to double
-          auto half = boost::endian::load_big_u16(first);
-          INCR_PTR(first, 2);
+          auto half = boost::endian::load_big_u16(data);
+          sv.remove_prefix(2);
           // IEEE 754 half-precision to double conversion
           auto sign = (half >> 15) & 0x1;
           auto exponent = (half >> 10) & CBOR_FLOAT16_EXPONENT_MAX;
@@ -686,64 +671,66 @@ namespace cbor {
                      (sign ? -1.0 : 1.0);
           }
           v = result;
-          return BYTES_CONSUMED(first, temp);
+          return original_size - sv.size();
         }
       case UC(SimpleValueTypes::FLOAT32): // float
         {
-          ensure(4, first, last);
-          auto w = boost::endian::endian_load<float, 4, boost::endian::order::big>(first);
-          INCR_PTR(first, 4);
+          ensure(4, sv);
+          auto data = reinterpret_cast<const UChar*>(sv.data());
+          auto w = boost::endian::endian_load<float, 4, boost::endian::order::big>(data);
+          sv.remove_prefix(4);
           v = w;
-          return BYTES_CONSUMED(first, temp);
+          return original_size - sv.size();
         }
       case UC(SimpleValueTypes::FLOAT64): // double
         {
-          ensure(8, first, last);
-          auto w = boost::endian::endian_load<double, 8, boost::endian::order::big>(first);
-          INCR_PTR(first, 8);
+          ensure(8, sv);
+          auto data = reinterpret_cast<const UChar*>(sv.data());
+          auto w = boost::endian::endian_load<double, 8, boost::endian::order::big>(data);
+          sv.remove_prefix(8);
           v = w;
-          return BYTES_CONSUMED(first, temp);
+          return original_size - sv.size();
         }
       default:
         throw_format_error("Invalid minor type for major type 7");
       }
     }
 
-    inline std::size_t parse_value(const UChar* first, const UChar* last, boost::json::value& v) {
-      auto temp = first;
-      ensure(1, first, last);
-      const auto curr = *first;
-      INCR_PTR(first, 1);
+    inline std::size_t parse_value(std::string_view& sv, boost::json::value& v) {
+      auto original_size = sv.size();
+      ensure(1, sv);
+      const auto curr = static_cast<UChar>(sv[0]);
       switch (MAJOR_TYPE(curr)) {
       case MajorTypes::UNSIGNED_INTEGER:
-        parse_unsigned(first, last, curr, v);
+        parse_unsigned(sv, v);
         break;
       case MajorTypes::NEGATIVE_INTEGER:
-        parse_signed(first, last, curr, v);
+        parse_signed(sv, v);
         break;
       case MajorTypes::BYTE_STRING:
-        parse_binary(first, last, curr, v);
+        sv.remove_prefix(1);
+        parse_binary(sv, v);
         break;
       case MajorTypes::TEXT_STRING:
-        parse_string(first, last, curr, v);
+        parse_string(sv, v);
         break;
       case MajorTypes::ARRAY:
-        parse_array(first, last, curr, v);
+        parse_array(sv, v);
         break;
       case MajorTypes::MAP:
-        parse_object(first, last, curr, v);
+        parse_object(sv, v);
         break;
       case MajorTypes::SEMANTIC_TAG:
-        parse_semantic_tag(first, last, curr, v);
+        parse_semantic_tag(sv, v);
         break;
       case MajorTypes::SIMPLE_VALUE:
-        parse_simple_value(first, last, curr, v);
+        parse_simple_value(sv, v);
         break;
       default:
         // This should be unreachable in valid CBOR
         throw_format_error("Invalid major type");
       }
-      return BYTES_CONSUMED(first, temp);
+      return original_size - sv.size();
     }
 
   } // namespace detail
@@ -761,15 +748,14 @@ namespace cbor {
 
   /**
    * @brief Parse a CBOR value and return bytes consumed
-   * @param first Start of input buffer
-   * @param last End of input buffer
+   * @param sv String view containing the CBOR data
    * @param v Output JSON value
    * @return Number of bytes consumed from input
    */
-  inline std::size_t parse_cbor_value(
-   const UChar* first, const UChar* last, boost::json::value& v) {
-    return detail::parse_value(first, last, v);
+  inline std::size_t parse_cbor_value(std::string_view sv, boost::json::value& v) {
+    return detail::parse_value(sv, v);
   }
+
 } // namespace cbor
 
 #undef ENCODE_SV

@@ -12,9 +12,8 @@ void test_overlong_encoding_rejection() {
     std::vector<unsigned char> data = { 0x0A }; // Direct encoding
     boost::json::value v;
     try {
-      const unsigned char* first = data.data();
-      const unsigned char* last = first + data.size();
-      cbor::parse_cbor_value(first, last, v);
+      std::string_view sv(reinterpret_cast<const char*>(data.data()), data.size());
+      cbor::parse_cbor_value(sv, v);
       std::cout << "✓ Accepted: " << v << std::endl;
     } catch (const std::exception& e) {
       std::cout << "✗ Rejected: " << e.what() << std::endl;
@@ -27,9 +26,8 @@ void test_overlong_encoding_rejection() {
     std::vector<unsigned char> data = { 0x18, 0x0A }; // additional info 24 + 1 byte
     boost::json::value v;
     try {
-      const unsigned char* first = data.data();
-      const unsigned char* last = first + data.size();
-      cbor::parse_cbor_value(first, last, v);
+      std::string_view sv(reinterpret_cast<const char*>(data.data()), data.size());
+      cbor::parse_cbor_value(sv, v);
       std::cout << "✗ ERROR: Accepted overlong encoding: " << v << std::endl;
     } catch (const std::exception& e) {
       std::cout << "✓ Correctly rejected: " << e.what() << std::endl;
@@ -42,9 +40,8 @@ void test_overlong_encoding_rejection() {
     std::vector<unsigned char> data = { 0x19, 0x00, 0x64 }; // 2-byte form
     boost::json::value v;
     try {
-      const unsigned char* first = data.data();
-      const unsigned char* last = first + data.size();
-      cbor::parse_cbor_value(first, last, v);
+      std::string_view sv(reinterpret_cast<const char*>(data.data()), data.size());
+      cbor::parse_cbor_value(sv, v);
       std::cout << "✗ ERROR: Accepted overlong encoding: " << v << std::endl;
     } catch (const std::exception& e) {
       std::cout << "✓ Correctly rejected: " << e.what() << std::endl;
@@ -57,9 +54,8 @@ void test_overlong_encoding_rejection() {
     std::vector<unsigned char> data = { 0x19, 0x03, 0xE8 };
     boost::json::value v;
     try {
-      const unsigned char* first = data.data();
-      const unsigned char* last = first + data.size();
-      cbor::parse_cbor_value(first, last, v);
+      std::string_view sv(reinterpret_cast<const char*>(data.data()), data.size());
+      cbor::parse_cbor_value(sv, v);
       std::cout << "✓ Accepted: " << v << std::endl;
     } catch (const std::exception& e) {
       std::cout << "✗ Rejected: " << e.what() << std::endl;
@@ -72,9 +68,8 @@ void test_overlong_encoding_rejection() {
     std::vector<unsigned char> data = { 0x1A, 0x00, 0x00, 0x03, 0xE8 };
     boost::json::value v;
     try {
-      const unsigned char* first = data.data();
-      const unsigned char* last = first + data.size();
-      cbor::parse_cbor_value(first, last, v);
+      std::string_view sv(reinterpret_cast<const char*>(data.data()), data.size());
+      cbor::parse_cbor_value(sv, v);
       std::cout << "✗ ERROR: Accepted overlong encoding: " << v << std::endl;
     } catch (const std::exception& e) {
       std::cout << "✓ Correctly rejected: " << e.what() << std::endl;
@@ -87,9 +82,8 @@ void test_overlong_encoding_rejection() {
     std::vector<unsigned char> data = { 0x1B, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x86, 0xA0 };
     boost::json::value v;
     try {
-      const unsigned char* first = data.data();
-      const unsigned char* last = first + data.size();
-      cbor::parse_cbor_value(first, last, v);
+      std::string_view sv(reinterpret_cast<const char*>(data.data()), data.size());
+      cbor::parse_cbor_value(sv, v);
       std::cout << "✗ ERROR: Accepted overlong encoding: " << v << std::endl;
     } catch (const std::exception& e) {
       std::cout << "✓ Correctly rejected: " << e.what() << std::endl;
@@ -135,9 +129,8 @@ void test_shortest_encoding_generation() {
 
     // Verify round-trip
     boost::json::value parsed;
-    const unsigned char* first = cbor_data.data();
-    const unsigned char* last = first + cbor_data.size();
-    cbor::parse_cbor_value(first, last, parsed);
+    std::string_view sv(reinterpret_cast<const char*>(cbor_data.data()), cbor_data.size());
+    cbor::parse_cbor_value(sv, parsed);
 
     if (parsed.as_uint64() == value) {
       std::cout << "  ✓ Round-trip successful" << std::endl;

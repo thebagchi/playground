@@ -718,9 +718,8 @@ void encode_decode_cbor() {
 
     // Parse back from CBOR
     boost::json::value parsed_json;
-    const unsigned char* first = cbor_data.data();
-    const unsigned char* last = first + cbor_data.size();
-    cbor::parse_cbor_value(first, last, parsed_json);
+    std::string_view sv(reinterpret_cast<const char*>(cbor_data.data()), cbor_data.size());
+    cbor::parse_cbor_value(sv, parsed_json);
     std::cout << "Parsed JSON: " << parsed_json << std::endl;
     std::cout << "Match: " << (simple_json == parsed_json ? "Yes" : "No") << std::endl;
 
@@ -737,9 +736,8 @@ void encode_decode_cbor() {
     std::cout << std::dec << std::endl;
 
     parsed_json = nullptr;
-    first = cbor_data.data();
-    last = first + cbor_data.size();
-    cbor::parse_cbor_value(first, last, parsed_json);
+    sv = std::string_view(reinterpret_cast<const char*>(cbor_data.data()), cbor_data.size());
+    cbor::parse_cbor_value(sv, parsed_json);
     std::cout << "Parsed JSON: " << parsed_json << std::endl;
     std::cout << "Match: " << (array_json == parsed_json ? "Yes" : "No") << std::endl;
 
@@ -759,9 +757,8 @@ void encode_decode_cbor() {
     std::cout << std::dec << std::endl;
 
     parsed_json = nullptr;
-    first = cbor_data.data();
-    last = first + cbor_data.size();
-    cbor::parse_cbor_value(first, last, parsed_json);
+    sv = std::string_view(reinterpret_cast<const char*>(cbor_data.data()), cbor_data.size());
+    cbor::parse_cbor_value(sv, parsed_json);
     std::cout << "Parsed JSON: " << parsed_json << std::endl;
     std::cout << "Match: " << (nested_json == parsed_json ? "Yes" : "No") << std::endl;
 
@@ -785,9 +782,8 @@ void encode_decode_cbor() {
     std::cout << std::dec << std::endl;
 
     parsed_json = nullptr;
-    first = cbor_data.data();
-    last = first + cbor_data.size();
-    cbor::parse_cbor_value(first, last, parsed_json);
+    sv = std::string_view(reinterpret_cast<const char*>(cbor_data.data()), cbor_data.size());
+    cbor::parse_cbor_value(sv, parsed_json);
     std::cout << "Parsed JSON: " << parsed_json << std::endl;
     std::cout << "Match: " << (types_json == parsed_json ? "Yes" : "No") << std::endl;
 
