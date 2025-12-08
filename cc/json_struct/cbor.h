@@ -691,19 +691,21 @@ namespace cbor {
       inline std::size_t Binary(std::string_view& sv, boost::json::value& v) {
         auto original_size = sv.size();
         ensure(1, sv);
-        auto head = static_cast<UChar>(sv[0]);
+        UChar head = static_cast<UChar>(sv.front());
 
         bool const indefinite = (MINOR_TYPE(head) == UC(MinorTypes::INDEFINITE));
 
-        // ──────── First pass: calculate total raw byte length (no modification) ────────
-        auto counter = sv;
+        // ──────── First pass: calculate total raw byte length ────────
         std::size_t total_bytes = 0;
 
         if (indefinite) {
+          auto counter = sv;
           counter.remove_prefix(1); // skip 0x5F
+
           while (true) {
             ensure(1, counter);
-            auto next = static_cast<UChar>(counter[0]);
+            UChar next = counter.front();
+
             if (next == CBOR_BREAK_STOP_CODE) {
               counter.remove_prefix(1);
               break;
@@ -712,20 +714,21 @@ namespace cbor {
               throw_format_error("Invalid chunk in indefinite byte string");
             }
 
-            auto len = Number(counter);
-            ensure(len, counter);
-            total_bytes += len;
-            counter.remove_prefix(len);
+            UInt64 len = Number(counter);
+            ensure(static_cast<std::size_t>(len), counter);
+            total_bytes += static_cast<std::size_t>(len);
+            counter.remove_prefix(static_cast<std::size_t>(len));
           }
         } else {
-          // Definite: read length and advance counter past head+length
-          auto len = Number(counter);
-          ensure(len, counter);
-          total_bytes = len;
+          // Definite length: validate and measure
+          auto counter = sv;
+          UInt64 len = Number(counter);
+          ensure(static_cast<std::size_t>(len), counter);
+          total_bytes = static_cast<std::size_t>(len);
         }
 
         // ──────── Allocate exact base64 output once ────────
-        auto encoded_size = base64::encoded_size(total_bytes);
+        std::size_t encoded_size = base64::encoded_size(total_bytes);
         boost::json::string base64_str(v.storage());
         base64_str.resize(encoded_size);
         char* out_ptr = const_cast<char*>(base64_str.data());
@@ -733,31 +736,35 @@ namespace cbor {
         // ──────── Second pass: consume and encode directly ────────
         if (indefinite) {
           sv.remove_prefix(1); // consume 0x5F
+
           while (true) {
             ensure(1, sv);
-            auto next = static_cast<UChar>(sv[0]);
+            UChar next = sv.front();
+
             if (next == CBOR_BREAK_STOP_CODE) {
               sv.remove_prefix(1);
               break;
             }
-            auto len = Number(sv);
-            ensure(len, sv);
-            auto written = base64::encode(out_ptr, sv.data(), len);
-            out_ptr += written;
-            sv.remove_prefix(len);
+
+            UInt64 len = Number(sv);
+            ensure(static_cast<std::size_t>(len), sv);
+
+            out_ptr += base64::encode(out_ptr, sv.data(), static_cast<std::size_t>(len));
+            sv.remove_prefix(static_cast<std::size_t>(len));
           }
         } else {
-          // Definite length: consume head+length, then encode payload
-          Number(sv); // consume head and length bytes (already calculated in first pass)
+          // Consume the head + length (already validated)
+          Number(sv);
           ensure(total_bytes, sv);
+
           base64::encode(out_ptr, sv.data(), total_bytes);
           sv.remove_prefix(total_bytes);
         }
 
         // Wrap in {"_binary": "..."}
-        boost::json::object obj(v.storage());
-        obj.emplace(CBOR_BINARY_MARKER, std::move(base64_str));
-        v = std::move(obj);
+        boost::json::object wrapper(v.storage());
+        wrapper.emplace(CBOR_BINARY_MARKER, std::move(base64_str));
+        v = std::move(wrapper);
 
         return original_size - sv.size();
       }
