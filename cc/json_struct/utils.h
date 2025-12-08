@@ -115,6 +115,12 @@ using Value = boost::json::value;
  */
 using StoragePtr = boost::json::storage_ptr;
 
+/**
+ * @brief Semantic tag type alias (tag number, tagged value)
+ * Used for CBOR semantic tag extraction
+ */
+using SemanticTag = std::tuple<UInt64, Value>;
+
 // =============================================================================
 // Utility Macros for Smart Pointer Creation
 // =============================================================================
