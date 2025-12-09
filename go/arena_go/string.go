@@ -113,6 +113,36 @@ func (s *ArenaString) Reset() {
 	// Keep arena memory – will be reused
 }
 
+// Clone returns a heap-allocated copy of the string that escapes the arena.
+// The returned string is independent of the arena lifecycle and can be safely
+// used after the arena is deleted. Use this when you need to preserve string
+// data beyond the arena's lifetime.
+func (s *ArenaString) Clone() string {
+	if s.len == 0 {
+		return ""
+	}
+	// Create a new heap-allocated string
+	return string(s.Bytes())
+}
+
+// Bytes returns a copy of the string content as a heap-allocated byte slice.
+// The returned slice is independent of the arena and safe to use after arena deletion.
+func (s *ArenaString) Bytes() []byte {
+	if s.len == 0 {
+		return nil
+	}
+	if !s.flag {
+		// SSO path - copy from inline buffer
+		b := make([]byte, s.len)
+		copy(b, s.data[:s.len])
+		return b
+	}
+	// Arena path - copy from arena memory
+	b := make([]byte, s.len)
+	copy(b, unsafe.Slice((*byte)(s.ptr), s.len))
+	return b
+}
+
 // MakeArenaString now returns ArenaString builder
 func (a *Arena) MakeArenaString(s string) ArenaString {
 	var as ArenaString

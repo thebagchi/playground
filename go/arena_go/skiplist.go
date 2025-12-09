@@ -230,3 +230,56 @@ func (sl *ArenaSkipList[K, V]) Max() (K, V, bool) {
 	var v V
 	return k, v, false
 }
+
+// Clone returns a heap-allocated standard Go map with all entries from the skip list.
+// The returned map is independent of the arena lifecycle and can be safely used
+// after the arena is deleted. Use this when you need to preserve skip list data
+// beyond the arena's lifetime. Note: The returned map does not preserve order.
+func (sl *ArenaSkipList[K, V]) Clone() map[K]V {
+	sl.mu.RLock()
+	defer sl.mu.RUnlock()
+
+	count := sl.Len()
+	if count == 0 {
+		return nil
+	}
+
+	result := make(map[K]V, count)
+	x := sl.head.forward[0]
+	for x != nil {
+		result[x.key] = x.val
+		x = x.forward[0]
+	}
+	return result
+}
+
+// CloneSlice returns a heap-allocated slice of key-value pairs in sorted order.
+// The returned slice is independent of the arena lifecycle and can be safely used
+// after the arena is deleted. Use this when you need to preserve skip list data
+// with ordering beyond the arena's lifetime.
+func (sl *ArenaSkipList[K, V]) CloneSlice() []struct {
+	Key K
+	Val V
+} {
+	sl.mu.RLock()
+	defer sl.mu.RUnlock()
+
+	count := sl.Len()
+	if count == 0 {
+		return nil
+	}
+
+	result := make([]struct {
+		Key K
+		Val V
+	}, 0, count)
+	x := sl.head.forward[0]
+	for x != nil {
+		result = append(result, struct {
+			Key K
+			Val V
+		}{Key: x.key, Val: x.val})
+		x = x.forward[0]
+	}
+	return result
+}

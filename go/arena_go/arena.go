@@ -94,6 +94,60 @@ func MakeSlice[T any](a *Arena, length, capacity int) []T {
 	return slice[:length]
 }
 
+// MakeObject allocates and returns a pointer to a new instance of type T in the arena.
+// The object is zero-initialized. This is useful for creating struct instances without
+// heap allocation. The pointer remains valid until the arena is deleted or reset.
+//
+// Example:
+//
+//	type Node struct { Value int; Next *Node }
+//	node := arena.MakeObject[Node](a)
+//	node.Value = 42
+func MakeObject[T any](a *Arena) *T {
+	var zero T
+	size := unsafe.Sizeof(zero)
+	align := unsafe.Alignof(zero)
+	if size == 0 {
+		size = 1
+	}
+	ptr := a.raw.Alloc(uint64(size), uint64(align))
+	return (*T)(ptr)
+}
+
+// CloneObject returns a heap-allocated copy of an arena-allocated object.
+// The returned object is independent of the arena lifecycle and can be safely
+// used after the arena is deleted. Use this when you need to preserve object
+// data beyond the arena's lifetime.
+//
+// Example:
+//
+//	type Node struct { Value int; Next *Node }
+//	arenaNode := arena.MakeObject[Node](a)
+//	arenaNode.Value = 42
+//	heapNode := arena.CloneObject(arenaNode)
+//	a.Delete() // heapNode is still valid
+func CloneObject[T any](arenaObject *T) *T {
+	if arenaObject == nil {
+		return nil
+	}
+	result := new(T)
+	*result = *arenaObject
+	return result
+}
+
+// CloneSlice returns a heap-allocated copy of an arena-backed slice.
+// The returned slice is independent of the arena lifecycle and can be safely
+// used after the arena is deleted. Use this when you need to preserve slice
+// data beyond the arena's lifetime.
+func CloneSlice[T any](arenaSlice []T) []T {
+	if len(arenaSlice) == 0 {
+		return nil
+	}
+	result := make([]T, len(arenaSlice))
+	copy(result, arenaSlice)
+	return result
+}
+
 // MakeString – zero-copy string that lives in the arena
 func (a *Arena) MakeString(s string) string {
 	if len(s) == 0 {
@@ -102,6 +156,18 @@ func (a *Arena) MakeString(s string) string {
 	ptr := a.raw.Alloc(uint64(len(s)), 1)
 	copy((*[1 << 30]byte)(ptr)[:len(s):len(s)], s)
 	return unsafe.String((*byte)(ptr), len(s))
+}
+
+// CloneString returns a heap-allocated copy of an arena-backed string.
+// The returned string is independent of the arena lifecycle and can be safely
+// used after the arena is deleted. Use this when you need to preserve string
+// data beyond the arena's lifetime.
+func CloneString(arenaString string) string {
+	if len(arenaString) == 0 {
+		return ""
+	}
+	// Force allocation on heap by creating a new string
+	return string([]byte(arenaString))
 }
 
 func (a *Arena) Reset() {

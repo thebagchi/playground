@@ -299,3 +299,26 @@ func (m *ArenaMap[K, V]) Reset() {
 	}
 	m.count = 0
 }
+
+// Clone returns a heap-allocated standard Go map with all entries from the ArenaMap.
+// The returned map is independent of the arena lifecycle and can be safely used
+// after the arena is deleted. Use this when you need to preserve map data beyond
+// the arena's lifetime.
+func (m *ArenaMap[K, V]) Clone() map[K]V {
+	m.mu.RLock()
+	defer m.mu.RUnlock()
+
+	if m.count == 0 {
+		return nil
+	}
+
+	result := make(map[K]V, m.count)
+	buckets := m.getBuckets()
+	for i := 0; i < m.cap; i++ {
+		b := &buckets[i]
+		if b.hash != 0 && b.hash != 0xFFFFFFFFFFFFFFFF {
+			result[b.key] = b.val
+		}
+	}
+	return result
+}

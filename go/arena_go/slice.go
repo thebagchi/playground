@@ -131,6 +131,26 @@ func (s *ArenaSlice[T]) Reset() {
 	// Keep ptr/cap for reuse
 }
 
+// Clone returns a heap-allocated copy of the slice that escapes the arena.
+// The returned slice is independent of the arena lifecycle and can be safely
+// used after the arena is deleted. Use this when you need to preserve slice
+// data beyond the arena's lifetime.
+func (s *ArenaSlice[T]) Clone() []T {
+	if s.len == 0 {
+		return nil
+	}
+	// Create a new heap-allocated slice
+	result := make([]T, s.len)
+	if !s.flag {
+		// SSO path - copy from inline buffer
+		copy(result, s.data[:s.len])
+	} else {
+		// Arena path - copy from arena memory
+		copy(result, unsafe.Slice((*T)(s.ptr), s.len))
+	}
+	return result
+}
+
 // MakeArenaSlice creates a new ArenaSlice from initial data
 func MakeArenaSlice[T any](a *Arena, initial ...T) ArenaSlice[T] {
 	var as ArenaSlice[T]
