@@ -31,9 +31,12 @@ def get_latest_version_golang_org():
     """Get latest Go version from golang.org"""
     try:
         with urllib.request.urlopen(
-            "https://golang.org/VERSION?m=text", timeout=10
+            "https://go.dev/VERSION?m=text", timeout=10
         ) as response:
-            return response.read().decode().strip()
+            content = response.read().decode().strip()
+            # The response contains multiple lines, take the first line which is the version
+            version = content.split("\n")[0]
+            return version
     except urllib.error.URLError as e:
         print(f"Failed to fetch from golang.org: {e}")
         return None
@@ -136,6 +139,32 @@ def show_progress(progress, downloaded, total):
     )
 
 
+def download_only(download_info, output_path=None):
+    """Download Go archive without installing"""
+    print(f"\n📥 Downloading Go {download_info['url'].split('/')[-1].split('.')[0]}...")
+
+    # Determine output path
+    if output_path:
+        output_path = os.path.expanduser(output_path)
+        if os.path.isdir(output_path):
+            filename = os.path.join(output_path, download_info["filename"])
+        else:
+            filename = output_path
+    else:
+        filename = download_info["filename"]
+
+    print(f"Downloading {download_info['url']} to {filename}...")
+    success = download_file(download_info["url"], filename, show_progress)
+    print()  # New line after progress bar
+
+    if success:
+        print(f"✅ Download completed: {filename}")
+        return filename
+    else:
+        print("❌ Download failed")
+        return None
+
+
 def backup_existing_go():
     """Backup existing Go installation"""
     go_root = os.environ.get("GOROOT", "/usr/local/go")
@@ -234,17 +263,12 @@ def check_version_info():
     print("🔍 Fetching latest Go version...")
     print("=" * 50)
 
-    # Get latest version from different sources
-    github_version = get_latest_version_github()
-    if github_version:
-        print(f"Latest Go version (GitHub): {github_version}")
-
+    # Get latest version from golang.org (primary source)
     golang_org_version = get_latest_version_golang_org()
     if golang_org_version:
-        print(f"Latest Go version (golang.org): {golang_org_version}")
+        print(f"Latest Go version: {golang_org_version}")
 
-    # Use golang.org version as primary source
-    latest_version = golang_org_version or github_version
+    latest_version = golang_org_version
 
     if not latest_version:
         print("❌ Could not fetch latest Go version")
@@ -304,6 +328,8 @@ Examples:
   python install_go.py --install                # Install with prompts
   python install_go.py --install --yes          # Install without prompts
   python install_go.py --install --path ~/go    # Install to custom path
+  python install_go.py --download-only          # Download only to current directory
+  python install_go.py --download-only --output ~/downloads  # Download to specific path
   python install_go.py --suggest-gomod          # Show go.mod update suggestion
         """,
     )
@@ -330,6 +356,19 @@ Examples:
     )
 
     parser.add_argument(
+        "--download-only",
+        "-d",
+        action="store_true",
+        help="Download the Go archive without installing",
+    )
+
+    parser.add_argument(
+        "--output",
+        "-o",
+        help="Output path for downloaded file (default: current directory)",
+    )
+
+    parser.add_argument(
         "--suggest-gomod",
         "-s",
         action="store_true",
@@ -337,6 +376,9 @@ Examples:
     )
 
     args = parser.parse_args()
+
+    # Expand user path (~) to absolute path
+    args.path = os.path.expanduser(args.path)
 
     # Check version information
     version_info = check_version_info()
@@ -355,6 +397,20 @@ Examples:
             suggest_go_mod_update(go_mod_version, latest_version)
         else:
             print("\n⚠️  go.mod is already up to date or not found")
+        return
+
+    # Handle --download-only flag
+    if args.download_only:
+        if not download_info:
+            print("❌ Cannot determine download information")
+            sys.exit(1)
+
+        output_path = args.output if hasattr(args, "output") and args.output else None
+        result = download_only(download_info, output_path)
+        if result:
+            print(f"\n📦 Go archive downloaded to: {result}")
+        else:
+            sys.exit(1)
         return
 
     # Handle --install flag
@@ -397,4 +453,4 @@ if __name__ == "__main__":
     except (ValueError, RuntimeError, OSError) as e:
         print(f"\nError: {e}")
         sys.exit(1)
-    pass    
+    pass
