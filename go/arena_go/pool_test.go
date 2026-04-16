@@ -213,8 +213,6 @@ func TestPool_DifferentAllocators(t *testing.T) {
 		typ  Allocator
 	}{
 		{"Bump", BUMP},
-		{"Slab", SLAB},
-		{"Buddy", BUDDY},
 	}
 
 	for _, alloc := range allocators {

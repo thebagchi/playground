@@ -26,36 +26,6 @@ func BenchmarkBumpAllocator(b *testing.B) {
 	}
 }
 
-func BenchmarkSlabAllocator(b *testing.B) {
-	sizes := []int{8, 64, 256, 1024}
-	for _, size := range sizes {
-		b.Run(fmt.Sprintf("size-%d", size), func(b *testing.B) {
-			a := NewSlabAllocator(size, 1024*1024)
-			defer a.Delete()
-			b.ResetTimer()
-			b.ReportAllocs()
-			for i := 0; i < b.N; i++ {
-				_ = a.Alloc(uint64(size), 16)
-			}
-		})
-	}
-}
-
-func BenchmarkBuddyAllocator(b *testing.B) {
-	sizes := []int{8, 64, 256, 1024, 4096}
-	for _, size := range sizes {
-		b.Run(fmt.Sprintf("size-%d", size), func(b *testing.B) {
-			a := NewBuddyAllocator(4096, 256)
-			defer a.Delete()
-			b.ResetTimer()
-			b.ReportAllocs()
-			for i := 0; i < b.N; i++ {
-				_ = a.Alloc(uint64(size), 16)
-			}
-		})
-	}
-}
-
 // Comparison with standard Go allocation
 func BenchmarkStdAlloc(b *testing.B) {
 	sizes := []int{8, 64, 256, 1024, 4096}
@@ -370,8 +340,6 @@ func BenchmarkConcurrent_Allocators(b *testing.B) {
 		typ  Allocator
 	}{
 		{"Bump", BUMP},
-		{"Slab", SLAB},
-		{"Buddy", BUDDY},
 	}
 
 	for _, alloc := range allocators {
@@ -492,8 +460,6 @@ func TestThreadSafety_Allocators(t *testing.T) {
 		typ  Allocator
 	}{
 		{"Bump", BUMP},
-		{"Slab", SLAB},
-		{"Buddy", BUDDY},
 	}
 
 	for _, alloc := range allocators {

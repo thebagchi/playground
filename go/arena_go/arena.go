@@ -1,10 +1,10 @@
 // arena/arena.go
 //
-// Package arena provides high-performance, zero-GC memory allocators with multiple strategies.
+// Package arena provides a high-performance, zero-GC bump memory allocator.
 //
 // Thread Safety:
-//   - All allocators (Bump, Slab, Buddy) are thread-safe and can be used concurrently
-//   - Alloc() operations are serialized with mutexes to prevent data races
+//   - The bump allocator is thread-safe and can be used concurrently
+//   - Alloc() operations are serialized with a mutex to prevent data races
 //   - Reset() and Delete() should NOT be called concurrently with Alloc() or with each other
 //   - Multiple Arena instances are completely independent and require no synchronization
 //
@@ -12,11 +12,6 @@
 //   - All memory is allocated via mmap and lives outside Go's garbage collector
 //   - Memory is never returned to the OS until Delete() is called
 //   - Reset() clears allocations but retains underlying memory pages
-//
-// Allocator Strategies:
-//   - BUMP: Fastest, best for batch allocations or when arena is reset frequently
-//   - SLAB: Best for fixed-size objects with high allocation/free turnover
-//   - BUDDY: Most flexible, good for varied-size allocations with power-of-2 sizes
 package arena
 
 import (
@@ -32,8 +27,6 @@ type Allocator int
 
 const (
 	BUMP Allocator = iota
-	SLAB
-	BUDDY
 )
 
 // Arena is the beautiful multi-type facade.
@@ -46,22 +39,10 @@ type Arena struct {
 // New creates an arena. pages == 0 → 1 page (4 KiB default)
 func New(pages int, typ Allocator) *Arena {
 	if pages <= 0 {
-		pages = 1 // ← your request: treat 0 as 1
+		pages = 1
 	}
 	totalBytes := pages * syscall.Getpagesize()
-
-	var raw RawArena
-	switch typ {
-	case BUMP:
-		raw = NewBumpAllocator(totalBytes)
-	case SLAB:
-		raw = NewSlabAllocator(256, totalBytes) // configurable block size
-	case BUDDY:
-		raw = NewBuddyAllocator(syscall.Getpagesize(), pages)
-	default:
-		raw = NewBumpAllocator(totalBytes)
-	}
-	return &Arena{raw: raw}
+	return &Arena{raw: NewBumpAllocator(totalBytes)}
 }
 
 // Alloc any type T

@@ -47,7 +47,7 @@ func TestMakeObject_Simple(t *testing.T) {
 }
 
 func TestMakeObject_Complex(t *testing.T) {
-	a := New(1, BUDDY)
+	a := New(1, BUMP)
 	defer a.Delete()
 
 	obj := MakeObject[ComplexStruct](a)
@@ -146,7 +146,7 @@ func TestMakeObject_EmptyStruct(t *testing.T) {
 }
 
 func TestMakeObject_MultipleObjects(t *testing.T) {
-	a := New(10, SLAB)
+	a := New(10, BUMP)
 	defer a.Delete()
 
 	// Allocate multiple objects
@@ -206,8 +206,6 @@ func TestMakeObject_DifferentAllocators(t *testing.T) {
 		allocator Allocator
 	}{
 		{"BUMP", BUMP},
-		{"SLAB", SLAB},
-		{"BUDDY", BUDDY},
 	}
 
 	for _, tt := range tests {
@@ -287,7 +285,7 @@ func BenchmarkMakeObject_Simple(b *testing.B) {
 }
 
 func BenchmarkMakeObject_Complex(b *testing.B) {
-	a := New(1024, BUDDY)
+	a := New(1024, BUMP)
 	defer a.Delete()
 
 	b.ResetTimer()
