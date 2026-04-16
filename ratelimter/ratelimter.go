@@ -16,52 +16,68 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"sync"
+	"sync/atomic"
 	"time"
 )
 
+var ErrUserNotFound = errors.New("user not registered")
+
+type rateState struct {
+	numTokens  uint64
+	lastAccess int64
+}
+
 type Rate struct {
-	mu               sync.Mutex
+	state            atomic.Pointer[rateState]
 	numberOfRequests uint64
-	windowSize       uint64
-	lastAccess       int64
-	numTokens        uint64
+	consumptionRate  float64
 }
 
 func NewRate(n, k uint64) *Rate {
-	return &Rate{
+	r := &Rate{
 		numberOfRequests: n,
-		windowSize:       k,
-		lastAccess:       time.Now().UnixMilli(),
-		numTokens:        n,
+		consumptionRate:  float64(n) / float64(k),
 	}
+	r.state.Store(&rateState{
+		numTokens:  n,
+		lastAccess: time.Now().UnixMilli(),
+	})
+	return r
 }
 
-func (r *Rate) Tokens() int {
-	r.mu.Lock()
-	defer r.mu.Unlock()
-	var (
-		result               int   = 0
-		tokenConsumptionRate       = float64(r.numberOfRequests) / float64(r.windowSize)
-		currentAccess        int64 = time.Now().UnixMilli()
-		diff                       = currentAccess - r.lastAccess
-	)
-	// fmt.Println("diff: ", diff, currentAccess, r.lastAccess)
-	// Start thinking in terms of milliseconds.
-	// TODO: use READTSC for getting accurate ticks
+func (r *Rate) Allow() bool {
+	for {
+		old := r.state.Load()
+		currentAccess := time.Now().UnixMilli()
+		diff := currentAccess - old.lastAccess
 
-	// number of tokens availabe has to be calculated.
-	if diff >= 0 {
-		numTokens := float64(diff) * tokenConsumptionRate
-		r.numTokens = min(r.numberOfRequests, r.numTokens+uint64(numTokens))
-		r.lastAccess = currentAccess
-		if r.numTokens >= 1 {
-			r.numTokens -= 1
-			result = int(r.numTokens) + 1
+		newNumTokens := old.numTokens
+		newLastAccess := old.lastAccess
+		if diff >= 0 {
+			added := float64(diff) * r.consumptionRate
+			newNumTokens = min(r.numberOfRequests, old.numTokens+uint64(added))
+			// Advance lastAccess only by the time consumed by whole tokens,
+			// preserving the fractional remainder for future calls.
+			wholeTokens := uint64(added)
+			if wholeTokens > 0 {
+				newLastAccess = old.lastAccess + int64(float64(wholeTokens)/r.consumptionRate)
+			}
+		}
+
+		if newNumTokens < 1 {
+			return false
+		}
+
+		if r.state.CompareAndSwap(old, &rateState{
+			numTokens:  newNumTokens - 1,
+			lastAccess: newLastAccess,
+		}) {
+			return true
 		}
 	}
-	return result
 }
 
 type RateLimiter struct {
@@ -69,42 +85,33 @@ type RateLimiter struct {
 	mu          sync.RWMutex
 	users       map[string]*Rate
 	maxRequests int
-	windowSize  int64
 }
 
-func NewRateLimiter(maxRequests int, windowSizeMillis int64) *RateLimiter {
+func NewRateLimiter(maxRequests int) *RateLimiter {
 	return &RateLimiter{
 		maxRequests: maxRequests,
-		windowSize:  windowSizeMillis,
 		users:       make(map[string]*Rate),
 	}
 }
 
-func (rl *RateLimiter) Register(userId string, n, k uint64) {
+// Register adds a user with a rate limit of n requests per windowMillis milliseconds.
+func (rl *RateLimiter) Register(userId string, n uint64, windowMillis int64) {
 	rl.mu.Lock()
 	defer rl.mu.Unlock()
 	if _, ok := rl.users[userId]; !ok {
-		var (
-			windowSize  = k * uint64(rl.windowSize)
-			numRequests = min(n, uint64(rl.maxRequests))
-		)
-		rl.users[userId] = NewRate(numRequests, windowSize)
-	} else {
-		// User exists
-		// TODO: Handle the case where user already exists
+		numRequests := min(n, uint64(rl.maxRequests))
+		rl.users[userId] = NewRate(numRequests, uint64(windowMillis))
 	}
 }
 
-func (rl *RateLimiter) AllowRequest(userId string) bool {
+func (rl *RateLimiter) AllowRequest(userId string) (bool, error) {
 	rl.mu.RLock()
 	rate, ok := rl.users[userId]
 	rl.mu.RUnlock()
-	if ok && rate != nil {
-		if rate.Tokens() >= 1 {
-			return true
-		}
+	if !ok || rate == nil {
+		return false, ErrUserNotFound
 	}
-	return false
+	return rate.Allow(), nil
 }
 
 // Requirements
@@ -125,17 +132,20 @@ func (rl *RateLimiter) AllowRequest(userId string) bool {
 func main() {
 	fmt.Println("Starting the rate limiter example")
 
-	rl := NewRateLimiter(10, 1000)
-	rl.Register("u1", 5, 5)
+	rl := NewRateLimiter(10)
+	rl.Register("u1", 5, 5000) // 5 requests per 5000ms
 
-	fmt.Println(rl.AllowRequest("u1")) // 1: true
-	fmt.Println(rl.AllowRequest("u1")) // 2: true
-	fmt.Println(rl.AllowRequest("u1")) // 3: true
-	fmt.Println(rl.AllowRequest("u1")) // 4: true
-	fmt.Println(rl.AllowRequest("u1")) // 5: true
-	fmt.Println(rl.AllowRequest("u1")) // 6: false (bucket exhausted)
+	for i := 1; i <= 6; i++ {
+		allowed, err := rl.AllowRequest("u1")
+		fmt.Printf("%d: allowed=%v err=%v\n", i, allowed, err)
+	}
+
+	// unregistered user
+	allowed, err := rl.AllowRequest("u2")
+	fmt.Printf("u2: allowed=%v err=%v\n", allowed, err)
 
 	// (after 5 seconds)
 	time.Sleep(5 * time.Second)
-	fmt.Println(rl.AllowRequest("u1")) // 7: true (tokens replenished)
+	allowed, err = rl.AllowRequest("u1")
+	fmt.Printf("after sleep: allowed=%v err=%v\n", allowed, err)
 }
