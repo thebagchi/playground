@@ -1,0 +1,64 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: dummyresources.dummycontroller.k8s.io
+  labels:
+    app: dummy-operator
+spec:
+  group: dummycontroller.k8s.io
+  scope: Namespaced
+  names:
+    kind: DummyResource
+    plural: dummyresources
+    singular: dummyresource
+    shortNames:
+      - dummy
+      - dummies
+  versions:
+    - name: v1alpha1
+      served: true
+      storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          description: DummyResource is a dummy custom resource for demonstration
+          properties:
+            apiVersion:
+              type: string
+            kind:
+              type: string
+            metadata:
+              type: object
+            spec:
+              type: object
+              description: DummyResourceSpec defines the desired state
+              properties:
+                replicas:
+                  type: integer
+                  format: int32
+                  minimum: 1
+                  maximum: 10
+                  description: Number of replicas
+                message:
+                  type: string
+                  description: A dummy message
+                image:
+                  type: string
+                  description: Container image to use
+            status:
+              type: object
+              description: DummyResourceStatus defines the observed state
+              properties:
+                observedGeneration:
+                  type: integer
+                  format: int64
+                phase:
+                  type: string
+                  description: Phase of the resource
+                message:
+                  type: string
+                readyReplicas:
+                  type: integer
+                  format: int32
+      subresources:
+        status: {}

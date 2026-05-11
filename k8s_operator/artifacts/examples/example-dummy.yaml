@@ -1,0 +1,9 @@
+apiVersion: dummycontroller.k8s.io/v1alpha1
+kind: DummyResource
+metadata:
+  name: example-dummy
+  namespace: default
+spec:
+  replicas: 3
+  message: "This is a dummy resource"
+  image: "nginx:latest"

@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dummy-operator
+  namespace: default
+  labels:
+    app: dummy-operator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dummy-operator
+  template:
+    metadata:
+      labels:
+        app: dummy-operator
+    spec:
+      serviceAccountName: dummy-operator
+      containers:
+      - name: dummy-operator
+        image: localhost:5000/dummy-operator:latest
+        imagePullPolicy: IfNotPresent
+        args:
+          - --workers=2
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 256Mi
+        env:
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+          - name: POD_NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
